@@ -1,0 +1,60 @@
+---
+// Lightweight cookie-consent banner wired to Google Consent Mode v2.
+//
+// NOTE: For visitors in the EEA / UK / Switzerland, Google requires a
+// Google-CERTIFIED Consent Management Platform (CMP). The simplest compliant
+// option is Google's own free CMP, enabled in the AdSense dashboard under
+// "Privacy & messaging → European regulations message" — it auto-publishes and
+// is wired to Consent Mode automatically. This banner is a baseline UX layer +
+// Consent Mode integration for non-EEA traffic; it does not replace a certified
+// CMP for regulated regions.
+---
+
+<div id="cookie-banner" hidden
+  class="fixed inset-x-0 bottom-0 z-[60] border-t border-ink/10 p-4 md:bottom-4 md:left-1/2 md:right-auto md:max-w-md md:-translate-x-1/2 md:rounded-2xl md:border"
+  style="background: var(--c-surface); box-shadow: var(--shadow-card); padding-bottom: calc(1rem + env(safe-area-inset-bottom));"
+  role="dialog" aria-label="Cookie consent" aria-live="polite">
+  <p class="text-sm muted">
+    We use cookies for analytics and, if you consent, personalised ads. You can
+    change this anytime. See our <a href="/cookies" class="text-accent underline">Cookie Policy</a>.
+  </p>
+  <div class="mt-3 flex flex-wrap gap-2">
+    <button id="cc-accept" class="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90">Accept all</button>
+    <button id="cc-decline" class="inline-flex min-h-11 flex-1 items-center justify-center rounded-lg border border-ink/15 px-4 text-sm font-semibold transition hover:bg-ink/5">Decline</button>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    var KEY = 'consent_v2';
+    var banner = document.getElementById('cookie-banner');
+    if (!banner) return;
+    if (!localStorage.getItem(KEY)) banner.hidden = false;
+
+    function gtag() { window.dataLayer = window.dataLayer || []; window.dataLayer.push(arguments); }
+
+    function set(granted) {
+      var state = {
+        ad_storage: granted ? 'granted' : 'denied',
+        ad_user_data: granted ? 'granted' : 'denied',
+        ad_personalization: granted ? 'granted' : 'denied',
+        analytics_storage: granted ? 'granted' : 'denied',
+      };
+      gtag('consent', 'update', state);
+      try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+      banner.hidden = true;
+    }
+
+    document.getElementById('cc-accept').addEventListener('click', function () { set(true); });
+    document.getElementById('cc-decline').addEventListener('click', function () { set(false); });
+
+    // Allow reopening from a "Cookie settings" link anywhere (href="#cookie-settings").
+    document.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && t.closest && t.closest('[data-cookie-settings]')) {
+        e.preventDefault();
+        banner.hidden = false;
+      }
+    });
+  })();
+</script>

@@ -1,11 +1,15 @@
 ---
 import '../styles/global.css';
+import ConsentBanner from '../components/ConsentBanner.astro';
+import { ADSENSE_PUB_ID } from '../consts';
 
 interface Props {
   title?: string;
   description?: string;
   noindex?: boolean;
 }
+
+const adsenseEnabled = ADSENSE_PUB_ID.length > 0;
 
 const {
   title = 'Em Dash Remover — Free AI Text Cleaner',
@@ -25,6 +29,7 @@ const ogImage = new URL(`/open-graph/${ogId}.png`, Astro.site).href;
 
 const nav = [
   { href: '/', label: 'Tool' },
+  { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
 ];
@@ -56,6 +61,32 @@ const orgGraph = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <!-- Google Consent Mode v2 — default DENIED, must load before any ad/analytics tag. -->
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500,
+      });
+      try {
+        var saved = JSON.parse(localStorage.getItem('consent_v2') || 'null');
+        if (saved) gtag('consent', 'update', saved);
+      } catch (e) {}
+    </script>
+
+    {adsenseEnabled && (
+      <script
+        is:inline
+        async
+        src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_PUB_ID}`}
+        crossorigin="anonymous"></script>
+    )}
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -112,15 +143,20 @@ const orgGraph = {
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <p>🔒 100% client-side — your text never leaves your browser.</p>
           <nav class="flex flex-wrap gap-x-5 gap-y-2">
+            <a href="/blog" class="inline-flex min-h-11 items-center hover:text-accent">Blog</a>
             <a href="/about" class="inline-flex min-h-11 items-center hover:text-accent">About</a>
             <a href="/contact" class="inline-flex min-h-11 items-center hover:text-accent">Contact</a>
             <a href="/privacy" class="inline-flex min-h-11 items-center hover:text-accent">Privacy</a>
+            <a href="/cookies" class="inline-flex min-h-11 items-center hover:text-accent">Cookies</a>
             <a href="/terms" class="inline-flex min-h-11 items-center hover:text-accent">Terms</a>
+            <a href="#" data-cookie-settings class="inline-flex min-h-11 items-center hover:text-accent">Cookie settings</a>
           </nav>
         </div>
         <p class="mt-6 text-xs">© {new Date().getFullYear()} Em Dash Remover. All rights reserved.</p>
       </div>
     </footer>
+
+    <ConsentBanner />
 
     <script is:inline>
       document.getElementById('theme-toggle')?.addEventListener('click', () => {

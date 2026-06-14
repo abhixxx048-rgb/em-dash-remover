@@ -1,68 +1,127 @@
 ---
 import Page from '../layouts/Page.astro';
+import { CONTACT_EMAIL } from '../consts';
 ---
 
 <Page
   title="Privacy Policy"
   heading="Privacy Policy"
   updated="June 15, 2026"
-  description="How Em Dash Remover handles your data — short version: your text never leaves your browser."
+  description="How Em Dash Remover handles your data — your text never leaves your browser. Full disclosure of cookies, analytics, and advertising."
 >
   <p>
     <strong>The short version:</strong> the text you paste into Em Dash Remover never
-    leaves your device. All processing happens locally in your browser. We don't
-    upload, store, or log your content. You can verify this yourself: open your
+    leaves your device. All text processing happens locally in your browser. We
+    don't upload, store, or log the content you clean. You can verify this: open your
     browser's developer tools, go to the Network tab, and watch — there are no
     requests while you clean text. The tool even works with your internet turned off.
+  </p>
+  <p>
+    This page explains, in full, what limited data the website itself involves
+    (cookies, analytics, and advertising) so you can make informed choices.
   </p>
 
   <h2>1. Text you process</h2>
   <p>
-    Any text you enter is processed entirely client-side (in your browser). It is
-    never transmitted to us or any third party. We have no access to it and keep no
-    copies.
+    Any text you enter into the cleaner is processed entirely client-side (in your
+    browser). It is never transmitted to us or any third party, and we keep no copies.
   </p>
 
   <h2>2. Local storage</h2>
   <p>
-    We use your browser's local storage to remember your preferences — such as your
-    chosen cleanup options and light/dark theme — so the tool behaves the way you
-    like on your next visit. This data stays on your device and is never sent to us.
-    You can clear it at any time through your browser settings.
+    We use your browser's local storage to remember your preferences — your chosen
+    cleanup options, theme, and cookie-consent choice — so the tool behaves the way
+    you like next time. This data stays on your device and is never sent to us. You
+    can clear it any time via your browser settings.
   </p>
 
-  <h2>3. Analytics</h2>
+  <h2>3. Cookies</h2>
   <p>
-    We may use privacy-friendly, cookieless analytics to understand aggregate traffic
-    (such as page views and referrers). These tools do not track you across sites,
-    do not build advertising profiles, and never receive the text you process.
+    The core tool does not require cookies to function. Cookies on this site come
+    from two optional sources, both of which depend on your consent: analytics and
+    advertising (described below). When you first visit, you can <strong>Accept</strong>
+    or <strong>Decline</strong> these via our cookie banner, and change your choice
+    anytime through the <a href="#" data-cookie-settings>Cookie settings</a> link in
+    the footer. See our <a href="/cookies">Cookie Policy</a> for details.
   </p>
 
-  <h2>4. Cookies</h2>
+  <h2>4. Advertising &amp; Google AdSense</h2>
   <p>
-    The core tool does not require cookies to function. Any cookies used are limited
-    to essential or privacy-respecting analytics purposes described above.
+    We may display advertising served by Google AdSense to keep this tool free.
+    The following disclosures are required by Google:
+  </p>
+  <ul>
+    <li>
+      Third-party vendors, including Google, use cookies to serve ads based on a
+      user's prior visits to this website or other websites.
+    </li>
+    <li>
+      Google's use of advertising cookies enables it and its partners to serve ads
+      to you based on your visit to this and/or other sites on the Internet.
+    </li>
+    <li>
+      You may opt out of personalised advertising by visiting
+      <a href="https://www.google.com/settings/ads" rel="nofollow noopener" target="_blank">Google Ads Settings</a>.
+    </li>
+    <li>
+      You can also opt out of a third-party vendor's use of cookies for personalised
+      advertising at
+      <a href="https://www.aboutads.info/choices/" rel="nofollow noopener" target="_blank">aboutads.info</a>
+      and
+      <a href="https://optout.networkadvertising.org/" rel="nofollow noopener" target="_blank">optout.networkadvertising.org</a>.
+    </li>
+  </ul>
+  <p>
+    For visitors in the European Economic Area, the United Kingdom, and Switzerland,
+    we use a Google-certified consent management platform and Google Consent Mode so
+    that personalised advertising and analytics cookies are only used after you give
+    consent. Until you consent, ads (if shown) are limited and non-personalised.
   </p>
 
-  <h2>5. Third-party services</h2>
+  <h2>5. Analytics</h2>
   <p>
-    Our website is served through standard hosting and content-delivery
-    infrastructure, which may process basic technical information (like your IP
-    address) to deliver the page, as is normal for any website. This is not linked to
-    the text you clean.
+    We may use privacy-friendly analytics to understand aggregate traffic (such as
+    page views and referrers). These tools do not receive the text you process. Where
+    analytics rely on cookies, they are loaded only after you consent.
   </p>
 
-  <h2>6. Your rights</h2>
+  <h2>6. Your rights (GDPR / UK GDPR)</h2>
   <p>
-    Because we don't collect or store your personal content, there's little personal
-    data for us to hold. If you have any questions about your privacy, contact us via
-    our <a href="/contact">contact page</a>.
+    If you are in the EEA or UK, you have the right to access, correct, or delete your
+    personal data, to object to or restrict its processing, and to data portability.
+    Because we don't collect or store your text or build user profiles ourselves,
+    most personal data on this site is handled by the third parties named above under
+    their own policies (see
+    <a href="https://policies.google.com/privacy" rel="nofollow noopener" target="_blank">Google's Privacy Policy</a>).
+    You can exercise consent choices at any time via the cookie banner.
   </p>
 
-  <h2>7. Changes to this policy</h2>
+  <h2>7. Your rights (CCPA / California)</h2>
   <p>
-    We may update this Privacy Policy from time to time. Any changes will be posted
-    on this page with an updated revision date.
+    If you are a California resident, you have the right to know what personal
+    information is collected, to request deletion, and to opt out of the "sale" or
+    "sharing" of personal information. We do not sell your personal information. You
+    can limit advertising cookies using the opt-out links in section 4 or by
+    declining via our cookie banner.
+  </p>
+
+  <h2>8. Children's privacy</h2>
+  <p>
+    This site is not directed to children under 13, and we do not knowingly collect
+    personal information from them.
+  </p>
+
+  <h2>9. Changes to this policy</h2>
+  <p>
+    We may update this Privacy Policy from time to time. Changes will be posted on
+    this page with an updated revision date.
+  </p>
+
+  <h2>10. Contact</h2>
+  <p>
+    Questions about your privacy? Email us at
+    <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a> or use our
+    <a href="/contact">contact page</a>.
   </p>
 
   <p class="text-sm muted">
