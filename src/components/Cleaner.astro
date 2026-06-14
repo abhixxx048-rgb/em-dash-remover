@@ -1,0 +1,361 @@
+---
+// The one interactive island. Static HTML; behavior wired up by the client
+// script, which imports the pure engine + jsdiff for the before/after view.
+---
+
+<section id="tool" aria-label="Text cleaner" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Em dash →</span>
+        <select id="opt-dash" class="ctl px-3">
+          <option value="smart">Smart (context-aware)</option>
+          <option value="comma">Comma</option>
+          <option value="period">Period</option>
+          <option value="colon">Colon</option>
+          <option value="parentheses">Parentheses</option>
+          <option value="space">Space</option>
+          <option value="remove">Remove</option>
+        </select>
+      </label>
+
+      <details class="group relative w-full sm:w-auto">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Cleanup options <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 w-full space-y-1 p-2 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-64 sm:p-3 sm:shadow-lg">
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-en" checked class="h-5 w-5" /> En dashes</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-quotes" checked class="h-5 w-5" /> Smart → straight quotes</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-ellipsis" checked class="h-5 w-5" /> Ellipsis character → ...</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-invis" checked class="h-5 w-5" /> Invisible / watermark chars</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-ws" checked class="h-5 w-5" /> Collapse extra whitespace</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-md" class="h-5 w-5" /> Strip markdown (**, ##)</label>
+        </div>
+      </details>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Result</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to clean"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste AI text — or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="email" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✉️ AI email</button>
+              <button data-sample="linkedin" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💼 LinkedIn post</button>
+              <button data-sample="essay" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📝 Essay</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats">0 words · 0 chars</p>
+      </div>
+
+      <!-- Output -->
+      <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <div class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
+            <button id="view-clean" class="min-h-9 rounded-md px-3 font-medium">Cleaned</button>
+            <button id="view-diff" class="min-h-9 rounded-md px-3 font-medium muted">Diff</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download cleaned text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <textarea id="output" rows="14" readonly aria-label="Cleaned text"
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+        <div id="diff" hidden
+          class="h-[calc(14*1.625em+1.5rem)] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed"
+          style="background: var(--c-paper);"></div>
+      </div>
+    </div>
+
+    <!-- Score + summary -->
+    <div class="grid items-center gap-5 border-t border-ink/8 px-4 py-4 sm:grid-cols-[auto_1fr]">
+      <div class="flex items-center gap-4">
+        <div class="relative h-20 w-20 shrink-0">
+          <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+            <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+            <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+              stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+              style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span class="text-[9px] muted">/ 100</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide muted">AI-tell score</p>
+          <p id="band" class="text-sm font-semibold">Paste text to scan</p>
+          <p id="fixed" class="mt-0.5 text-xs text-emerald-600" aria-live="polite"></p>
+          <button id="share" class="mt-1 text-xs font-medium text-accent hover:underline" hidden>↗ Share my score</button>
+        </div>
+      </div>
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wide muted">What we found</span>
+        <ul id="tells" class="mt-1.5 flex flex-wrap gap-1.5 text-xs" aria-live="polite"></ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<script>
+  import { clean, DEFAULT_OPTIONS, type CleanOptions, type DashStyle } from '../lib/cleaner';
+  import { scan, stats } from '../lib/ai-tells';
+  import { diffWords } from 'diff';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+  const diffEl = $<HTMLDivElement>('diff');
+
+  const SAMPLES: Record<string, string> = {
+    email: `Hi team — I wanted to delve into our Q3 results. It's not just about the numbers, it's about the story they tell. We've leveraged a robust, multifaceted strategy to unlock our full potential — and it's a testament to everyone's hard work. Moreover, it's worth noting that our seamless integration paved the way for success.`,
+    linkedin: `🚀 Let's be honest — most people get this wrong. I used to think success was about working harder. It's not. It's about working smarter. Here's the thing: in today's fast-paced world, you need to harness the power of focus. Three things changed everything for me: clarity, consistency, and courage. The future belongs to those who delve deeper. Agree?`,
+    essay: `The Industrial Revolution stands as a testament to human ingenuity. It fundamentally reshaped society — transforming economies, redefining labor, and revolutionizing daily life. In the realm of manufacturing, it underscored the pivotal role of innovation. Ultimately, it's important to note that this transformative era laid the cornerstone for the modern world.`,
+  };
+
+  function readOptions(): CleanOptions {
+    return {
+      ...DEFAULT_OPTIONS,
+      dashStyle: $<HTMLSelectElement>('opt-dash').value as DashStyle,
+      enDashes: $<HTMLInputElement>('opt-en').checked,
+      smartQuotes: $<HTMLInputElement>('opt-quotes').checked,
+      ellipsis: $<HTMLInputElement>('opt-ellipsis').checked,
+      invisibles: $<HTMLInputElement>('opt-invis').checked,
+      whitespace: $<HTMLInputElement>('opt-ws').checked,
+      markdown: $<HTMLInputElement>('opt-md').checked,
+    };
+  }
+
+  // --- persistence
+  const OPT_IDS = ['opt-dash', 'opt-en', 'opt-quotes', 'opt-ellipsis', 'opt-invis', 'opt-ws', 'opt-md'];
+  function saveOpts() {
+    const s: Record<string, string | boolean> = {};
+    s['opt-dash'] = $<HTMLSelectElement>('opt-dash').value;
+    for (const id of OPT_IDS.slice(1)) s[id] = $<HTMLInputElement>(id).checked;
+    localStorage.setItem('opts', JSON.stringify(s));
+  }
+  function loadOpts() {
+    try {
+      const s = JSON.parse(localStorage.getItem('opts') || '{}');
+      if (s['opt-dash']) $<HTMLSelectElement>('opt-dash').value = s['opt-dash'];
+      for (const id of OPT_IDS.slice(1)) if (id in s) $<HTMLInputElement>(id).checked = s[id];
+    } catch {}
+  }
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(to); el.dataset.v = String(to); return; }
+    const from = parseInt(el.dataset.v || '0', 10);
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // --- diff rendering
+  function renderDiff(before: string, after: string) {
+    diffEl.innerHTML = '';
+    for (const part of diffWords(before, after)) {
+      const span = document.createElement('span');
+      if (part.added) span.className = 'diff-ins';
+      else if (part.removed) span.className = 'diff-del';
+      span.textContent = part.value;
+      diffEl.appendChild(span);
+    }
+  }
+
+  const RING = 213.6;
+  let lastScore = 0;
+  let cleanedTotalBefore = 0;
+
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const st = stats(src);
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${st.words} word${st.words === 1 ? '' : 's'} · ${st.chars} chars` + (st.words ? ` · ${st.readingMin} min read` : '');
+
+    const { text, counts } = clean(src, readOptions());
+    output.value = text;
+    $<HTMLButtonElement>('copy').disabled = text.length === 0;
+    ($('copy-bar') as HTMLButtonElement).disabled = text.length === 0;
+    $<HTMLButtonElement>('share').hidden = src.trim().length === 0;
+    renderDiff(src, text);
+
+    // "fixed N" pill
+    if (counts.total > 0) {
+      $<HTMLParagraphElement>('fixed').textContent = `✓ Cleaned ${counts.total} item${counts.total === 1 ? '' : 's'}`;
+    } else {
+      $<HTMLParagraphElement>('fixed').textContent = '';
+    }
+
+    const report = scan(text);
+    const scoreNum = $<HTMLSpanElement>('score-num');
+    if (!src.trim()) {
+      scoreNum.textContent = '—'; scoreNum.dataset.v = '0';
+      $<SVGCircleElement>('ring' as any).style.strokeDashoffset = String(RING);
+      $<HTMLParagraphElement>('band').textContent = 'Paste text to scan';
+    } else {
+      animateCount(scoreNum, report.score);
+      const ring = document.getElementById('ring') as unknown as SVGCircleElement;
+      ring.style.strokeDashoffset = String(RING * (1 - report.score / 100));
+      const color = report.band === 'human' ? 'var(--color-ok)' : report.band === 'some' ? 'var(--color-warn)' : 'var(--color-bad)';
+      ring.style.stroke = color;
+      $<HTMLParagraphElement>('band').textContent =
+        report.band === 'human' ? '✓ Reads human' : report.band === 'some' ? 'Some AI tells' : 'Heavy AI tells';
+    }
+    lastScore = report.score;
+
+    const tellsEl = $<HTMLUListElement>('tells');
+    tellsEl.innerHTML = '';
+    if (!src.trim()) {
+      tellsEl.innerHTML = '<li class="muted">Paste text to scan.</li>';
+    } else if (report.tells.length === 0) {
+      tellsEl.innerHTML = '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">No tells found — reads human ✓</li>';
+    } else {
+      for (const t of report.tells) {
+        const li = document.createElement('li');
+        li.className = 'rounded-full bg-accent-soft px-2 py-0.5 text-accent';
+        li.style.background = 'var(--c-accent-soft)';
+        li.textContent = `${t.label}: ${t.count}`;
+        if (t.examples.length) li.title = t.examples.join(' · ');
+        tellsEl.appendChild(li);
+      }
+    }
+  }
+
+  // debounced
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  OPT_IDS.forEach((id) => $(id).addEventListener('change', () => { saveOpts(); run(); }));
+
+  // samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!]; run(); setPane('output'); }));
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- shared actions (bound to both in-card and sticky-bar buttons)
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value);
+    const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+    b.textContent = '✓ Copied'; toast('Copied to clipboard');
+    setTimeout(() => (b.textContent = prev), 1300);
+  }
+  function doReset() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // download
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    const blob = new Blob([output.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'cleaned.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded cleaned.txt');
+  });
+
+  // share score
+  $<HTMLButtonElement>('share').addEventListener('click', async () => {
+    const msg = `My text scored ${lastScore}/100 on the AI-tell test. Check yours: ${location.origin}`;
+    try { await navigator.share({ text: msg }); }
+    catch { await navigator.clipboard.writeText(msg); toast('Share text copied'); }
+  });
+
+  // view toggle
+  function setView(diff: boolean) {
+    output.hidden = diff; diffEl.hidden = !diff;
+    $<HTMLButtonElement>('view-clean').classList.toggle('muted', diff);
+    $<HTMLButtonElement>('view-diff').classList.toggle('muted', !diff);
+    $<HTMLButtonElement>('view-clean').style.background = diff ? '' : 'var(--c-accent-soft)';
+    $<HTMLButtonElement>('view-diff').style.background = diff ? 'var(--c-accent-soft)' : '';
+  }
+  $<HTMLButtonElement>('view-clean').addEventListener('click', () => setView(false));
+  $<HTMLButtonElement>('view-diff').addEventListener('click', () => setView(true));
+
+  // keyboard
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); }
+  });
+
+  loadOpts(); setView(false); setPane('input'); run();
+</script>

@@ -1,0 +1,50 @@
+---
+import Page from '../layouts/Page.astro';
+
+const EMAIL = 'hello@emdashremover.app';
+---
+
+<Page
+  title="Contact Us"
+  heading="Contact us"
+  description="Get in touch with the Em Dash Remover team — feedback, bug reports, and partnership enquiries."
+>
+  <p>
+    Questions, feedback, bug reports, or partnership ideas? We read everything.
+    Email us directly at <a href={`mailto:${EMAIL}`}>{EMAIL}</a>, or use the form below.
+  </p>
+
+  <form id="contact-form" class="not-prose mt-6 space-y-4">
+    <div>
+      <label for="name" class="mb-1 block text-sm font-medium">Name</label>
+      <input id="name" name="name" type="text" required class="ctl w-full px-3 py-2" />
+    </div>
+    <div>
+      <label for="email" class="mb-1 block text-sm font-medium">Your email</label>
+      <input id="email" name="email" type="email" required class="ctl w-full px-3 py-2" />
+    </div>
+    <div>
+      <label for="message" class="mb-1 block text-sm font-medium">Message</label>
+      <textarea id="message" name="message" rows="6" required class="ctl w-full px-3 py-2"></textarea>
+    </div>
+    <button type="submit" class="rounded-lg bg-accent px-5 py-2.5 font-semibold text-white transition hover:opacity-90">
+      Send message
+    </button>
+    <p class="text-xs muted">
+      Submitting opens your email app with the message pre-filled — nothing is sent or
+      stored by this website.
+    </p>
+  </form>
+
+  <script is:inline define:vars={{ EMAIL }}>
+    document.getElementById('contact-form')?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = (document.getElementById('name')).value;
+      const email = (document.getElementById('email')).value;
+      const message = (document.getElementById('message')).value;
+      const subject = encodeURIComponent(`Contact form — ${name}`);
+      const body = encodeURIComponent(`${message}\n\n— ${name} (${email})`);
+      window.location.href = `mailto:${EMAIL}?subject=${subject}&body=${body}`;
+    });
+  </script>
+</Page>

@@ -1,0 +1,187 @@
+---
+import Base from '../layouts/Base.astro';
+import Cleaner from '../components/Cleaner.astro';
+
+const faqs = [
+  {
+    q: 'Why do people remove em dashes from AI text?',
+    a: 'Heavy em-dash use (—) is one of the most recognizable "tells" of AI-generated writing. Models like ChatGPT and Claude lean on em dashes far more than most human writers, so cleaning them up helps your text read naturally.',
+  },
+  {
+    q: 'How is this different from other em dash removers?',
+    a: 'Most tools do a blind find-and-replace (every em dash becomes a comma), which creates comma splices and broken sentences. Our Smart mode looks at the surrounding words and picks the right fix — a comma, semicolon, colon, period, or parentheses — so the grammar stays correct.',
+  },
+  {
+    q: 'Does my text get sent to a server?',
+    a: 'No. All cleaning happens entirely in your browser. Nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. The tool even works offline.',
+  },
+  {
+    q: 'What else does it clean besides em dashes?',
+    a: 'En dashes, curly "smart" quotes, ellipsis characters, non-breaking spaces, invisible zero-width / watermark characters, extra whitespace, and (optionally) leftover markdown. It also scans for AI cliché phrases and overused vocabulary.',
+  },
+  {
+    q: 'How do I remove em dashes in Word or Google Docs?',
+    a: 'The fastest way is to paste your text into this tool, copy the cleaned result, and paste it back. You can also use Find & Replace in Word or Google Docs and search for the em dash character (—), but that does a blind replace and will not fix the grammar around it.',
+  },
+  {
+    q: 'Is it free?',
+    a: 'Yes — completely free, no signup, no limits.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}#app`,
+  name: 'AI Em Dash Remover & Text Cleaner',
+  url: Astro.site,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Remove em dashes from text',
+    'Grammar-aware em dash replacement',
+    'Clean AI-generated text from ChatGPT, Claude and Gemini',
+    'Remove invisible / zero-width / watermark characters',
+    'Convert smart quotes to straight quotes',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Em Dash Remover – Free AI Text Cleaner (No Signup)"
+  description="Instantly remove em dashes, smart quotes and invisible characters from ChatGPT and AI text. Grammar-aware, free, no signup — runs 100% in your browser."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Em Dash Remover — clean AI text the smart way.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Strip em dashes, smart quotes, invisible characters and other AI tells
+        from your text — with <strong>grammar-aware</strong> replacements, not a
+        blind find-and-replace. Clean AI writing for real quality, keep your
+        human voice.
+      </p>
+    </header>
+
+    <Cleaner />
+
+    <!-- Value props -->
+    <section class="mx-auto mt-16 max-w-5xl px-4">
+      <div class="grid gap-6 sm:grid-cols-3">
+        <div class="card p-5">
+          <h2 class="font-semibold">Grammar-correct, not just deleted</h2>
+          <p class="mt-1.5 text-sm muted">An em dash does many jobs. Smart mode picks a comma, colon, semicolon or parentheses based on the sentence — so you never get a comma splice.</p>
+        </div>
+        <div class="card p-5">
+          <h2 class="font-semibold">Your text never leaves your browser</h2>
+          <p class="mt-1.5 text-sm muted">No upload, no server, no logging. Provable privacy — check the Network tab. Safe for confidential work.</p>
+        </div>
+        <div class="card p-5">
+          <h2 class="font-semibold">More than dashes</h2>
+          <p class="mt-1.5 text-sm muted">Invisible watermark characters, smart quotes, AI cliché phrases and overused words — all caught in one pass, with a live AI-tell score.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">What is an em dash (—) and why remove it?</h2>
+      <p class="muted">
+        An em dash (—) is the longest dash in typography, wider than a hyphen (-)
+        and an en dash (–). Writers use it to add a dramatic pause, insert an aside,
+        or join related ideas. Used sparingly, it is excellent punctuation. The
+        problem is that AI writing tools <em>overuse</em> it dramatically — studies of
+        AI-generated text find em dashes appearing several times more often than in
+        typical human writing. That makes the em dash one of the clearest signs that
+        a piece was drafted by ChatGPT, Claude or Gemini.
+      </p>
+
+      <h2 class="text-2xl font-bold">Why does AI text contain so many em dashes?</h2>
+      <p class="muted">
+        Large language models learn punctuation patterns from huge amounts of web
+        and book text, and they gravitate to the em dash because it is a flexible,
+        always-grammatical connector. Combined with markdown formatting leaking into
+        prose, the result is text peppered with dashes. Removing them — and the other
+        tells like curly quotes and invisible characters — instantly makes writing
+        read more naturally and personally.
+      </p>
+
+      <h2 class="text-2xl font-bold">How to remove em dashes from text</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Paste your text into the cleaner box above (or click an example).</li>
+        <li>Choose how em dashes should be replaced — <strong>Smart</strong> mode picks the grammatically correct fix automatically.</li>
+        <li>Review the cleaned result, or switch to <strong>Diff</strong> view to see exactly what changed.</li>
+        <li>Click <strong>Copy</strong> and paste the clean text wherever you need it.</li>
+      </ol>
+      <p class="muted">
+        It works the same whether your text came from ChatGPT, an email draft, a
+        LinkedIn post, or a school essay. Because everything runs in your browser,
+        you can clean confidential text safely — nothing is uploaded.
+      </p>
+
+      <h3 class="text-lg font-semibold">Removing em dashes in Word or Google Docs</h3>
+      <p class="muted">
+        Microsoft Word and Google Docs both have Find &amp; Replace, but searching for
+        "—" and replacing it with a comma is a blind swap that often breaks your
+        sentences. For correct results, paste your text here first, let Smart mode fix
+        the grammar, then copy it back into your document.
+      </p>
+
+      <h2 class="text-2xl font-bold">What else this tool cleans</h2>
+      <p class="muted">
+        Em dashes are only one AI tell. This cleaner also removes en dashes,
+        converts curly "smart" quotes and apostrophes to straight ones, expands the
+        ellipsis character (…) to three dots, strips non-breaking spaces and
+        invisible zero-width "watermark" characters, and can remove leftover markdown.
+        It also scores your text for clichéd phrases and overused AI vocabulary so you
+        can see — and fix — what makes writing sound robotic.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+  </style>
+</Base>
