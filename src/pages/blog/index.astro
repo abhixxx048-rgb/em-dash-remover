@@ -7,27 +7,101 @@ const posts = (await getCollection('blog')).sort(
 );
 
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+const [lead, ...rest] = posts;
 ---
 
 <Base
   title="Blog - Writing, Punctuation & AI Text Guides"
   description="Guides on em dashes, punctuation, and editing AI-assisted writing. Learn the rules and clean up your text."
 >
-  <main class="mx-auto max-w-3xl px-4 py-12">
-    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">The Blog</h1>
-    <p class="mt-3 text-lg muted">
-      Practical guides on punctuation, the em dash, and editing AI-assisted writing
-      into your own clear, natural voice.
-    </p>
+  <main class="mx-auto max-w-3xl px-4 py-14">
+    <header>
+      <p class="eyebrow text-mark">From the desk · field notes</p>
+      <h1 class="mt-4 text-4xl tracking-tight sm:text-5xl">The Margin Notes</h1>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed muted">
+        Practical guides on punctuation, the em dash, and editing AI-assisted
+        writing back into your own clear, natural voice.
+      </p>
+    </header>
 
-    <div class="mt-10 space-y-4">
-      {posts.map((post) => (
-        <a href={`/blog/${post.id}`} class="card block p-5 transition hover:border-accent">
-          <h2 class="text-lg font-bold">{post.data.title}</h2>
-          <p class="mt-1.5 text-sm muted">{post.data.description}</p>
-          <p class="mt-2 text-xs muted">{fmt(post.data.pubDate)}</p>
-        </a>
-      ))}
-    </div>
+    <hr class="rule-dash mt-10" />
+
+    {lead && (
+      <a href={`/blog/${lead.id}`} class="entry entry-lead group block">
+        <p class="entry-meta">
+          <span class="eyebrow text-mark">Latest</span>
+          <span aria-hidden="true" class="entry-dot">·</span>
+          <time datetime={iso(lead.data.pubDate)} class="entry-date">{fmt(lead.data.pubDate)}</time>
+        </p>
+        <h2 class="entry-title entry-title-lead mt-3">{lead.data.title}</h2>
+        <p class="mt-2.5 leading-relaxed muted">{lead.data.description}</p>
+        <span class="entry-cta mt-3 inline-block">Read the proof →</span>
+      </a>
+    )}
+
+    {rest.length > 0 && (
+      <>
+        <p class="eyebrow muted mt-14 mb-2">More from the archive</p>
+        <ol class="entry-list">
+          {rest.map((post) => (
+            <li>
+              <a href={`/blog/${post.id}`} class="entry group block">
+                <p class="entry-meta">
+                  <time datetime={iso(post.data.pubDate)} class="entry-date">{fmt(post.data.pubDate)}</time>
+                </p>
+                <h2 class="entry-title mt-1.5">{post.data.title}</h2>
+                <p class="mt-1.5 text-sm leading-relaxed muted">{post.data.description}</p>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </>
+    )}
   </main>
+
+  <style is:global>
+    .entry-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .entry-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--c-muted);
+    }
+    .entry-dot { color: color-mix(in srgb, var(--c-ink) 30%, transparent); }
+
+    .entry-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+      font-size: 1.3rem;
+      transition: color 0.15s;
+    }
+    .entry-title-lead { font-size: 2rem; line-height: 1.08; }
+    .entry:hover .entry-title { color: var(--color-accent); }
+
+    .entry-lead { padding: 1.6rem 0 1.9rem; }
+    .entry-cta {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.04em;
+      color: var(--color-accent);
+    }
+
+    /* The archive: ruled-paper rows with a hairline between entries. */
+    .entry-list { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+    .entry-list > li { border-top: 1px solid color-mix(in srgb, var(--c-ink) 12%, transparent); }
+    .entry-list > li:last-child { border-bottom: 1px solid color-mix(in srgb, var(--c-ink) 12%, transparent); }
+    .entry-list .entry { padding: 1.4rem 0; }
+
+    @media (min-width: 640px) {
+      .entry-title-lead { font-size: 2.4rem; }
+    }
+  </style>
 </Base>

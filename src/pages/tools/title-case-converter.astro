@@ -1,0 +1,242 @@
+---
+import Base from '../../layouts/Base.astro';
+import CaseConverter from '../../components/tools/CaseConverter.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+
+const faqs = [
+  {
+    q: 'How do I convert text to title case?',
+    a: 'Paste your heading into the box above, leave the mode on Title Case, pick a style guide (AP, Chicago, APA or MLA), and the converter capitalizes the major words while lowercasing small words like "the", "of" and "and" instantly. Then press Copy and paste your titled headline wherever you need it.',
+  },
+  {
+    q: 'What is the difference between AP and Chicago title case?',
+    a: 'The main difference is prepositions. AP capitalizes prepositions of four or more letters (From, With, Into, Over) and lowercases short ones (of, in, to, at). Chicago lowercases all prepositions regardless of length, capitalizes "yet" and "so" as well, and capitalizes only the first part of a hyphenated compound. This generator applies each rule set automatically when you switch styles.',
+  },
+  {
+    q: 'Is "and" capitalized in a title?',
+    a: 'No. "And" is a coordinating conjunction, so AP, Chicago, APA and MLA all lowercase it in the middle of a title - unless it happens to be the first or last word, which is always capitalized regardless of style.',
+  },
+  {
+    q: 'Which words are not capitalized in title case?',
+    a: 'In standard title case the articles a, an and the, the coordinating conjunctions and, but, or, nor and for, and short prepositions (of, in, to, on, at, by) stay lowercase in the middle of a title. Every style still capitalizes the first word, the last word, and the first word after a colon.',
+  },
+  {
+    q: 'Why does Word’s "Capitalize Each Word" get titles wrong?',
+    a: 'Word and Google Docs simply capitalize the first letter of every word, including little words like "the", "of" and "and" that proper title case should lowercase. This title case generator applies real style-guide small-word lists, so you get a correctly capitalized headline instead of Every Word Capitalized.',
+  },
+  {
+    q: 'Do I have to capitalize the first word after a colon?',
+    a: 'You do not have to do it manually - the generator does it for you. Across AP, Chicago, APA and MLA, the first word of a subtitle (the word right after a colon) is always capitalized, and the tool handles it automatically.',
+  },
+  {
+    q: 'Is this title case generator free, and do I need to sign up?',
+    a: 'It is completely free with no signup, no registration and no download. Open the page and start capitalizing your title - there are no limits, watermarks or paywalls.',
+  },
+  {
+    q: 'Is my text uploaded when I generate a title?',
+    a: 'No. Everything runs in your browser using plain JavaScript, so your headlines are never uploaded, stored or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. The tool also works offline.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/title-case-converter#app`,
+  name: 'Title Case Converter - AP & Chicago Title Case Generator',
+  url: `${Astro.site}tools/title-case-converter`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  dateModified: '2026-06-15',
+  featureList: [
+    'Convert headlines to title case in one click',
+    'AP, Chicago (CMOS), APA 7 and MLA style guides',
+    'Correct lowercasing of articles, conjunctions and short prepositions',
+    'Automatic first-word, last-word and post-colon capitalization',
+    'Brand-name and acronym preservation (iPhone, NASA)',
+    'Runs fully in-browser - no upload, works offline',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to convert a headline to title case',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Paste your title',
+      text: 'Type or paste your headline into the converter box above (or tap an example).',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Keep Title Case selected',
+      text: 'The tool opens in Title Case mode - leave it selected so the major words are capitalized and small words stay lowercase.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Choose your style guide',
+      text: 'Pick AP, Chicago, APA or MLA from the Style guide menu and the capitalized title updates live.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Copy the title',
+      text: 'Press Copy (or Ctrl/Cmd + Enter) and paste the correctly capitalized title wherever you need it.',
+    },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Title Case Converter - AP & Chicago Title Case Generator"
+  description="Free title case converter and generator. Capitalize headlines in AP, Chicago, APA or MLA style - small words lowercased correctly - in one click. No signup, in-browser, private."
+>
+  <main class="halo">
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Title case &middot; AP &amp; Chicago &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Title Case Converter
+      </h1>
+      <p class="lede mt-4 max-w-2xl">
+        Paste a headline and get it back correctly capitalized &mdash; major
+        words up, little words like <em>the, of</em> and <em>and</em> down &mdash;
+        in proper <strong>AP, Chicago, APA or MLA</strong> title case. One click,
+        and your text never leaves your browser.
+      </p>
+      <p class="definition mt-4 max-w-2xl muted">
+        A title case converter is a free online tool that capitalizes the major
+        words of a heading and lowercases articles, conjunctions and short
+        prepositions, applying real style-guide rules so your title is
+        capitalized the way editors expect.
+      </p>
+    </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
+    <CaseConverter />
+
+    <TrustStrip />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
+
+      <h2 class="text-2xl font-bold">How to use the title case generator</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Type or paste your headline into the box above (or tap an example).</li>
+        <li>Leave the mode on <strong>Title Case</strong> - it is selected by default.</li>
+        <li>Pick your <strong>style guide</strong> (AP, Chicago, APA or MLA); the capitalized title updates live.</li>
+        <li>Hit <strong>Copy</strong> (or Ctrl/Cmd + Enter) and paste your title wherever you need it.</li>
+      </ol>
+
+      <h2 class="text-2xl font-bold">AP vs Chicago: which words get capitalized</h2>
+      <p class="muted">
+        "Title case" is not a single rule - each style guide treats the little
+        words differently, which is exactly why a naive "capitalize every word"
+        button gets headlines wrong. All four styles always capitalize the first
+        word, the last word, and the first word after a colon, and they all
+        lowercase the articles <em>a, an, the</em> and the conjunctions
+        <em>and, but, or, nor, for</em>. The split is in the prepositions:
+      </p>
+      <ul class="list-disc space-y-2 pl-6 muted">
+        <li><strong>AP</strong> - lowercases prepositions of three letters or fewer (<em>of, in, to, at</em>) but capitalizes those of four letters or more (<em>From, With, Into, Over</em>). It also lowercases <em>yet</em> and <em>so</em>.</li>
+        <li><strong>Chicago (CMOS)</strong> - lowercases <em>all</em> prepositions regardless of length, and capitalizes only the first part of a hyphenated word (<em>Self-care</em>).</li>
+        <li><strong>APA 7</strong> - lowercases prepositions of three letters or fewer and capitalizes any major word of four letters or more.</li>
+        <li><strong>MLA</strong> - lowercases prepositions of any length, along with articles and coordinating conjunctions.</li>
+      </ul>
+      <p class="muted">
+        Want the reasoning behind every capital letter? Our guide on
+        <a href="/blog/title-case-rules-ap-vs-chicago">title case rules and AP vs Chicago capitalization</a>
+        walks through why each word is capitalized so you can pick the right
+        convention with confidence.
+      </p>
+
+      <h2 class="text-2xl font-bold">Better than Word’s "Capitalize Each Word"</h2>
+      <p class="muted">
+        Microsoft Word and Google Docs only offer "Capitalize Each Word", which
+        capitalizes the first letter of <em>every</em> word - including
+        <em>the, of</em> and <em>and</em> - so your headline ends up over-capitalized
+        and wrong for any real style guide. This converter applies the proper
+        small-word lists for AP, Chicago, APA and MLA, keeps brand names like
+        iPhone and NASA intact, and capitalizes the word after a colon
+        automatically, so the title comes out the way an editor would write it.
+      </p>
+
+      <h2 class="text-2xl font-bold">Privacy - your headlines stay on your device</h2>
+      <p class="muted">
+        There is no server and no upload. Every title is capitalized with plain
+        JavaScript on your device, so you can safely run unpublished headlines and
+        confidential copy through it. Open your browser's DevTools Network tab
+        while you work and you'll see zero requests - and the tool keeps working
+        with your connection turned off.
+      </p>
+      <p class="muted">
+        Need more than capitalization? The full
+        <a href="/tools/case-converter">case converter</a> adds UPPER CASE, lower
+        case, Sentence case and developer formats like camelCase and snake_case,
+        and if a headline pasted from a document carries the wrong quotation
+        marks, the
+        <a href="/tools/straight-to-curly-quotes-converter">straight-to-curly quotes converter</a>
+        fixes those in one pass too.
+      </p>
+
+      <p class="updated muted text-sm">Last updated: June 2026</p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedTools currentSlug="case-converter" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+  </style>
+</Base>

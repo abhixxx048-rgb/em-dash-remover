@@ -4,14 +4,15 @@ import Page from '../layouts/Page.astro';
 
 <Page
   title="About Us"
-  heading="About Em Dash Remover"
+  heading="The copyeditor's desk, automated"
+  eyebrow="About · our story"
   description="Why we built a free, privacy-first, grammar-aware em dash remover and AI text cleaner."
 >
   <p>
-    <strong>Em Dash Remover</strong> is a free tool that cleans the tell-tale signs of
-    AI-generated writing out of your text - em dashes (-), curly quotes, invisible
-    "watermark" characters, leftover markdown, and the clichéd phrasing that makes
-    writing read like a chatbot.
+    <strong>Em Dash Remover</strong> reads your draft the way a copyeditor would, then
+    quietly strikes the <span class="struck">tells</span> of machine writing: em dashes,
+    curly quotes, invisible "watermark" characters, leftover markdown, and the clichéd
+    phrasing that makes a page read like a chatbot wrote it.
   </p>
 
   <h2>Why we built it</h2>
@@ -45,8 +46,10 @@ import Page from '../layouts/Page.astro';
     <li>An AI-tell score that flags clichéd phrases and overused vocabulary</li>
   </ul>
 
+  <hr class="rule-dash" style="margin: 2.75rem 0 1.75rem;" />
+
   <p>
-    Have an idea or found a bug? We'd love to hear from you - visit our
-    <a href="/contact">contact page</a>.
+    Have an idea or found a bug? We read every note. Visit the
+    <a href="/contact">contact page</a> and tell us what you're working on.
   </p>
 </Page>

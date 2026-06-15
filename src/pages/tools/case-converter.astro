@@ -6,6 +6,18 @@ import TrustStrip from '../../components/TrustStrip.astro';
 
 const faqs = [
   {
+    q: 'How do I change uppercase to lowercase without retyping?',
+    a: 'Paste the text into the box and click lower case - the whole block is rewritten in lowercase instantly. To rescue a sentence that was typed in all caps, use Sentence case instead, which re-capitalizes only the first letter of each sentence and your proper nouns.',
+  },
+  {
+    q: 'What is the difference between title case and sentence case?',
+    a: 'Title Case capitalizes the major words of a heading (and lowercases small words like "the", "of" and "and"), while sentence case capitalizes only the first word of each sentence plus proper nouns - the way normal prose is written. Use Title Case for headlines and sentence case for body text.',
+  },
+  {
+    q: 'Is the case converter free, and do I need to sign up?',
+    a: 'It is completely free with no signup, no registration and no download. Open the page and start converting - there are no limits, watermarks or paywalls.',
+  },
+  {
     q: 'Is "and" capitalized in a title?',
     a: 'No. "And" is a coordinating conjunction, so AP, Chicago, APA and MLA all lowercase it in the middle of a title - unless it happens to be the first or last word, which is always capitalized.',
   },
@@ -46,6 +58,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Convert text to UPPER CASE and lower case',
     'Sentence case with correct sentence detection',
@@ -55,6 +68,34 @@ const webApp = {
     'Live character, word, sentence and reading-time counters',
   ],
   publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to convert text case online',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Paste your text',
+      text: 'Type or paste your text into the converter box (or tap an example).',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Choose a case',
+      text: 'Click the case you want: UPPER CASE, lower case, Sentence case, Title Case, or a developer case like camelCase or snake_case.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Set the style guide',
+      text: 'For Title Case, pick your style guide (AP, Chicago, APA or MLA) and the converted result updates live.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Copy the result',
+      text: 'Press Copy (or Ctrl/Cmd + Enter) and paste the converted text wherever you need it.',
+    },
+  ],
 };
 
 const faqSchema = {
@@ -69,27 +110,33 @@ const faqSchema = {
 ---
 
 <Base
-  title="Case Converter - UPPER, lower, Sentence & Title Case (AP, Chicago, APA, MLA)"
-  description="Free case converter: convert text to UPPER CASE, lower case, Sentence case and Title Case (AP, Chicago, APA, MLA), plus camelCase and snake_case - instantly, 100% in your browser."
+  title="Case Converter - UPPER, lower, Title & Sentence Case Online"
+  description="Free case converter to change text to UPPER CASE, lower case, Sentence case and Title Case (AP, Chicago, APA, MLA), plus camelCase and snake_case. No signup, in-browser."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <a href="/tools" class="mb-4 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no signup
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Case Converter - UPPER, lower, Sentence &amp; Title Case
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Capitalization &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Case Converter
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Convert any text to UPPER CASE, lower case, Sentence case or Title Case -
-        with real, style-guide-accurate capitalization for
-        <strong>AP, Chicago, APA and MLA</strong> - plus developer cases like
+      <p class="lede mt-4 max-w-2xl">
+        Convert any text to UPPER CASE, lower case, Sentence case or Title Case
+        &mdash; with real, style-guide-accurate capitalization for
+        <strong>AP, Chicago, APA and MLA</strong>, plus developer cases like
         camelCase and snake_case. Done right, instantly, and your text never
         leaves your browser.
       </p>
+      <p class="definition mt-4 max-w-2xl muted">
+        A case converter is a free online tool that changes the letter case of
+        your text - switching uppercase to lowercase, capitalizing the first
+        letter of each word, or applying proper Title Case - in one click,
+        without retyping.
+      </p>
     </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
 
     <CaseConverter />
 
@@ -97,6 +144,18 @@ const faqSchema = {
 
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
+
+      <h2 class="text-2xl font-bold">Who the case converter is for</h2>
+      <ul class="list-disc space-y-2 pl-6 muted">
+        <li><strong>Writers and bloggers</strong> capitalizing a title for a blog post or headline without breaking the small-word rules.</li>
+        <li><strong>Students and academics</strong> who need AP, Chicago, APA or MLA title case for essays, citations and references.</li>
+        <li><strong>Editors and proofreaders</strong> fixing a sentence typed in all caps or converting all caps to lowercase in seconds.</li>
+        <li><strong>SEO and marketing teams</strong> generating consistent, copy-and-paste headlines and meta titles.</li>
+        <li><strong>Developers</strong> converting variable names between camelCase, snake_case, kebab-case, PascalCase and CONSTANT_CASE.</li>
+      </ul>
+
       <h2 class="text-2xl font-bold">How to use the case converter</h2>
       <ol class="list-decimal space-y-2 pl-6 muted">
         <li>Type or paste your text into the box above (or tap an example).</li>
@@ -120,6 +179,12 @@ const faqSchema = {
         <li><strong>APA 7</strong> - lowercases prepositions of three letters or fewer and capitalizes any major word of four letters or more.</li>
         <li><strong>MLA</strong> - lowercases prepositions of any length, along with articles and coordinating conjunctions.</li>
       </ul>
+      <p class="muted">
+        Not sure which style to follow? Our guide on
+        <a href="/blog/title-case-rules-ap-vs-chicago">title case rules and AP vs Chicago capitalization</a>
+        walks through exactly why each word is capitalized so you can pick the
+        right convention with confidence.
+      </p>
 
       <h2 class="text-2xl font-bold">Sentence case vs Capitalize Each Word</h2>
       <p class="muted">
@@ -152,10 +217,33 @@ const faqSchema = {
         and you'll see zero requests - and the tool keeps working with your
         connection turned off.
       </p>
+      <p class="muted">
+        Cleaning up text pasted from a document often needs more than casing. If
+        your headline has the wrong quotation marks, run it through the
+        <a href="/tools/straight-to-curly-quotes-converter">straight-to-curly quotes converter</a>,
+        and if a paste from Word or Google Docs carries messy spacing, the
+        <a href="/tools/whitespace-line-break-reflow-fixer">whitespace and line-break reflow fixer</a>
+        tidies it into clean paragraphs.
+      </p>
+
+      <h2 class="text-2xl font-bold">Specific case converters</h2>
+      <p class="muted">
+        Already know exactly which conversion you need? Jump straight to a
+        focused, single-purpose tool:
+      </p>
+      <ul class="list-disc space-y-2 pl-6 muted">
+        <li><a href="/tools/sentence-case-converter">Sentence case converter</a> - capitalize only the first letter of each sentence (plus proper nouns) for clean body text.</li>
+        <li><a href="/tools/title-case-converter">Title case converter</a> - apply AP, Chicago, APA or MLA title capitalization to a headline.</li>
+        <li><a href="/tools/uppercase-to-lowercase">Uppercase to lowercase converter</a> - turn ALL CAPS text into all lowercase in one click.</li>
+        <li><a href="/tools/lowercase-to-uppercase">Lowercase to uppercase converter</a> - shout a line by converting any text to UPPER CASE.</li>
+      </ul>
+
+      <p class="updated muted text-sm">Last updated: June 2026</p>
     </article>
 
     <!-- FAQ -->
-    <section class="mx-auto mt-16 max-w-3xl px-4">
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
       <h2 class="text-2xl font-bold">Frequently asked questions</h2>
       <div class="mt-6 divide-y divide-ink/10">
         {faqs.map((f) => (
@@ -175,6 +263,7 @@ const faqSchema = {
     <RelatedTools currentSlug="case-converter" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </main>
 
@@ -183,5 +272,12 @@ const faqSchema = {
     @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
     .seo a { color: var(--color-accent); text-decoration: underline; }
     .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
   </style>
 </Base>

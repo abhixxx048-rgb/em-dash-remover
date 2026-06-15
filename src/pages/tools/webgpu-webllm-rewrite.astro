@@ -6,16 +6,28 @@ import TrustStrip from '../../components/TrustStrip.astro';
 
 const faqs = [
   {
-    q: 'Does my text get uploaded anywhere?',
-    a: 'No. The rewrite runs entirely in your browser with plain JavaScript - nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. It even works with your connection turned off.',
+    q: 'How do I rewrite text without uploading it to a server?',
+    a: 'Use this in-browser AI text rewriter: paste your text, pick a mode, and rewrite. Everything runs as plain JavaScript on your own device, so nothing is uploaded. Open your browser DevTools Network tab while you use it and you will see zero requests - it even works with your connection turned off.',
   },
   {
-    q: 'Does it work offline?',
-    a: 'Yes. The instant deterministic rewrite needs no model and no network, so it works offline immediately. The optional on-device LLM path (WebLLM) would download model weights once and then also run fully offline.',
+    q: 'Is an in-browser AI rewriter actually private?',
+    a: 'Yes - this one is private by design, not by promise. Because the rewrite happens locally in your browser, your text physically never leaves your machine. There is no server to store it, no log to leak, and nothing to trust beyond what you can verify yourself in DevTools.',
   },
   {
-    q: 'Which browsers and devices does it support?',
-    a: 'The instant rewrite works in every modern browser, on any device, including older phones. The experimental on-device AI model path additionally requires WebGPU - available in current Chrome, Edge, Safari 26+, and Firefox where enabled. If WebGPU is missing, the tool detects this and falls back to the instant rewrite instead of showing an error.',
+    q: 'Does the WebGPU rewriter send my text anywhere?',
+    a: 'No. Both the instant deterministic rewrite and the optional WebGPU/WebLLM model path run entirely on-device. The only network activity that can ever happen is a one-time download of model weights for the experimental WebLLM path - never your text.',
+  },
+  {
+    q: 'Can I rewrite text locally without internet?',
+    a: 'Yes. The instant deterministic rewrite needs no model and no network, so it works offline immediately. The optional on-device LLM path (WebLLM) downloads model weights once, caches them, and then also runs fully offline.',
+  },
+  {
+    q: 'Which browsers support WebGPU AI rewriting, and does it need a GPU?',
+    a: 'The instant rewrite works in every modern browser, on any device, including older phones, and needs no GPU. The experimental on-device AI model path additionally requires WebGPU - available in current Chrome, Edge, Safari 26+, and Firefox where enabled - which uses your GPU. If WebGPU is missing, the tool detects this and falls back to the instant rewrite instead of showing an error.',
+  },
+  {
+    q: 'Is WebLLM rewriting safe for sensitive text?',
+    a: 'Yes. Because the model runs on your own device, sensitive material - legal, medical, financial, or unpublished work - never touches a third-party server. That makes a local AI rewriter a far safer fit for confidential text than any cloud paraphraser that uploads what you paste.',
   },
   {
     q: 'Will this beat an AI detector?',
@@ -46,6 +58,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript. WebGPU optional for on-device AI model.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Rewrite text 100% in your browser with no upload',
     'Six rewrite modes: Standard, Fluent, Formal, Casual, Shorten, Expand',
@@ -56,6 +69,19 @@ const webApp = {
     'Works offline - copy and download the result',
   ],
   publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to rewrite text in your browser with no upload',
+  step: [
+    { '@type': 'HowToStep', name: 'Paste your text', text: 'Paste a paragraph, email, or document into the editor. It stays on your device.' },
+    { '@type': 'HowToStep', name: 'Choose a rewrite mode', text: 'Pick Standard, Fluent, Formal, Casual, Shorten or Expand to set tone and length.' },
+    { '@type': 'HowToStep', name: 'Run the rewrite', text: 'Run the on-device pass to strip AI tells and filler while the before/after meters update instantly.' },
+    { '@type': 'HowToStep', name: 'Review the diff', text: 'See exactly what changed word by word, then tweak the mode for a different read.' },
+    { '@type': 'HowToStep', name: 'Copy or download', text: 'Copy or download the rewritten text - no upload, no account, ready to paste anywhere.' },
+  ],
 };
 
 const faqSchema = {
@@ -70,29 +96,52 @@ const faqSchema = {
 ---
 
 <Base
-  title="Private On-Device AI Rewriter - Runs in Your Browser, No Upload"
-  description="Free private AI rewriter that runs 100% in your browser - no upload, no signup, works offline. Rewrite and de-AI text with Fluent, Formal, Casual, Shorten and Expand modes. WebGPU-ready, with an instant fallback everywhere."
+  title="In-Browser AI Text Rewriter - Private, Offline, No Upload"
+  description="Free in-browser AI text rewriter that runs 100% on your device - no upload, no signup, works offline. Rewrite text locally with Fluent, Formal, Casual, Shorten and Expand modes. WebGPU-ready."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <a href="/tools" class="mb-4 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no signup · works offline
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Private AI Rewriter - runs 100% in your browser, no upload.
+    <!-- Editorial header -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-2">
+      <a href="/tools" class="eyebrow text-accent hover:underline">← All tools</a>
+      <p class="eyebrow text-mark mt-6">Copydesk · private rewrite</p>
+      <h1 class="mt-3 text-4xl sm:text-5xl">
+        Rewrite the draft. Nothing <span class="struck">uploaded</span>.
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Rewrite and de-AI your text without it ever leaving your device. Pick a
-        mode - <strong>Fluent, Formal, Casual, Shorten</strong> or
-        <strong>Expand</strong> - and the rewrite happens instantly, offline, with
-        nothing uploaded. On WebGPU devices, an on-device AI model is coming next.
-        Clean AI writing for real quality - keep your human voice.
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed muted">
+        An <strong style="color: var(--c-ink); font-weight: 600;">in-browser AI text rewriter</strong> is a tool that rewrites and paraphrases your text entirely on your own device, so nothing is ever uploaded to a server.
       </p>
+      <p class="mt-4 max-w-2xl text-lg leading-relaxed muted">
+        Rewrite text locally in your browser without it ever leaving your machine. Pick a mode — <strong style="color: var(--c-ink); font-weight: 600;">Fluent, Formal, Casual, Shorten</strong> or <strong style="color: var(--c-ink); font-weight: 600;">Expand</strong> — and the rewrite happens instantly, offline, with no upload and no signup. On WebGPU devices, an on-device AI model is coming next. Clean writing for real quality; keep your human voice.
+      </p>
+
+      <!-- Who it's for -->
+      <div class="mt-6 rounded-xl p-4 muted" style="background: var(--c-accent-soft);">
+        <p class="text-sm font-semibold" style="color: var(--c-ink);">Who this private text rewriter is for</p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-bg);">Lawyers &amp; medical writers with confidential drafts</span>
+          <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-bg);">Authors polishing an unpublished manuscript</span>
+          <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-bg);">Employees under data-loss-prevention rules</span>
+          <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-bg);">Students &amp; researchers wanting an offline AI paraphraser</span>
+          <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-bg);">Developers who need a client-side AI rewriter with no API key</span>
+        </div>
+      </div>
     </header>
 
+    <hr class="rule-dash mx-auto my-8 max-w-3xl" />
+
     <WebgpuWebllmRewrite />
+
+    <!-- How to use -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">How to rewrite text in your browser</h2>
+      <ol class="mt-5 list-decimal space-y-3 pl-6 muted">
+        <li><strong style="color: var(--c-ink);">Paste your text</strong> into the editor above — a paragraph, an email, or a whole document. It stays on your device.</li>
+        <li><strong style="color: var(--c-ink);">Choose a rewrite mode</strong> — Standard, Fluent, Formal, Casual, Shorten or Expand — to set the tone and length you want.</li>
+        <li><strong style="color: var(--c-ink);">Run the rewrite</strong> and watch the on-device pass strip AI tells and filler while the before/after meters update instantly.</li>
+        <li><strong style="color: var(--c-ink);">Review the diff</strong> to see exactly what changed word by word, then tweak the mode if you want a different read.</li>
+        <li><strong style="color: var(--c-ink);">Copy or download</strong> the rewritten text — no upload, no account, ready to paste anywhere.</li>
+      </ol>
+    </section>
 
     <TrustStrip />
 
@@ -115,7 +164,8 @@ const faqSchema = {
         in your browser, and then paraphrases on your own GPU with no further
         network calls. The page already feature-detects WebGPU and shows whether
         your device could run it - but the privacy guarantee is identical either
-        way, because both paths run locally.
+        way, because both paths run locally. We unpack how this works in our guide
+        to <a href="/blog/in-browser-llm-with-webgpu">running an in-browser LLM with WebGPU</a>.
       </p>
 
       <h2 class="text-2xl font-bold">Choose a rewrite mode</h2>
@@ -135,7 +185,11 @@ const faqSchema = {
         Every mode is deterministic and content-preserving: it never invents facts
         or hallucinates, so the result is always a faithful, readable version of
         what you wrote. The before/after meters show your reading grade level and
-        AI-tell density dropping in real time.
+        AI-tell density dropping in real time. Want a one-click pass that taps your
+        browser's built-in AI instead? Try the
+        <a href="/tools/on-device-ai-rewrite">on-device AI rewrite tool</a>, or run a
+        <a href="/tools/human-voice-ai-tell-report">human-voice and AI-tell report</a>
+        first to see exactly which patterns make your draft read like a machine.
       </p>
 
       <h2 class="text-2xl font-bold">Why on-device? Your text never leaves your device</h2>
@@ -180,11 +234,13 @@ const faqSchema = {
           </details>
         ))}
       </div>
+      <p class="mt-6 text-xs muted">Last updated: June 2026</p>
     </section>
 
     <RelatedTools currentSlug="webgpu-webllm-rewrite" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </main>
 

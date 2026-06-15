@@ -6,12 +6,28 @@ import TrustStrip from '../../components/TrustStrip.astro';
 
 const faqs = [
   {
-    q: 'Does this send my text anywhere?',
-    a: 'No. All emoji and symbol stripping happens entirely in your browser. Nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests - it even works offline.',
+    q: 'How do I remove emojis from text online?',
+    a: 'Paste your text into the box above, pick a preset (AI bullet cleanup, Emoji only, or Strip everything), and the cleaned version appears instantly. Then click Copy or Download. It is a free emoji remover that runs online in your browser with no signup, no upload, and no character limit.',
   },
   {
-    q: 'Will it remove © ™ ° and currency symbols?',
-    a: 'No. By default the tool keeps semantically meaningful symbols - currency ($ € £ ¥), math and signs (° ± × ÷ → ≤ ≥), and legal marks (© ® ™ §). That is the #1 thing naive emoji removers get wrong. You can turn each safe-keep class off in Options if you really want to strip everything.',
+    q: 'How do I remove emojis from ChatGPT or AI-generated output?',
+    a: 'Paste the ChatGPT, Claude, Copilot, or Gemini response into the tool and use the AI bullet cleanup preset. It strips the 🚀✨🔹 emoji and ✅ checkmark bullets these models add to lists and headings, leaving clean, human-sounding prose. To remove em dashes and other AI tells at the same time, run the full cleaner afterward.',
+  },
+  {
+    q: 'Is it safe to paste text into an online emoji remover?',
+    a: 'With this tool, yes. All emoji and symbol stripping happens entirely in your browser. Nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests - it even works offline, which makes it safe for confidential emails and unpublished drafts.',
+  },
+  {
+    q: 'Can I strip emojis but keep punctuation and symbols?',
+    a: 'Yes - that is the whole point. By default the tool removes emoji and decorative bullets while keeping semantically meaningful symbols: currency ($ € £ ¥), math and signs (° ± × ÷ → ≤ ≥), and legal marks (© ® ™ §). That is the #1 thing naive emoji removers get wrong. You can turn each safe-keep class off in Options if you really want to strip everything.',
+  },
+  {
+    q: 'How do I remove emojis from a Word document, Outlook, or Google Docs?',
+    a: 'Native find-and-replace fails on emoji because they span multiple Unicode ranges, including ZWJ-joined and keycap sequences. Instead, copy the text out of Word, Outlook, or Google Docs, paste it here, clean it, then paste the result back. That reliably removes Copilot emoji and decorative bullets without leaving stray fragments behind.',
+  },
+  {
+    q: 'Does removing emojis change my text formatting?',
+    a: 'No. The tool only deletes emoji and decorative glyphs - your letters, numbers, punctuation, line breaks, and paragraph structure stay intact. With "List bullets only" you can even turn a leading decorative bullet into a hyphen or asterisk so your list layout survives instead of collapsing.',
   },
   {
     q: 'Does it handle skin-tone, family, and flag emoji?',
@@ -42,6 +58,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Remove emoji from text',
     'Remove decorative bullets from ChatGPT text',
@@ -51,6 +68,34 @@ const webApp = {
     'Turn decorative bullets into plain dashes',
   ],
   publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howTo = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to remove emojis from text',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Paste your text',
+      text: 'Paste the text you want to clean into the box - a ChatGPT or Copilot response, a caption, a product description, or a pasted document.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Choose a preset',
+      text: 'Pick AI bullet cleanup to remove emoji and decorative bullets while keeping real symbols, Emoji only, or Strip everything for an aggressive clean.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Fine-tune the options',
+      text: 'Open Options to keep currency, math, and legal symbols, switch on "list bullets only," or convert leading decorative bullets into plain dashes.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Copy the cleaned text',
+      text: 'Review the cleaned output and the "what we removed" inventory, then click Copy or Download to use your emoji-free text anywhere.',
+    },
+  ],
 };
 
 const faqSchema = {
@@ -65,35 +110,52 @@ const faqSchema = {
 ---
 
 <Base
-  title="Remove Emoji from Text - Free Emoji & Decorative-Symbol Stripper"
-  description="Remove emoji and decorative bullets (✦▶❖✅) from ChatGPT and AI text - free, private, 100% in your browser. Keeps your real symbols (©, °, $). Strip emoji and special characters instantly."
+  title="Remove Emojis from Text - Free Online Emoji Remover & Stripper"
+  description="Remove emojis from text free and online - strip emoji and decorative bullets from ChatGPT and AI output, but keep your real symbols (© ° $). 100% in-browser, no signup, no upload."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <p class="mb-4">
-        <a href="/tools" class="inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
-      </p>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no signup
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Remove Emoji &amp; Decorative Symbols from Text
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Decoration cut &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Emoji &amp; Decorative-Symbol Stripper
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Strip the emoji, checkmarks, and ✦▶❖ ornamental bullets that scream
-        "an LLM wrote this" - instantly and privately. Grammar-safe defaults keep
-        your real symbols (©, °, $) while pulling the decoration. Clean AI writing
-        for real quality, keep your human voice.
+      <p class="lede mt-4 max-w-2xl">
+        Strike the emoji, checkmarks, and ✦▶❖ ornamental bullets that scream
+        <span class="struck">an LLM wrote this</span> &mdash; instantly and privately.
+        Grammar-safe defaults keep your real symbols (©, °, $) while pulling the
+        decoration. Clean AI writing for real quality, keep your human voice.
+      </p>
+      <p class="definition mt-3 max-w-2xl muted text-sm">
+        An emoji remover is a free online tool that strips emojis and decorative
+        symbols from text - removing pictographs and AI bullets like 🚀✅✦▶❖ while
+        leaving your letters, punctuation, and meaningful symbols untouched.
       </p>
     </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
 
     <EmojiDecorativeSymbolStripper />
 
     <TrustStrip />
 
+    <!-- Who it's for -->
+    <section class="who mx-auto mt-16 max-w-3xl px-4">
+      <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">Who it's for</span>
+      <ul class="mt-4 grid gap-2 text-sm muted sm:grid-cols-2">
+        <li><strong>Writers &amp; editors</strong> cleaning emojis from ChatGPT and AI-generated content before publishing.</li>
+        <li><strong>Marketers &amp; social teams</strong> removing emojis from social media captions and product descriptions.</li>
+        <li><strong>Office &amp; support staff</strong> stripping Copilot emojis from Word, Outlook, and Google Docs.</li>
+        <li><strong>Students &amp; professionals</strong> who need to strip emojis but keep punctuation and currency symbols.</li>
+        <li><strong>Developers</strong> cleaning emoji from a string, CSV file, or spreadsheet cell before processing.</li>
+      </ul>
+    </section>
+
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
       <h2 class="text-2xl font-bold">What it removes (and what it keeps)</h2>
       <p class="muted">
         This tool removes emoji and ornamental symbols in two careful passes. The
@@ -119,7 +181,9 @@ const faqSchema = {
         is not about beating a detector - it is about presenting clean, professional
         prose in your own voice. As a bonus, it also makes your text cleaner for
         screen readers, which would otherwise announce "white heavy check mark"
-        before every line.
+        before every line. For a step-by-step walkthrough, see our guide on
+        <a href="/blog/how-to-remove-emojis-from-text">how to remove emojis from text</a>
+        across ChatGPT, Word, and the browser.
       </p>
 
       <h2 class="text-2xl font-bold">How to use it / presets</h2>
@@ -141,14 +205,20 @@ const faqSchema = {
         upload, no API key, and no cookie needed for the tool to function, so the
         privacy story is airtight: nothing you paste touches the network. That makes
         it safe for confidential emails, support replies, and unpublished drafts. If
-        you also need to remove em dashes, smart quotes, or invisible watermark
-        characters, run the
+        a document still looks "off" after stripping emoji, the leftover tells are
+        usually hidden Unicode - run the
+        <a href="/tools/invisible-watermark-character-inspector">invisible character inspector</a>
+        to find zero-width watermarks, then the
+        <a href="/tools/paste-from-word-docs-cleaner">paste-from-Word cleaner</a>
+        to scrub formatting soup. To remove em dashes, smart quotes, and other AI
+        tells in one pass, run the
         <a href="/">full em dash remover &amp; AI text cleaner</a> next.
       </p>
     </article>
 
     <!-- FAQ -->
-    <section class="mx-auto mt-16 max-w-3xl px-4">
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
       <h2 class="text-2xl font-bold">Frequently asked questions</h2>
       <div class="mt-6 divide-y divide-ink/10">
         {faqs.map((f) => (
@@ -163,11 +233,13 @@ const faqSchema = {
           </details>
         ))}
       </div>
+      <p class="mt-6 text-xs muted">Last updated: June 2026</p>
     </section>
 
     <RelatedTools currentSlug="emoji-decorative-symbol-stripper" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howTo)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </main>
 
@@ -177,5 +249,12 @@ const faqSchema = {
     .seo a { color: var(--color-accent); text-decoration: underline; }
     .seo kbd { font-family: var(--font-mono); font-size: 0.85em; padding: 1px 5px; border-radius: 5px; border: 1px solid color-mix(in srgb, var(--c-ink) 16%, transparent); }
     .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
   </style>
 </Base>

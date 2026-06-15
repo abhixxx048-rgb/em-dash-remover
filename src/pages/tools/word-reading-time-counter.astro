@@ -6,28 +6,36 @@ import TrustStrip from '../../components/TrustStrip.astro';
 
 const faqs = [
   {
-    q: 'How is reading time calculated?',
-    a: 'We divide your word count by a words-per-minute rate. The default, 238 wpm, is the average silent-reading speed from a large 2019 meta-analysis by Brysbaert. You can switch to Slow (150), Fast (350), so the estimate matches how you actually read.',
+    q: 'Is there a free word counter with no signup?',
+    a: 'Yes. This is a free online word counter with no signup, no login and no ads. Paste your text and the word count, character count and reading time appear instantly. There is no usage cap and nothing to install.',
   },
   {
-    q: 'What words-per-minute do you use for speaking time?',
-    a: 'Speaking time uses 130 wpm, a comfortable presentation pace. Conversational speech runs faster (150–160 wpm), but 130 leaves room for pauses and emphasis, which is what most speakers actually need when timing a talk.',
+    q: 'How do you calculate reading time?',
+    a: 'Reading time is your word count divided by a words-per-minute rate. The default, 238 wpm, is the average silent-reading speed from a large 2019 meta-analysis by Brysbaert. You can switch to Slow (150) or Fast (350) so the estimate matches how you actually read.',
+  },
+  {
+    q: 'What is the average reading speed in words per minute?',
+    a: 'The average adult reads silently at about 238 words per minute, based on Brysbaert’s 2019 meta-analysis. Reading aloud is slower, around 180 wpm. This counter defaults to 238 wpm and lets you pick Slow (150) or Fast (350) to estimate read time for any blog post or article.',
+  },
+  {
+    q: 'How long does it take to read 1000 words?',
+    a: 'At the average reading speed of 238 wpm, 1,000 words takes roughly 4 minutes to read silently. A 500-word essay is about 2 minutes and 2,000 words is around 8–9 minutes. Paste your text and the reading-time estimate updates live as the word count changes.',
+  },
+  {
+    q: 'How many words is a 5 minute speech?',
+    a: 'At a comfortable speaking pace of 130 wpm, a 5-minute speech is about 650 words; a 3-minute speech is roughly 390 words and a 10-minute talk is around 1,300 words. Paste your script and the speaking-time readout tells you exactly how long it runs.',
+  },
+  {
+    q: 'How many words per minute do people speak?',
+    a: 'Speaking time here uses 130 wpm, a comfortable presentation pace. Conversational speech runs faster (150–160 wpm), but 130 leaves room for pauses and emphasis, which is what most speakers actually need when timing a talk or presentation.',
+  },
+  {
+    q: 'How do I count characters with and without spaces?',
+    a: 'The counter shows characters with spaces and characters without spaces side by side, plus the X (280), Instagram, LinkedIn, Threads and SMS limits. It is a handy character counter for Twitter, Instagram captions and LinkedIn posts without opening each platform.',
   },
   {
     q: 'Does my text get uploaded anywhere?',
     a: 'No. Every count, limit and estimate is computed in your browser with JavaScript. Nothing is sent to a server, stored remotely, or logged. Open DevTools → Network while you type and you will see zero requests. It even works offline.',
-  },
-  {
-    q: 'What is the X / Twitter character limit in 2026?',
-    a: 'A standard X post is 280 characters. Verified subscribers can post much longer, but 280 is the limit most people write to, so that is the pill we show. Links count toward the limit on the platform itself.',
-  },
-  {
-    q: 'Why do emojis count differently for SMS?',
-    a: 'A plain GSM-7 text message fits 160 characters per segment. The moment you include an emoji, a curly quote, or an em dash, the whole message switches to UCS-2 encoding, which only fits 70 characters per segment. Our SMS panel flags exactly which characters forced that switch.',
-  },
-  {
-    q: 'How are sentences and paragraphs counted?',
-    a: 'Sentences are segmented with the browser’s Intl.Segmenter where available, which handles abbreviations and decimals far better than a naive split on “.?!”. Paragraphs are blocks of text separated by a blank line. Lines are simply newline-delimited.',
   },
   {
     q: 'Why does my count differ from Microsoft Word?',
@@ -46,6 +54,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Live word and character counter',
     'Reading time and speaking time calculator',
@@ -55,6 +64,34 @@ const webApp = {
     '100% client-side - text never leaves your browser',
   ],
   publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to use the word counter and reading-time calculator',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Paste your text',
+      text: 'Open the tool and paste or type your text into the box — an essay, blog post, tweet, caption or speech script. Counting starts instantly; there is no signup and nothing is uploaded.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Read the live counts',
+      text: 'Watch the live word count, character count, sentence and paragraph totals, plus reading time and speaking time update as you type.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Pick your reading or speaking pace',
+      text: 'Switch the words-per-minute rate to Slow, Average or Fast to estimate how long it takes to read, or use the 130 wpm speaking pace to time a speech.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Check the platform limits',
+      text: 'Glance at the X, LinkedIn, Instagram, Threads, SMS and SEO limit pills to confirm your text fits where you plan to publish it, then edit until it does.',
+    },
+  ],
 };
 
 const faqSchema = {
@@ -69,32 +106,65 @@ const faqSchema = {
 ---
 
 <Base
-  title="Word & Character Counter + Reading-Time Calculator (Free, Private)"
-  description="Free in-browser word and character counter with live reading time, speaking time, and X, LinkedIn, Instagram, SMS and SEO character limits. No sign-up, nothing uploaded."
+  title="Word Counter + Character Counter & Reading-Time Calculator"
+  description="Free online word counter and character counter with live reading time, speaking time and X, LinkedIn, Instagram & SMS limits. No signup, in-browser, nothing uploaded."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <p class="mb-3">
-        <a href="/tools" class="text-sm font-medium text-accent hover:underline">← All tools</a>
-      </p>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no signup
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Word &amp; Reading-Time Counter - free, private, in-browser.
+    <!-- Editorial header -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-2">
+      <a href="/tools" class="eyebrow text-accent hover:underline">← All tools</a>
+      <p class="eyebrow text-mark mt-6">Copydesk · word &amp; time count</p>
+      <h1 class="mt-3 text-4xl sm:text-5xl">
+        Word counter &amp; reading-time calculator
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Paste any text to see live <strong>word</strong>, <strong>character</strong>,
-        sentence and paragraph counts, plus <strong>reading and speaking time</strong>
-        and platform-limit pills for X, LinkedIn, Instagram, Threads, SMS and SEO.
-        Nothing is uploaded - your text never leaves your browser.
+      <p class="mt-4 max-w-2xl text-base leading-relaxed muted">
+        A <strong style="color: var(--c-ink); font-weight: 600;">word counter</strong> is a tool that tallies the words, characters, sentences and paragraphs in your text and estimates how long it takes to read or speak — live, as you type, with no signup.
+      </p>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed muted">
+        Paste any text to see live <strong style="color: var(--c-ink); font-weight: 600;">word</strong>, <strong style="color: var(--c-ink); font-weight: 600;">character</strong>, sentence and paragraph counts, plus <strong style="color: var(--c-ink); font-weight: 600;">reading and speaking time</strong> and platform-limit pills for X, LinkedIn, Instagram, Threads, SMS and SEO. Nothing is uploaded — your text never leaves your browser.
       </p>
     </header>
+
+    <hr class="rule-dash mx-auto my-8 max-w-3xl" />
 
     <WordReadingTimeCounter />
 
     <TrustStrip />
+
+    <!-- Who it's for -->
+    <section class="mx-auto mt-20 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Who it's for</h2>
+      <p class="mt-3 muted">A fast, private word and character counter for anyone working to a length, a limit or a deadline:</p>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+        <li class="card p-4 text-sm">
+          <strong>Students &amp; essay writers</strong> — hit a 500, 1,000 or 2,000-word target and see how long the essay takes to read.
+        </li>
+        <li class="card p-4 text-sm">
+          <strong>Speakers &amp; presenters</strong> — convert words to minutes and time a 3, 5 or 10-minute speech before you stand up.
+        </li>
+        <li class="card p-4 text-sm">
+          <strong>Bloggers &amp; SEO writers</strong> — add an accurate reading-time estimate to a blog post and keep titles and meta descriptions in range.
+        </li>
+        <li class="card p-4 text-sm">
+          <strong>Social media &amp; marketers</strong> — check the character count for a tweet, Instagram caption or LinkedIn post against each platform limit.
+        </li>
+        <li class="card p-4 text-sm">
+          <strong>Freelancers &amp; editors</strong> — count words without Microsoft Word and keep confidential client drafts in the browser.
+        </li>
+      </ul>
+    </section>
+
+    <!-- How to use -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">How to use the word counter</h2>
+      <ol class="mt-4 space-y-3 muted list-decimal pl-6">
+        <li><strong>Paste or type your text</strong> into the box above — essay, blog post, tweet, caption or speech script. Counting starts instantly; no signup, nothing uploaded.</li>
+        <li><strong>Read the live counts</strong> — word count, character count (with and without spaces), sentences, paragraphs, plus reading time and speaking time, all updating as you type.</li>
+        <li><strong>Pick your pace</strong> — switch the words-per-minute rate to Slow, Average or Fast for reading time, or use the 130 wpm speaking pace to time a talk.</li>
+        <li><strong>Check the platform limits</strong> — glance at the X, LinkedIn, Instagram, Threads, SMS and SEO pills to confirm your text fits where you plan to publish.</li>
+        <li><strong>Edit and re-check</strong> — trim or expand until the count, reading time and limits all land where you want them.</li>
+      </ol>
+    </section>
 
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
@@ -116,7 +186,13 @@ const faqSchema = {
         Brysbaert’s 2019 meta-analysis; switch to Slow (150) or Fast (350) to match
         how you actually read. Speaking time uses <strong>130 wpm</strong>, a
         realistic presentation pace with room for pauses - handy when you need to fit
-        a script into a five-minute slot.
+        a script into a five-minute slot. For the full breakdown of common lengths -
+        how long it takes to read 500, 1,000 or 2,000 words - see our guide on
+        <a href="/blog/how-long-does-it-take-to-read-x-words">how long it takes to read X words</a>.
+        Once the length looks right, run the draft through our
+        <a href="/tools/readability-grade-level-scorer">readability grade-level scorer</a>
+        to check it is easy to read, or the
+        <a href="/tools/sentence-splitter">sentence splitter</a> to audit cadence one line at a time.
       </p>
 
       <h2 class="text-2xl font-bold">Platform limits: X, LinkedIn, Instagram, Threads, SMS &amp; SEO</h2>
@@ -159,11 +235,13 @@ const faqSchema = {
           </details>
         ))}
       </div>
+      <p class="mt-8 text-xs muted">Last updated: June 2026</p>
     </section>
 
     <RelatedTools currentSlug="word-reading-time-counter" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </main>
 

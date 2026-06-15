@@ -33,7 +33,50 @@ const faqs = [
     q: 'Why are uniform sentence lengths a sign of AI writing?',
     a: 'Human prose naturally varies: a long, winding sentence gives way to a short punchy one. AI-generated text often defaults to a steady medium length, sentence after sentence. The uniformity meter scores the variation in your sentence lengths so you can see - and break up - that robotic, metronomic cadence.',
   },
+  {
+    q: 'Is there a free sentence splitter with no signup?',
+    a: 'Yes - this is a free online sentence splitter with no signup, no registration, and no paywall. There is nothing to install and no account to create. Paste your text, get one sentence per line instantly, and copy or download the result. It runs entirely in your browser, so you can split text into sentences without uploading your data anywhere.',
+  },
+  {
+    q: 'How do I separate sentences for subtitles or SRT captions?',
+    a: 'Paste your transcript or script, split it into one sentence per line, and you have a clean caption list. Because abbreviations, decimals and dialogue stay intact, you avoid the broken mid-line cuts that naive splitters create. Switch the output to Numbered or CSV if your subtitle workflow expects an indexed list, then copy or download as a .txt or .csv file.',
+  },
+  {
+    q: 'What is a good sentence length for readability?',
+    a: 'Most readability guidance puts the sweet spot around 15-20 words per sentence on average, but the average matters less than the variety. Mixing short, medium and long sentences keeps readers moving. Use the length bars and uniformity meter here to check sentence length variation, then pair it with our Readability / Grade-Level Scorer for a formal grade-level reading.',
+  },
 ];
+
+const howToSteps = [
+  {
+    name: 'Paste your text',
+    text: 'Paste any paragraph, essay, transcript or ChatGPT output into the input box. It is split into sentences live as you type - nothing is uploaded.',
+  },
+  {
+    name: 'Configure abbreviations and output',
+    text: 'Add any domain abbreviations (Fig., Eq., Approx.) so they stay intact, then pick an output mode: one sentence per line, Numbered, Markdown list, or CSV (sentence,words).',
+  },
+  {
+    name: 'Split and audit the cadence',
+    text: 'Read the one-sentence-per-line output and scan the length bars and uniformity meter to spot run-ons, repeated openings, and robotic, metronomic rhythm.',
+  },
+  {
+    name: 'Copy, download or rejoin',
+    text: 'Copy the sentences to your clipboard, download them as a .txt or .csv file, or hit rejoin to flow the edited lines back into paragraphs.',
+  },
+];
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to split text into sentences, one per line',
+  step: howToSteps.map((s, i) => ({
+    '@type': 'HowToStep',
+    position: i + 1,
+    name: s.name,
+    text: s.text,
+  })),
+};
 
 const webApp = {
   '@context': 'https://schema.org',
@@ -46,6 +89,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Split text into sentences, one sentence per line',
     'Abbreviation-aware segmentation (Dr., e.g., U.S. stay intact)',
@@ -80,28 +124,26 @@ const breadcrumb = {
 ---
 
 <Base
-  title="Sentence Splitter - One Sentence Per Line (Abbreviation-Aware)"
-  description="Free sentence splitter: paste text and get one sentence per line. Abbreviation-aware, so Dr., e.g. and 3.14 stay intact. Audit your cadence - 100% in your browser, no signup."
+  title="Sentence Splitter - Split Text Into Sentences, One Per Line"
+  description="Free sentence splitter online: paste text and split it into sentences, one per line. Abbreviation-aware so Dr., e.g. and 3.14 stay intact. No signup, 100% in-browser."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <div class="mb-3 flex justify-center">
-        <a href="/tools" class="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">← All tools</a>
-      </div>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no signup
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Sentence Splitter - one sentence per line, done right.
+    <!-- Editorial header -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-2">
+      <a href="/tools" class="eyebrow text-accent hover:underline">← All tools</a>
+      <p class="eyebrow text-mark mt-6">Copydesk · sentence splitter</p>
+      <h1 class="mt-3 text-4xl sm:text-5xl">
+        One sentence per line. Done right.
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Paste any text and split it into <strong>one sentence per line</strong> -
-        abbreviation-aware, so <strong>Dr.</strong>, <strong>e.g.</strong> and
-        <strong>3.14</strong> don't break in the wrong place. Then see your
-        rhythm at a glance and keep your human voice.
+      <p class="mt-4 max-w-2xl text-base leading-relaxed muted">
+        A <strong style="color: var(--c-ink); font-weight: 600;">sentence splitter</strong> is a tool that breaks a paragraph into individual sentences and puts each one on its own line.
+      </p>
+      <p class="mt-3 max-w-2xl text-lg leading-relaxed muted">
+        Paste any text and split it into <strong style="color: var(--c-ink); font-weight: 600;">one sentence per line</strong> — abbreviation-aware, so <strong style="color: var(--c-ink); font-weight: 600;">Dr.</strong>, <strong style="color: var(--c-ink); font-weight: 600;">e.g.</strong> and <strong style="color: var(--c-ink); font-weight: 600;">3.14</strong> don't break in the wrong place. Then read your rhythm at a glance and keep your human voice.
       </p>
     </header>
+
+    <hr class="rule-dash mx-auto my-8 max-w-3xl" />
 
     <SentenceSplitter />
 
@@ -123,6 +165,29 @@ const breadcrumb = {
           <p class="mt-1.5 text-sm muted">Pure in-browser segmentation. No upload, no server, no signup. Check the Network tab - zero requests. Safe for confidential drafts, works offline.</p>
         </div>
       </div>
+    </section>
+
+    <!-- Who it's for -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Who it's for</h2>
+      <p class="mt-2 muted">Anyone who needs to split text into sentences for editing, review or alignment:</p>
+      <ul class="mt-4 grid gap-2 sm:grid-cols-2">
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">Writers &amp; copywriters</strong> editing in one-sentence-per-line mode to vary sentence length and tighten flow.</li>
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">Students &amp; proofreaders</strong> splitting an essay into sentences for line-by-line review.</li>
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">Subtitlers</strong> prepping one sentence per line for SRT captions from a transcript.</li>
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">Translators</strong> aligning source and target text for translation memories, sentence by sentence.</li>
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">SEO &amp; AI editors</strong> checking ChatGPT output for uniform, robotic cadence before publishing.</li>
+      </ul>
+    </section>
+
+    <!-- How to use -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">How to split text into sentences</h2>
+      <ol class="mt-4 list-decimal space-y-3 pl-5 muted marker:font-semibold marker:text-accent">
+        {howToSteps.map((s) => (
+          <li><strong style="color: var(--c-ink);">{s.name}.</strong> {s.text}</li>
+        ))}
+      </ol>
     </section>
 
     <!-- SEO content -->
@@ -167,7 +232,11 @@ const breadcrumb = {
         numbers editors quote: total words, average words per sentence, and your
         longest and shortest sentence (click either to jump straight to it). Use it
         to break up run-ons and add the short, punchy sentences that give prose
-        momentum.
+        momentum. For a full walkthrough of the method, read our guide on
+        <a href="/blog/how-to-audit-sentence-cadence">how to audit sentence cadence</a>,
+        and if you suspect a draft reads like AI, run it through the
+        <a href="/tools/human-voice-ai-tell-report">Human Voice / AI-Tell Report</a> to
+        catch the uniform rhythm before you publish.
       </p>
 
       <h2 class="text-2xl font-bold">One sentence per line, the writer's editing method</h2>
@@ -214,11 +283,13 @@ const breadcrumb = {
           </details>
         ))}
       </div>
+      <p class="mt-8 text-xs muted">Last updated: June 2026</p>
     </section>
 
     <RelatedTools currentSlug="sentence-splitter" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(breadcrumb)} />
   </main>

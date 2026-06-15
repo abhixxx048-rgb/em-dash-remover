@@ -1,0 +1,243 @@
+---
+import Base from '../../layouts/Base.astro';
+import CaseConverter from '../../components/tools/CaseConverter.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+
+const faqs = [
+  {
+    q: 'What is sentence case?',
+    a: 'Sentence case is the way ordinary prose is written: only the first letter of each sentence is capitalized, along with proper nouns such as names, places and brands. Everything else stays lowercase. It is the opposite of Title Case, where most words in a heading are capitalized.',
+  },
+  {
+    q: 'How do I convert text to sentence case?',
+    a: 'Paste your text into the box above and click "Sentence case". The converter rewrites the whole block so each sentence starts with a capital letter and the rest is lowercased, while keeping proper nouns intact. This rescues text typed in ALL CAPS or all lowercase in one click.',
+  },
+  {
+    q: 'What is the difference between sentence case and title case?',
+    a: 'Sentence case capitalizes only the first word of each sentence (plus proper nouns), exactly like normal body text. Title Case capitalizes the major words of a heading and lowercases small words like "the", "of" and "and". Use sentence case for paragraphs and Title Case for headlines.',
+  },
+  {
+    q: 'How do I capitalize a whole sentence at once without retyping?',
+    a: 'Select the sentence, paste it into the converter, and click Sentence case. The first letter is capitalized and the rest is normalized instantly, so you never have to retype a line that was accidentally left in lowercase or shouted in all caps.',
+  },
+  {
+    q: 'Does sentence case capitalize the first letter after a period?',
+    a: 'Yes. The converter detects sentence boundaries at periods, question marks and exclamation points, then capitalizes the first letter of the next sentence automatically, so a paragraph with several sentences is fixed correctly in one pass.',
+  },
+  {
+    q: 'Will sentence case lowercase my proper nouns and brand names?',
+    a: 'No. With brand-name preservation on, terms such as iPhone, NASA, JavaScript and proper names keep their intended casing instead of being flattened, so only the parts that should be lowercase are changed.',
+  },
+  {
+    q: 'Is the sentence case converter free, and do I need to sign up?',
+    a: 'It is completely free with no signup, no registration and no download. Open the page and start converting - there are no limits, watermarks or paywalls.',
+  },
+  {
+    q: 'Does this work offline, and is my text uploaded?',
+    a: 'Everything runs in your browser using plain JavaScript. Your text is never uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests, and the tool also works offline.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/sentence-case-converter#app`,
+  name: 'Sentence Case Converter',
+  url: `${Astro.site}tools/sentence-case-converter`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  dateModified: '2026-06-15',
+  featureList: [
+    'Convert text to sentence case in one click',
+    'Capitalize the first letter of each sentence automatically',
+    'Fix text typed in ALL CAPS or all lowercase',
+    'Proper-noun and brand-name preservation',
+    'Also supports UPPER CASE, lower case and Title Case',
+    'Live character, word, sentence and reading-time counters',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to convert text to sentence case online',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Paste your text',
+      text: 'Type or paste the text you want to fix into the converter box above.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Click Sentence case',
+      text: 'Click the "Sentence case" button to capitalize the first letter of each sentence and lowercase the rest.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Keep brand names intact',
+      text: 'Leave brand-name preservation on so proper nouns like iPhone or NASA keep their correct casing.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Copy the result',
+      text: 'Press Copy (or Ctrl/Cmd + Enter) and paste the sentence-cased text wherever you need it.',
+    },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Sentence Case Converter - Fix ALL CAPS & lowercase Free"
+  description="Free sentence case converter: paste text and capitalize the first letter of each sentence in one click. Fix ALL CAPS or all-lowercase text. No signup, runs in your browser."
+>
+  <main class="halo">
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Capitalization &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Sentence Case Converter
+      </h1>
+      <p class="lede mt-4 max-w-2xl">
+        Paste your text and click <strong>Sentence case</strong> to capitalize
+        the first letter of every sentence and tidy the rest &mdash; the fastest
+        way to rescue a line shouted in ALL CAPS or left in all lowercase. Proper
+        nouns stay intact, and your text never leaves your browser.
+      </p>
+      <p class="definition mt-4 max-w-2xl muted">
+        A sentence case converter is a free online tool that capitalizes only the
+        first letter of each sentence (plus proper nouns) and lowercases the
+        rest, rewriting your text the way normal prose is written - in one click,
+        without retyping.
+      </p>
+    </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
+    <CaseConverter />
+
+    <TrustStrip />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
+
+      <h2 class="text-2xl font-bold">Who the sentence case converter is for</h2>
+      <ul class="list-disc space-y-2 pl-6 muted">
+        <li><strong>Writers and bloggers</strong> normalizing body copy so every sentence starts with a capital and nothing is shouting.</li>
+        <li><strong>Students</strong> fixing a paragraph accidentally typed in caps lock before it goes into an essay.</li>
+        <li><strong>Editors and proofreaders</strong> converting all caps to sentence case across pasted notes in seconds.</li>
+        <li><strong>Support and ops teams</strong> cleaning up messages and macros that came in entirely lowercase or uppercase.</li>
+        <li><strong>Anyone</strong> who pasted text from a spreadsheet or caption and needs it to read like proper sentences again.</li>
+      </ul>
+
+      <h2 class="text-2xl font-bold">How to convert text to sentence case</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Type or paste your text into the box above.</li>
+        <li>Click <strong>Sentence case</strong> - the first letter of each sentence is capitalized and the rest is lowercased.</li>
+        <li>Keep <strong>brand-name preservation</strong> on so proper nouns like iPhone and NASA stay correct.</li>
+        <li>Hit <strong>Copy</strong> (or Ctrl/Cmd + Enter) and paste the result wherever you need it.</li>
+      </ol>
+
+      <h2 class="text-2xl font-bold">What sentence case actually does</h2>
+      <p class="muted">
+        Sentence case capitalizes the first letter of each sentence and leaves
+        everything else lowercase, apart from proper nouns. The converter detects
+        sentence boundaries at periods, question marks and exclamation points, so
+        a multi-sentence paragraph is fixed in a single pass rather than one line
+        at a time. That makes it ideal for two common messes: text that arrived in
+        ALL CAPS (a caps-lock accident or a shouty caption) and text that came in
+        entirely lowercase (chat exports, transcripts, quick notes). Either way,
+        one click turns it back into readable prose.
+      </p>
+
+      <h2 class="text-2xl font-bold">Sentence case vs Title Case vs Capitalize Each Word</h2>
+      <p class="muted">
+        These are easy to confuse. <strong>Sentence case</strong> capitalizes only
+        the first word of each sentence (and proper nouns) - the right choice for
+        paragraphs and body text. <strong>Title Case</strong> capitalizes the major
+        words of a heading while lowercasing small words like "the", "of" and
+        "and", following a style guide. <strong>Capitalize Each Word</strong>
+        capitalizes the first letter of every single word, including those small
+        words, which looks like a title but breaks the rules real headlines follow.
+        If you are formatting a heading rather than a sentence, switch to the
+        <a href="/tools/case-converter">full case converter</a>, which supports
+        Title Case for AP, Chicago, APA and MLA. To understand exactly why each
+        word in a heading is capitalized, see our guide on
+        <a href="/blog/title-case-rules-ap-vs-chicago">title case rules and AP vs Chicago capitalization</a>.
+      </p>
+
+      <h2 class="text-2xl font-bold">Privacy - everything runs in your browser</h2>
+      <p class="muted">
+        There is no server and no upload. All casing is done with plain
+        JavaScript on your device, so you can safely convert confidential or
+        unpublished text. Open your browser's DevTools Network tab while you work
+        and you'll see zero requests - and the tool keeps working with your
+        connection turned off.
+      </p>
+      <p class="muted">
+        Cleaning up a paste often needs more than casing. If the text carries
+        messy spacing or stray line breaks from a document, the
+        <a href="/tools/whitespace-line-break-reflow-fixer">whitespace and line-break reflow fixer</a>
+        tidies it into clean paragraphs before you fix the capitalization.
+      </p>
+
+      <p class="updated muted text-sm">Last updated: June 2026</p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedTools currentSlug="case-converter" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+  </style>
+</Base>

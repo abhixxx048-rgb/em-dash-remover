@@ -1,0 +1,236 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cleaner from '../../components/Cleaner.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+
+const faqs = [
+  {
+    q: 'How do I remove em dashes in a Gmail email?',
+    a: 'Write or paste your draft, copy it out of the Gmail compose box, paste it into the cleaner above, then click Copy and paste the cleaned text back into your email. Smart mode swaps each em dash for the grammatically correct comma, semicolon, colon or period, so your message reads naturally instead of full of comma splices.',
+  },
+  {
+    q: 'Does Gmail have a Find and Replace to delete em dashes?',
+    a: 'No. The Gmail web compose window has no Find & Replace and no special-character search, so there is no built-in way to swap every em dash at once. Copying your draft into this browser tool and pasting it back is the fastest reliable method - it works in the desktop compose window and in the Gmail mobile app.',
+  },
+  {
+    q: 'Why is my Gmail draft full of em dashes?',
+    a: 'Almost always because the text was drafted in ChatGPT, Claude or Gemini and pasted in. Large language models lean on the em dash heavily as a flexible connector, so AI-written emails carry far more dashes than a human would type. Gmail itself does not insert em dashes, so a cleanup pass removes the AI tell before you hit Send.',
+  },
+  {
+    q: 'Will cleaning the text break my Gmail formatting or signature?',
+    a: 'No. The cleaner only changes punctuation and removes invisible characters - it never touches your bold, links, bullet lists or signature. Select just the body paragraphs (leave your signature block out of the selection), clean them, and paste them back over the same selection to keep everything else intact.',
+  },
+  {
+    q: 'How do I paste the cleaned text back into Gmail without weird styling?',
+    a: 'In Gmail, use Paste as plain text (Ctrl+Shift+V / Cmd+Shift+V) so the words inherit your email font instead of carrying over outside styling. The text you cleaned is already plain, so a normal paste works too - just re-select the old paragraphs first and paste over them.',
+  },
+  {
+    q: 'Can I remove em dashes in the Gmail app on my phone?',
+    a: 'Yes. The mobile Gmail app has no Find & Replace at all, so the copy-clean-paste flow is usually the only practical way to strip em dashes on a phone. The tool runs in your mobile browser with nothing to install - open it in a tab, paste your draft, copy the result, and switch back to the Gmail app.',
+  },
+  {
+    q: 'Is my email text uploaded or stored anywhere?',
+    a: 'No. Everything runs locally in your browser with plain JavaScript - your email text is never sent to a server, stored or logged. Open your browser DevTools Network tab while you clean and you will see zero requests, and it keeps working offline. That makes it safe for confidential or client emails.',
+  },
+  {
+    q: 'What else does it clean out of a pasted email draft?',
+    a: 'Besides em dashes it converts curly "smart" quotes and apostrophes to straight ones, replaces en dashes, expands the ellipsis character (…), strips non-breaking spaces and invisible zero-width watermark characters, and flags AI cliché phrases - all of the tells that ride along when you paste an AI-written email into Gmail.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/remove-em-dash-in-gmail#app`,
+  name: 'Remove Em Dashes in Gmail',
+  url: `${Astro.site}tools/remove-em-dash-in-gmail`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  dateModified: '2026-06-15',
+  featureList: [
+    'Remove em dashes from Gmail and email drafts',
+    'Grammar-aware em dash replacement',
+    'A Find & Replace alternative for Gmail (which has none)',
+    'Remove smart quotes and invisible characters from pasted AI email text',
+    'Runs 100% in your browser - no upload',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSteps = [
+  { name: 'Copy your email draft', text: 'In the Gmail compose window, select the body of your message (leave your signature out), then press Ctrl+C / Cmd+C to copy it.' },
+  { name: 'Paste it into the cleaner', text: 'Paste the draft into the cleaner box above. The em dashes are removed instantly along with smart quotes and invisible characters.' },
+  { name: 'Choose how em dashes are replaced', text: 'Leave Smart mode on to let the tool pick a grammar-correct comma, colon, semicolon or parentheses for each sentence, or force a single replacement like a comma or hyphen.' },
+  { name: 'Paste the clean text back into Gmail', text: 'Click Copy, return to your compose window, re-select the old paragraphs, and use Paste as plain text (Ctrl+Shift+V / Cmd+Shift+V) to drop the clean version in before you hit Send.' },
+];
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to remove em dashes in Gmail',
+  step: howToSteps.map((s) => ({ '@type': 'HowToStep', name: s.name, text: s.text })),
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Remove Em Dashes in Gmail - Free, In-Browser Email Cleaner"
+  description="Remove em dashes in Gmail emails fast: paste your draft, clean it with grammar-aware fixes, copy it back before you Send. Free, no signup, runs in your browser."
+>
+  <main class="halo">
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="mt-4">
+        <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">Gmail &amp; email &middot; Free &middot; In your browser</span>
+      </p>
+      <h1 class="mt-3 text-4xl sm:text-5xl">
+        Remove em dashes in Gmail
+      </h1>
+      <p class="lede mt-4 max-w-2xl">
+        Paste your email draft below, strip every em dash (&mdash;) with
+        grammar-correct fixes, then copy the clean text straight back into your
+        Gmail compose box before you hit Send &mdash; no Find &amp; Replace
+        (Gmail doesn&rsquo;t have one), no signup, nothing uploaded.
+      </p>
+      <p class="definition mt-4 max-w-2xl muted">
+        Removing em dashes in Gmail means replacing the long dash (&mdash;) that
+        AI tools overuse in drafted emails with the right punctuation - a comma,
+        semicolon, colon or period - so your message reads like you wrote it.
+      </p>
+    </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
+    <!-- Tool high on the page (transactional intent) -->
+    <div id="paste">
+      <Cleaner />
+    </div>
+
+    <TrustStrip />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The full walkthrough</p>
+      <hr class="rule-dash" />
+
+      <h2 class="text-2xl font-bold">How to remove em dashes in Gmail</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        {howToSteps.map((s) => (
+          <li><strong>{s.name}.</strong> {s.text}</li>
+        ))}
+      </ol>
+      <p class="muted">
+        Because the cleaner runs entirely on your device, you can safely paste a
+        confidential or client email - nothing leaves your browser. If you only
+        want to fix one paragraph, highlight just that part of your draft in the
+        compose window before you copy.
+      </p>
+
+      <h2 class="text-2xl font-bold">Why Gmail has no Find &amp; Replace for em dashes</h2>
+      <p class="muted">
+        Unlike Microsoft Word or Google Docs, the Gmail compose window has no
+        Find &amp; Replace and no special-character search at all. There is no
+        keyboard shortcut to swap every &mdash; in your message, and the mobile
+        Gmail app offers even less. That leaves three options: delete each dash by
+        hand, retype the sentence, or copy the draft into a tool that fixes them
+        in one pass. The
+        <a href="/">grammar-aware em dash remover</a> above does the last one - it
+        reads the words around each dash and picks the correct comma, colon or
+        period instead of a blind swap that leaves run-on sentences behind.
+      </p>
+
+      <h2 class="text-2xl font-bold">Why your email draft is full of em dashes</h2>
+      <p class="muted">
+        One reason: the draft came from ChatGPT, Claude or Gemini. Asking an AI to
+        &ldquo;write a polite follow-up&rdquo; or &ldquo;draft a cold outreach
+        email&rdquo; produces text peppered with em dashes, because language models
+        lean on that long dash as a flexible, always-grammatical connector far more
+        than people do. Paste that into Gmail and the dashes become an obvious tell
+        that the message wasn&rsquo;t written by hand - not the impression you want
+        on a job application, sales email or note to a client.
+      </p>
+      <p class="muted">
+        The same flow works for the desktop apps too. If you also draft in a word
+        processor before emailing, our companion guide to
+        <a href="/blog/how-to-remove-em-dashes-in-word-and-google-docs">removing em dashes in Word and Google Docs</a>
+        walks through the exact Find &amp; Replace codes for both - handy when the
+        email started life as a document.
+      </p>
+
+      <h2 class="text-2xl font-bold">Pasting the clean text back into Gmail</h2>
+      <p class="muted">
+        Once you&rsquo;ve copied the cleaned text, return to your compose window,
+        re-select the original paragraphs, and use <strong>Paste as plain
+        text</strong> (<strong>Ctrl+Shift+V</strong> / <strong>Cmd+Shift+V</strong>)
+        so the words inherit your email font instead of carrying over outside
+        styling. Leave your signature block out of the selection and it stays
+        exactly as it was - the cleaner only rewrites punctuation and removes hidden
+        characters, so your links, bold and lists are untouched.
+      </p>
+
+      <h2 class="text-2xl font-bold">Beyond em dashes: the other tells in a pasted AI email</h2>
+      <p class="muted">
+        Em dashes are the loudest tell, but rarely the only one in an AI-drafted
+        email. The same pass also converts curly &ldquo;smart&rdquo; quotes and
+        apostrophes to straight ones, replaces en dashes, expands the ellipsis
+        character (&hellip;) to three dots, and strips non-breaking spaces and
+        invisible zero-width &ldquo;watermark&rdquo; characters that AI tools slip
+        in. To see exactly what was hiding in your draft before you send it, the
+        <a href="/tools/invisible-watermark-character-inspector">invisible character inspector</a>
+        reveals every hidden character in your text.
+      </p>
+
+      <p class="updated muted text-sm">Last updated: June 2026</p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">Questions, answered</p>
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+  </style>
+</Base>

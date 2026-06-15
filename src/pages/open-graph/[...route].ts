@@ -31,6 +31,14 @@ const pages = {
   'tools-webgpu-webllm-rewrite': { title: 'WebGPU Rewrite', description: 'Experimental on-device rewrite that never uploads your text.' },
   'tools-browser-extension': { title: 'Browser Extension', description: 'Clean em dashes and AI tells in place, anywhere you type.' },
   'tools-obsidian-plugin': { title: 'Obsidian Plugin', description: 'Clean AI-chat pastes automatically inside your Obsidian vault.' },
+  'tools-sentence-case-converter': { title: 'Sentence Case Converter', description: 'Convert text to sentence case — free, in your browser.' },
+  'tools-title-case-converter': { title: 'Title Case Converter', description: 'Title case generator with AP & Chicago rules — free, in-browser.' },
+  'tools-uppercase-to-lowercase': { title: 'Uppercase to Lowercase', description: 'Convert UPPERCASE to lowercase instantly — free, no signup.' },
+  'tools-lowercase-to-uppercase': { title: 'Lowercase to Uppercase', description: 'Convert lowercase to UPPERCASE instantly — free, no signup.' },
+  'tools-remove-em-dash-in-word': { title: 'Remove Em Dashes in Word', description: 'Strip em dashes from Word documents — 100% in your browser.' },
+  'tools-remove-em-dash-in-google-docs': { title: 'Remove Em Dashes in Google Docs', description: 'Clean em dashes from Google Docs text — free, in-browser.' },
+  'tools-remove-em-dash-in-gmail': { title: 'Remove Em Dashes in Gmail', description: 'Clean em dashes from email drafts — free, no signup.' },
+  'tools-remove-em-dash-from-chatgpt': { title: 'Remove Em Dashes from ChatGPT', description: 'Strip em dashes & AI tells from ChatGPT text — in your browser.' },
 };
 
 export const { getStaticPaths, GET } = OGImageRoute({

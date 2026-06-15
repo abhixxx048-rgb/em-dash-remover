@@ -6,35 +6,65 @@ const EMAIL = 'hello@emdashremover.app';
 
 <Page
   title="Contact Us"
-  heading="Contact us"
+  heading="Send a note to the desk"
+  eyebrow="Contact · we read everything"
   description="Get in touch with the Em Dash Remover team - feedback, bug reports, and partnership enquiries."
 >
   <p>
-    Questions, feedback, bug reports, or partnership ideas? We read everything.
-    Email us directly at <a href={`mailto:${EMAIL}`}>{EMAIL}</a>, or use the form below.
+    Questions, feedback, bug reports, or partnership ideas? Email us directly at
+    <a href={`mailto:${EMAIL}`}>{EMAIL}</a>, or leave the form below marked up with
+    whatever's on your mind.
   </p>
 
-  <form id="contact-form" class="not-prose mt-6 space-y-4">
+  <hr class="rule-dash" style="margin: 2.5rem 0;" />
+
+  <form id="contact-form" class="not-prose space-y-5">
     <div>
-      <label for="name" class="mb-1 block text-sm font-medium">Name</label>
+      <label for="name" class="contact-label">Name</label>
       <input id="name" name="name" type="text" required autocomplete="name" autocapitalize="words" class="ctl w-full px-3 text-base" />
     </div>
     <div>
-      <label for="email" class="mb-1 block text-sm font-medium">Your email</label>
+      <label for="email" class="contact-label">Your email</label>
       <input id="email" name="email" type="email" required autocomplete="email" inputmode="email" autocapitalize="none" autocorrect="off" spellcheck="false" class="ctl w-full px-3 text-base" />
     </div>
     <div>
-      <label for="message" class="mb-1 block text-sm font-medium">Message</label>
+      <label for="message" class="contact-label">Message</label>
       <textarea id="message" name="message" rows="6" required class="ctl w-full px-3 py-2 text-base"></textarea>
     </div>
-    <button type="submit" class="inline-flex min-h-12 w-full items-center justify-center rounded-lg bg-accent px-5 font-semibold text-white transition hover:opacity-90 sm:w-auto">
-      Send message
+    <button type="submit" class="contact-send ctl inline-flex w-full items-center justify-center gap-2 px-6 font-semibold sm:w-auto">
+      Send message <span aria-hidden="true">▸</span>
     </button>
-    <p class="text-xs muted">
+    <p class="contact-note">
       Submitting opens your email app with the message pre-filled - nothing is sent or
       stored by this website.
     </p>
   </form>
+
+  <style>
+    .contact-label {
+      display: block;
+      margin-bottom: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+    }
+    .contact-send {
+      background: var(--color-accent);
+      border-color: var(--color-accent);
+      color: #fff;
+      transition: opacity 0.15s ease;
+    }
+    .contact-send:hover { opacity: 0.9; }
+    .contact-note {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      line-height: 1.5;
+      color: var(--c-muted);
+    }
+  </style>
 
   <script is:inline define:vars={{ EMAIL }}>
     document.getElementById('contact-form')?.addEventListener('submit', (e) => {

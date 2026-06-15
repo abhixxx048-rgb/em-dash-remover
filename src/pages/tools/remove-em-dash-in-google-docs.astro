@@ -1,0 +1,246 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cleaner from '../../components/Cleaner.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+
+const faqs = [
+  {
+    q: 'How do I remove em dashes in Google Docs?',
+    a: 'The fastest way is to copy the text out of your Google Doc, paste it into the cleaner above, click Copy, and paste the cleaned text back over the original. Smart mode replaces each em dash with the grammatically correct comma, semicolon, colon, period or parentheses, so you do not get the comma splices a blind Find & Replace leaves behind.',
+  },
+  {
+    q: 'Can I use Find and Replace in Google Docs to delete em dashes?',
+    a: 'Yes, but with limits. Open Edit > Find and replace (or Ctrl+H / Cmd+Shift+H), paste an em dash (—) into the Find field, type your replacement, and click Replace all. The catch is that Google Docs swaps every em dash for the same character regardless of context, which often produces broken or run-on sentences. The tool above fixes the grammar around each dash automatically.',
+  },
+  {
+    q: 'How do I type or copy an em dash to paste into Find and Replace?',
+    a: 'Copy this character: —. You can also produce it in a Google Doc by typing two hyphens (--) between words and letting autocorrect convert them, then copy that. Google Docs Find and Replace does not accept Unicode codes like \\u2014, so you must paste the literal em dash character.',
+  },
+  {
+    q: 'How do I stop Google Docs from autocorrecting two hyphens into an em dash?',
+    a: 'Go to Tools > Preferences and untick "Automatic substitution", or remove the -- to — entry. That stops new em dashes from appearing as you type, but it will not touch em dashes already in the document or in text you paste from ChatGPT, so you still need a cleanup pass for existing dashes.',
+  },
+  {
+    q: 'Will pasting cleaned text back into Google Docs keep my formatting?',
+    a: 'Use "Paste without formatting" (Ctrl+Shift+V / Cmd+Shift+V) to drop the text in as plain characters that inherit your document style, or paste normally to keep basic formatting. The cleaner only changes punctuation and invisible characters, so your headings, bold and links are unaffected when you replace the body text.',
+  },
+  {
+    q: 'Does this work on the Google Docs mobile app?',
+    a: 'Yes. The mobile Docs app does not have a full Find and replace for special characters, so copying your text into this browser tool and pasting it back is usually the only practical way to remove em dashes on a phone or tablet. The cleaner runs in your mobile browser with no app to install.',
+  },
+  {
+    q: 'Is my Google Docs text uploaded anywhere?',
+    a: 'No. Everything runs locally in your browser with plain JavaScript - your document text is never sent to a server, stored or logged. You can open your browser DevTools Network tab while you clean and see zero requests, and it works offline.',
+  },
+  {
+    q: 'What else does it remove besides em dashes?',
+    a: 'It also converts curly "smart" quotes and apostrophes to straight ones, replaces en dashes, expands the ellipsis character (…), strips non-breaking spaces and invisible zero-width watermark characters, and flags AI cliché phrases - all of which commonly hitch a ride when you paste AI text into Google Docs.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/remove-em-dash-in-google-docs#app`,
+  name: 'Remove Em Dashes in Google Docs',
+  url: `${Astro.site}tools/remove-em-dash-in-google-docs`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  dateModified: '2026-06-15',
+  featureList: [
+    'Remove em dashes from Google Docs text',
+    'Grammar-aware em dash replacement',
+    'Works as a Google Docs Find & Replace alternative',
+    'Remove smart quotes and invisible characters from pasted AI text',
+    'Runs 100% in your browser - no upload',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSteps = [
+  { name: 'Select and copy your Google Doc text', text: 'In Google Docs, press Ctrl+A / Cmd+A to select everything (or highlight the section), then Ctrl+C / Cmd+C to copy it.' },
+  { name: 'Paste it into the cleaner', text: 'Paste your text into the cleaner box above. The em dashes are removed instantly along with smart quotes and invisible characters.' },
+  { name: 'Choose how em dashes are replaced', text: 'Leave Smart mode on to let the tool pick a grammar-correct comma, colon, semicolon or parentheses for each sentence, or force a single replacement like a comma or hyphen.' },
+  { name: 'Copy and paste it back into Google Docs', text: 'Click Copy, return to your document, and use Paste without formatting (Ctrl+Shift+V / Cmd+Shift+V) to drop the clean text back in.' },
+];
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to remove em dashes in Google Docs',
+  step: howToSteps.map((s) => ({ '@type': 'HowToStep', name: s.name, text: s.text })),
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Remove Em Dashes in Google Docs - Free, In-Browser Tool"
+  description="Remove em dashes in Google Docs the easy way: paste, clean, and copy back with grammar-aware fixes - a smarter Find & Replace. Free, no signup, runs in your browser."
+>
+  <main class="halo">
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="mt-4">
+        <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">Google Docs &middot; Free &middot; In your browser</span>
+      </p>
+      <h1 class="mt-3 text-4xl sm:text-5xl">
+        Remove em dashes in Google&nbsp;Docs
+      </h1>
+      <p class="lede mt-4 max-w-2xl">
+        Paste your Google Doc below, let it strip every em dash (&mdash;) with
+        grammar-correct fixes, then copy the clean text straight back into your
+        document. It&rsquo;s the Find &amp; Replace you wish Docs had &mdash; no
+        broken sentences, no signup, nothing uploaded.
+      </p>
+      <p class="definition mt-4 max-w-2xl muted">
+        Removing em dashes in Google Docs means replacing the long dash (&mdash;)
+        that AI tools overuse with the right punctuation - a comma, semicolon,
+        colon or period - so your document reads in your own voice.
+      </p>
+    </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
+    <!-- Tool high on the page (transactional intent) -->
+    <div id="paste">
+      <Cleaner />
+    </div>
+
+    <TrustStrip />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The full walkthrough</p>
+      <hr class="rule-dash" />
+
+      <h2 class="text-2xl font-bold">How to remove em dashes in Google Docs</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        {howToSteps.map((s) => (
+          <li><strong>{s.name}.</strong> {s.text}</li>
+        ))}
+      </ol>
+      <p class="muted">
+        Because the cleaner runs entirely on your device, you can safely paste a
+        confidential or unpublished Google Doc - nothing leaves your browser. If
+        you only want to fix one paragraph, highlight just that part in Docs
+        before you copy.
+      </p>
+
+      <h2 class="text-2xl font-bold">The Google Docs Find &amp; Replace method (and why it falls short)</h2>
+      <p class="muted">
+        Google Docs does have a built-in way to do this. Open
+        <strong>Edit &rsaquo; Find and replace</strong> (or press
+        <strong>Ctrl+H</strong> on Windows, <strong>Cmd+Shift+H</strong> on Mac),
+        paste an em dash (&mdash;) into the <em>Find</em> box, type your
+        replacement into <em>Replace with</em>, and click
+        <strong>Replace all</strong>. It works for a quick blanket swap.
+      </p>
+      <p class="muted">
+        The problem is that an em dash does several different grammatical jobs, so
+        replacing every one with the <em>same</em> character is a blind swap. Turn
+        a dash that joined two independent clauses into a comma and you create a
+        comma splice; turn one that introduced a list into a comma and the
+        sentence reads wrong. Google Docs Find &amp; Replace also won&rsquo;t
+        accept Unicode codes like <code>—</code> - you have to paste the
+        literal character - and it leaves the smart quotes and invisible
+        characters that rode in with your AI text untouched. The
+        <a href="/">grammar-aware em dash remover</a> above reads the words around
+        each dash and picks the correct fix instead.
+      </p>
+
+      <h2 class="text-2xl font-bold">Why your Google Doc is full of em dashes</h2>
+      <p class="muted">
+        Two things put them there. First, pasting drafts from ChatGPT, Claude or
+        Gemini - large language models lean on the em dash heavily because it is a
+        flexible, always-grammatical connector, so AI text carries far more dashes
+        than human writing. Second, Google Docs itself: by default it
+        autocorrects two hyphens (<code>--</code>) into an em dash as you type. You
+        can switch that off under <strong>Tools &rsaquo; Preferences</strong> by
+        unticking <em>Automatic substitution</em>, but that only stops
+        <em>new</em> dashes - the ones already in your document still need a
+        cleanup pass.
+      </p>
+      <p class="muted">
+        For the keyboard shortcuts and the equivalent steps in Microsoft Word,
+        our companion guide to
+        <a href="/blog/how-to-remove-em-dashes-in-word-and-google-docs">removing em dashes in Word and Google Docs</a>
+        walks through the exact Find &amp; Replace codes for both apps.
+      </p>
+
+      <h2 class="text-2xl font-bold">Pasting the clean text back without breaking formatting</h2>
+      <p class="muted">
+        Once you&rsquo;ve copied the cleaned text, return to your document and use
+        <strong>Paste without formatting</strong>
+        (<strong>Ctrl+Shift+V</strong> / <strong>Cmd+Shift+V</strong>) so the
+        words inherit your existing heading, font and paragraph styles instead of
+        carrying over the cleaner&rsquo;s plain styling. The tool only rewrites
+        punctuation and removes hidden characters, so your bold, links and lists
+        stay intact when you replace the body text.
+      </p>
+
+      <h2 class="text-2xl font-bold">Beyond em dashes: the other tells in pasted AI text</h2>
+      <p class="muted">
+        Em dashes are the loudest tell, but rarely the only one. The same pass
+        also converts curly &ldquo;smart&rdquo; quotes and apostrophes to straight
+        ones, replaces en dashes, expands the ellipsis character (&hellip;) to
+        three dots, and strips non-breaking spaces and invisible zero-width
+        &ldquo;watermark&rdquo; characters that AI tools slip in. To see exactly
+        what was hiding in your document, the
+        <a href="/tools/invisible-watermark-character-inspector">invisible character inspector</a>
+        reveals every hidden character before you clean it.
+      </p>
+
+      <p class="updated muted text-sm">Last updated: June 2026</p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">Questions, answered</p>
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+  </style>
+</Base>

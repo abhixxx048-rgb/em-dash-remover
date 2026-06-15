@@ -22,7 +22,7 @@ If the code doesn't work in your version, copy an em dash (-) from anywhere, pas
 
 ### Turn off auto-creation
 
-Word recreates em dashes as you type. To stop that: File → Options → Proofing → AutoCorrect Options → uncheck "Hyphens (--) with dash".
+Word recreates em dashes as you type. To stop that: File → Options → Proofing → AutoCorrect Options → uncheck "Hyphens (--) with dash". If you'd rather skip the manual setup entirely, our [remove em dashes in Word guide and tool](/tools/remove-em-dash-in-word) cleans a pasted document in one step.
 
 ## Google Docs
 
@@ -31,7 +31,7 @@ Word recreates em dashes as you type. To stop that: File → Options → Proofin
 3. Enter your replacement in **Replace with** (for example `, ` for a comma and space, or leave blank to delete).
 4. Click **Replace all**.
 
-To stop Docs from auto-converting `--` into an em dash: Tools → Preferences → uncheck "Automatic substitution".
+To stop Docs from auto-converting `--` into an em dash: Tools → Preferences → uncheck "Automatic substitution". For a quicker route on a longer file, the [remove em dashes in Google Docs tool](/tools/remove-em-dash-in-google-docs) handles the whole document for you.
 
 ## The problem with Find & Replace
 
@@ -66,4 +66,4 @@ Then you copy the result back into Word or Google Docs. You can even use **Diff*
 | Shows what changed | No | Yes (Diff view) |
 | Cost | Free | Free |
 
-Find & Replace is fine for a quick, one-off swap. For cleaning AI text or a whole manuscript, let a tool handle the grammar so you don't have to re-read every sentence.
+Find & Replace is fine for a quick, one-off swap. For cleaning AI text or a whole manuscript, let a tool handle the grammar so you don't have to re-read every sentence. The same approach works beyond documents too - you can [remove em dashes from ChatGPT output](/tools/remove-em-dash-from-chatgpt) before you ever paste it, or [strip em dashes out of a Gmail draft](/tools/remove-em-dash-in-gmail) so your email reads in your own voice.

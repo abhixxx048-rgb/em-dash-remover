@@ -6,6 +6,14 @@ import TrustStrip from '../../components/TrustStrip.astro';
 
 const faqs = [
   {
+    q: 'How do I find passive voice in my writing?',
+    a: 'Paste your draft into the box above and this passive voice checker highlights every passive construction live as you type, with a running count and a passive-voice percentage. No need to read sentence by sentence - the be-verb + past-participle patterns are underlined in place so you can spot and fix passive voice in essays, articles or ChatGPT-generated text at a glance.',
+  },
+  {
+    q: 'How do I check passive voice in Word or Google Docs?',
+    a: 'In Microsoft Word you can turn on the passive-voice check under File - Options - Proofing - Settings - Passive Voice, but it only underlines as you write and skips weasel words and adverbs. Google Docs has no built-in passive voice checker at all. A faster route for either is to paste your text into this free in-browser passive voice highlighter, which flags passive voice, weak adverbs and weasel words together and explains each one.',
+  },
+  {
     q: 'What counts as passive voice?',
     a: 'Passive voice is a "be" verb (am, is, are, was, were, be, been, being) followed by a past participle - for example "was written", "is reviewed", "has been approved". The actor (who did it) is either missing or pushed to the end after "by". Active voice puts the actor first: "The committee wrote the report." This tool flags every be-verb + participle pattern so you can see them at a glance.',
   },
@@ -50,6 +58,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Passive voice checker and highlighter',
     'Weasel words and vague attribution finder',
@@ -61,6 +70,29 @@ const webApp = {
     'Runs 100% in your browser, no signup',
   ],
   publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to check passive voice and weasel words',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Paste your text',
+      text: 'Paste or type your text into the box - the passive voice checker runs instantly in your browser, with no upload and no signup.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Read the live results',
+      text: 'Passive voice, weak adverbs and weasel words are underlined in place, with counts and a passive-voice percentage at the top.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Act on each flag',
+      text: 'Hover for the one-line reason and fix pattern, then rewrite passive sentences into active voice by naming the actor.',
+    },
+  ],
 };
 
 const faqSchema = {
@@ -75,46 +107,77 @@ const faqSchema = {
 ---
 
 <Base
-  title="Free Passive Voice Checker & Weasel-Word Highlighter - No Signup"
-  description="Free passive voice checker and highlighter. Instantly find passive voice, -ly adverbs and weasel words like 'studies suggest' with live counts and a passive-voice percentage - 100% in your browser, no signup."
+  title="Passive Voice Checker & Weasel-Word Highlighter - Free"
+  description="Passive voice checker that highlights passive voice, -ly adverbs and weasel words like 'studies suggest' live, with counts and a passive-voice percentage. Free, no signup, in your browser."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <div class="mb-3 flex justify-center">
-        <a href="/tools" class="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">← All tools</a>
-      </div>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no signup
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Passive Voice &amp; Weasel-Word Highlighter - find passive voice, adverbs &amp; vague words.
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Plain-prose markup &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Passive Voice &amp; Weasel-Word Highlighter
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+      <p class="lede mt-4 max-w-2xl">
         Paste your draft and instantly see every <strong>passive construction</strong>,
         weak <strong>-ly adverb</strong>, and vague <strong>"studies suggest"</strong>
-        hedge highlighted in place - with live counts, a passive-voice percentage, and a
+        hedge marked in place &mdash; with live counts, a passive-voice percentage, and a
         one-line "why" on each flag. Write with a stronger, more human voice. Nothing is uploaded.
       </p>
+      <p class="def-line mt-4 max-w-2xl text-sm muted">
+        A <strong>passive voice checker</strong> is a tool that scans your text and highlights every
+        passive construction - plus weak -ly adverbs and weasel words - so you can rewrite them into
+        clearer, more direct sentences.
+      </p>
     </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
 
     <PassiveVoiceWeaselWordHighlighter />
 
     <TrustStrip />
 
+    <!-- Who it's for -->
+    <section class="audience mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">Who it's for</p>
+      <h2 class="mt-2 text-2xl font-bold">Built for anyone tightening their prose</h2>
+      <ul class="mt-4 flex flex-wrap gap-2 muted">
+        <li class="chip">Students proofreading essays and academic writing</li>
+        <li class="chip">Writers and bloggers cutting weasel words and filler</li>
+        <li class="chip">SEO and content editors after concise, direct copy</li>
+        <li class="chip">Developers and technical writers checking docs</li>
+        <li class="chip">Anyone editing ChatGPT or AI text for a human voice</li>
+      </ul>
+    </section>
+
+    <!-- How to use -->
+    <section class="howto mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">How to use it</p>
+      <h2 class="mt-2 text-2xl font-bold">Check passive voice in three steps</h2>
+      <ol class="mt-4 list-decimal space-y-2 pl-5 muted">
+        <li>Paste or type your text into the box above - the passive voice checker runs instantly, with no upload and no signup.</li>
+        <li>Read the live results: passive voice, weak adverbs and weasel words are underlined in place, with counts and a passive-voice percentage at the top.</li>
+        <li>Act on each flag - hover for the one-line "why" and fix pattern, then rewrite passive sentences into active voice by naming the actor.</li>
+      </ol>
+    </section>
+
     <!-- Value props -->
-    <section class="mx-auto mt-16 max-w-5xl px-4">
-      <div class="grid gap-6 sm:grid-cols-3">
+    <section class="prop-grid mx-auto mt-16 max-w-5xl px-4">
+      <p class="eyebrow text-mark">What the pen catches</p>
+      <div class="mt-4 grid gap-6 sm:grid-cols-3">
         <div class="card p-5">
-          <h2 class="font-semibold">Three tells, one pass</h2>
+          <p class="eyebrow muted">01</p>
+          <h2 class="mt-2 font-semibold">Three tells, one pass</h2>
           <p class="mt-1.5 text-sm muted">Passive voice, weak -ly adverbs and weasel words / vague attributions - flagged together with distinct, colourblind-safe underlines and a live count for each.</p>
         </div>
         <div class="card p-5">
-          <h2 class="font-semibold">It coaches, never rewrites</h2>
+          <p class="eyebrow muted">02</p>
+          <h2 class="mt-2 font-semibold">It coaches, never rewrites</h2>
           <p class="mt-1.5 text-sm muted">Every highlight explains why it weakens your writing and shows a fix pattern, so you improve as you edit - and keep your own voice instead of an AI rewrite.</p>
         </div>
         <div class="card p-5">
-          <h2 class="font-semibold">Private by design</h2>
+          <p class="eyebrow muted">03</p>
+          <h2 class="mt-2 font-semibold">Private by design</h2>
           <p class="mt-1.5 text-sm muted">Pure in-browser regex and word lists. No upload, no server, no signup. Check the Network tab - zero requests. Safe for confidential drafts, works offline.</p>
         </div>
       </div>
@@ -122,6 +185,8 @@ const faqSchema = {
 
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
       <h2 class="text-2xl font-bold">Highlight passive voice, adverbs &amp; weasel words instantly</h2>
       <p class="muted">
         Paste any text into the box above and this passive voice checker highlights three
@@ -150,8 +215,11 @@ const faqSchema = {
         vague attributions - <em>studies suggest, experts say, it is thought, it could be argued,
         evidence suggests, many people believe</em> - which imply authority while dodging a real
         citation. These are exactly the phrases large language models overuse, so they are also classic
-        AI tells. Replace each with something concrete: a number, a name, or a real source. After cleaning
-        AI text with the <a href="/">Em Dash Remover</a>, run it here to confirm it no longer hedges.
+        AI tells. Replace each with something concrete: a number, a name, or a real source. To dig into
+        why <a href="/blog/passive-voice-as-an-ai-tell">passive voice is an AI tell</a>, and run a wider
+        scan for cadence and clichés, pair this with the
+        <a href="/tools/human-voice-ai-tell-report">Human-Voice / AI-Tell Report</a>. After cleaning AI
+        text with the <a href="/">Em Dash Remover</a>, run it here to confirm it no longer hedges.
       </p>
 
       <h2 class="text-2xl font-bold">-ly adverbs that weaken your writing</h2>
@@ -184,7 +252,8 @@ const faqSchema = {
     </article>
 
     <!-- FAQ -->
-    <section class="mx-auto mt-16 max-w-3xl px-4">
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
       <h2 class="text-2xl font-bold">Frequently asked questions</h2>
       <div class="mt-6 divide-y divide-ink/10">
         {faqs.map((f) => (
@@ -199,11 +268,13 @@ const faqSchema = {
           </details>
         ))}
       </div>
+      <p class="mt-6 text-xs muted">Last updated: June 2026</p>
     </section>
 
     <RelatedTools currentSlug="passive-voice-weasel-word-highlighter" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </main>
 
@@ -212,5 +283,15 @@ const faqSchema = {
     @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
     .seo a { color: var(--color-accent); text-decoration: underline; }
     .seo code { font-size: 0.85em; background: color-mix(in srgb, var(--c-ink) 7%, transparent); padding: 0.1em 0.35em; border-radius: 4px; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+
+    /* Audience chips */
+    .audience .chip { display: inline-block; border-radius: 9999px; padding: 0.3rem 0.75rem; font-size: 0.8rem; background: color-mix(in srgb, var(--c-ink) 6%, transparent); }
   </style>
 </Base>

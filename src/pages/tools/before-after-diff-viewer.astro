@@ -6,8 +6,24 @@ import RelatedTools from '../../components/RelatedTools.astro';
 
 const faqs = [
   {
-    q: 'Does this upload my text anywhere?',
-    a: 'No. The diff is computed entirely in your browser with JavaScript - your original and changed text never leave your device. Open your browser DevTools Network tab while you use it and you will see zero requests with your text. It even works offline. That makes it safe for confidential legal, medical, or financial copy.',
+    q: 'What is a diff checker and how does it work?',
+    a: 'A diff checker is a tool that compares two texts and highlights the differences between them. You paste an original and a changed version, and it lines them up, then marks added words in green, deleted words in red, and unchanged text neutrally - so you can see exactly what changed at a glance.',
+  },
+  {
+    q: 'How do I compare two texts for differences?',
+    a: 'Paste your original text into the left box and the edited version into the right box. The diff appears instantly and recomputes as you type. Switch between inline and side-by-side views, and word-level or character-level diffing, to read the changes the way that suits you best.',
+  },
+  {
+    q: 'Can I compare text without uploading to a server?',
+    a: 'Yes. The diff is computed entirely in your browser with JavaScript - your original and changed text never leave your device. Open your browser DevTools Network tab while you use it and you will see zero requests with your text. It even works offline, which makes it safe for confidential legal, medical, or financial copy.',
+  },
+  {
+    q: 'Is there a free way to compare two texts online with no signup?',
+    a: 'This text diff checker is completely free, needs no signup or registration, and shows no ads. It runs client-side in your browser, so there is no account to create and nothing to install - a private alternative to upload-based compare tools.',
+  },
+  {
+    q: 'How can I tell what ChatGPT changed in my writing?',
+    a: 'Paste your original draft on the left and the AI-rewritten version on the right. The viewer redlines every difference so you can compare ChatGPT-edited text with the original and review AI edits before keeping them - accepting the improvements you like and rejecting the rest.',
   },
   {
     q: "What's the difference between word-level and character-level diff?",
@@ -42,6 +58,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Compare before and after text instantly',
     'Inline and side-by-side diff views',
@@ -51,6 +68,19 @@ const webApp = {
     '100% private - no upload, runs in your browser',
   ],
   publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to compare two texts and highlight differences',
+  step: [
+    { '@type': 'HowToStep', name: 'Paste your two texts', text: 'Paste your original text into the left box and the changed or edited version into the right box.' },
+    { '@type': 'HowToStep', name: 'Choose view and diff level', text: 'Pick inline or side-by-side view and word-level or character-level diffing to compare the two texts the way you prefer.' },
+    { '@type': 'HowToStep', name: 'Review the differences', text: 'Read every highlighted difference: added words appear in green, deleted words in red, and invisible characters show as labelled chips.' },
+    { '@type': 'HowToStep', name: 'Accept or reject each change', text: 'Use the per-change controls to keep your original wording or use the cleaned version, change by change.' },
+    { '@type': 'HowToStep', name: 'Copy the result', text: 'Copy or download the merged result once you are happy. Everything runs in your browser, so nothing is uploaded.' },
+  ],
 };
 
 const faqSchema = {
@@ -65,35 +95,67 @@ const faqSchema = {
 ---
 
 <Base
-  title="Before/After Diff Viewer - Compare Text & See What Changed (No Upload)"
-  description="Compare your before and after text instantly. Inline or side-by-side, word or character diff, accept or reject every change. 100% private - runs in your browser, no upload."
+  title="Text Diff Checker - Compare Two Texts Free, No Signup"
+  description="Free online text diff checker to compare two texts and highlight differences. Side-by-side or inline, accept or reject each change. Private, in-browser, no signup."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <p class="mb-3">
-        <a href="/tools" class="inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
-      </p>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no upload
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Before/After Diff Viewer: see exactly what changed.
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Compare &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Text Diff Checker
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Compare your original and cleaned text side by side or inline. Every em
-        dash, quote, and invisible character is highlighted - and you decide,
+      <p class="definition mt-4 max-w-2xl">
+        A text diff checker is a tool that compares two texts and highlights the
+        differences between them, showing exactly which words and characters were
+        added, removed, or changed.
+      </p>
+      <p class="lede mt-4 max-w-2xl">
+        Compare two versions of text side by side or inline. Every word, em
+        dash, quote, and invisible character is marked up &mdash; and you decide,
         change by change, whether to <strong>keep the original or use the
-        cleaned version</strong>. Clean for quality, keep your human voice.
+        cleaned version</strong>. Compare original and edited text, keep your
+        human voice.
       </p>
     </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
 
     <BeforeAfterDiffViewer />
 
     <TrustStrip />
 
+    <!-- Who it's for -->
+    <section class="mx-auto mt-20 max-w-3xl px-4">
+      <p class="eyebrow text-mark">Who it's for</p>
+      <h2 class="mt-2 text-2xl font-bold">Built for anyone reviewing two versions of text</h2>
+      <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+        <li class="card p-4 text-sm muted"><strong>Writers &amp; editors</strong> comparing before and after versions of an essay or draft, change by change.</li>
+        <li class="card p-4 text-sm muted"><strong>Students</strong> who want to compare two versions of text online and see exactly what an edit changed.</li>
+        <li class="card p-4 text-sm muted"><strong>SEO &amp; content teams</strong> reviewing microcopy variants, redlining headlines, and tracking edits.</li>
+        <li class="card p-4 text-sm muted"><strong>Developers</strong> wanting a git-style diff viewer for plain text, release notes, and prompt revisions.</li>
+        <li class="card p-4 text-sm muted"><strong>AI-edit reviewers</strong> who need to compare ChatGPT-edited text with the original and review AI edits before keeping them.</li>
+      </ul>
+    </section>
+
+    <!-- How to use -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">How to use</p>
+      <h2 class="mt-2 text-2xl font-bold">How to compare two texts and highlight differences</h2>
+      <ol class="how-steps mt-5 list-decimal space-y-3 pl-6 muted">
+        <li><strong>Paste your original text</strong> into the left (Original) box and the changed or edited version into the right (Changed) box.</li>
+        <li><strong>Choose your view and diff level</strong> &mdash; inline or side-by-side, and word-level or character-level &mdash; to compare the two texts the way you prefer.</li>
+        <li><strong>Review every highlighted difference</strong>: added words appear in green, deleted words in red, and invisible characters show as labelled chips.</li>
+        <li><strong>Accept or reject each change</strong> with ↩ / ✓ to keep your original wording or use the cleaned version.</li>
+        <li><strong>Copy or download the merged result</strong> once you are happy &mdash; everything runs in your browser, so nothing is uploaded.</li>
+      </ol>
+    </section>
+
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
       <h2 class="text-2xl font-bold">Compare your original and cleaned text instantly</h2>
       <p class="muted">
         Bulk find-and-replace tools are scary because they change your prose
@@ -102,7 +164,8 @@ const faqSchema = {
         cleaned or edited version on the right, and the diff appears instantly -
         recomputing as you type. Deletions are shown struck through in red,
         insertions underlined in green, and unchanged text stays neutral, so you
-        can read the change at a glance.
+        can read the change at a glance. For a step-by-step walkthrough, see our
+        guide on <a href="/blog/how-to-compare-two-versions-of-text">how to compare two versions of text</a>.
       </p>
 
       <h2 class="text-2xl font-bold">Inline vs side-by-side: pick your view</h2>
@@ -146,12 +209,17 @@ const faqSchema = {
         classification, accept/reject merging, and export run in your browser with
         zero network calls - a direct answer to searches for a private, no-upload,
         offline text diff checker. It is safe for sensitive documents and works
-        with no internet connection at all.
+        with no internet connection at all. Pair it with the
+        <a href="/tools/paste-from-word-docs-cleaner">paste-from-Word cleaner</a>
+        to strip formatting soup before you compare, or the
+        <a href="/tools/whitespace-line-break-reflow-fixer">whitespace and reflow fixer</a>
+        to unwrap hard-wrapped text so your diff stays readable.
       </p>
     </article>
 
     <!-- FAQ -->
-    <section class="mx-auto mt-16 max-w-3xl px-4">
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
       <h2 class="text-2xl font-bold">Frequently asked questions</h2>
       <div class="mt-6 divide-y divide-ink/10">
         {faqs.map((f) => (
@@ -170,7 +238,10 @@ const faqSchema = {
 
     <RelatedTools currentSlug="before-after-diff-viewer" />
 
+    <p class="mx-auto mt-10 max-w-3xl px-4 text-xs muted">Last updated: June 2026</p>
+
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </main>
 
@@ -178,5 +249,14 @@ const faqSchema = {
     @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
     .seo a { color: var(--color-accent); text-decoration: underline; }
     .seo code { font-family: var(--font-mono); font-size: 0.9em; background: var(--c-accent-soft); padding: 0 0.3em; border-radius: 4px; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .tool-head .definition { font-size: 1.05rem; line-height: 1.55; color: var(--c-muted); }
+    .how-steps li::marker { color: var(--color-accent); font-weight: 700; }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
   </style>
 </Base>

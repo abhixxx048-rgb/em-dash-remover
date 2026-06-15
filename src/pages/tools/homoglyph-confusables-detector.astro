@@ -33,6 +33,22 @@ const faqs = [
     q: 'Will it change my accented letters like é or ñ?',
     a: 'No. Accented Latin letters (é, ñ, ü, ç) are genuine Latin characters, not confusables, so they are never flagged or altered. The tool only touches characters that exist in its cross-script confusables table or are fullwidth / mathematical-alphanumeric compatibility variants.',
   },
+  {
+    q: 'How do I detect Cyrillic characters in a Word document?',
+    a: 'Copy the text out of Word (or Google Docs) and paste it into the box above. The detector instantly highlights every Cyrillic or Greek letter sitting inside otherwise-Latin words, shows its U+XXXX code point, and lets you normalize the whole document back to plain Latin in one click - no add-in or macro needed.',
+  },
+  {
+    q: 'Can ChatGPT or AI tools insert hidden Cyrillic characters?',
+    a: 'Yes, it happens. Some "humanizer" wrappers deliberately swap a few Latin letters for identical-looking Cyrillic or Greek ones, and stray confusables can also sneak in through copy-paste. This detector finds those fake letters in AI-generated text so you can clean them out - it is a checker and fixer, not a generator.',
+  },
+  {
+    q: 'What is the difference between the Latin and Cyrillic "o"?',
+    a: 'They look identical but are different code points: the Latin "o" is U+006F and the Cyrillic "о" is U+043E. Fonts render them the same, so the only reliable way to tell them apart is to inspect the code point - which is exactly what this tool does for every letter in your text.',
+  },
+  {
+    q: 'How do I check if a domain or username uses homoglyphs?',
+    a: 'Paste the domain, URL or username into the tool. It flags any mixed-script or look-alike characters - the signature of an IDN homograph attack, where "paypal" is spoofed with a Cyrillic "а" - and shows the skeleton so you can compare it against the real, all-Latin version.',
+  },
 ];
 
 const webApp = {
@@ -46,6 +62,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Detect homoglyph and confusable characters in text',
     'Find Cyrillic and Greek letters disguised as Latin',
@@ -55,6 +72,19 @@ const webApp = {
     'Highlight mixed-script words inline with code points',
   ],
   publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to detect and remove confusable characters from text',
+  step: [
+    { '@type': 'HowToStep', name: 'Paste your text', text: 'Paste an essay, username, URL or anything copied from another app into the detector box.' },
+    { '@type': 'HowToStep', name: 'Review flagged letters', text: 'Every confusable is highlighted inline with its U+XXXX code point and source script.' },
+    { '@type': 'HowToStep', name: 'Check the skeleton', text: 'View the canonical form a machine reads, and keep any glyph that is genuinely meant to be there.' },
+    { '@type': 'HowToStep', name: 'Normalize', text: 'Map every look-alike character back to its plain Latin equivalent.' },
+    { '@type': 'HowToStep', name: 'Copy clean text', text: 'Copy the cleaned text back out, ready to paste into your document, form or codebase.' },
+  ],
 };
 
 const faqSchema = {
@@ -69,38 +99,68 @@ const faqSchema = {
 ---
 
 <Base
-  title="Homoglyph Detector - Find Cyrillic & Confusable Look-Alike Letters"
-  description="Free homoglyph & confusable character detector. Find Cyrillic, Greek and fullwidth letters disguised as Latin, see the Unicode skeleton, and normalize back to clean text - 100% in your browser."
+  title="Homoglyph Detector - Find Confusable Look-Alike Letters Free"
+  description="Free homoglyph detector & confusables checker. Detect Cyrillic, Greek and fullwidth letters disguised as Latin, see the Unicode skeleton, and normalize to clean text - in-browser, no signup."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <p class="mb-3">
-        <a href="/tools" class="inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
-      </p>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no signup
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Homoglyph &amp; Confusable Character Detector - find fake look-alike letters.
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Look-alike letters &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Homoglyph &amp; Confusable Character Detector
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Paste your text to catch the Cyrillic <strong>а</strong>, Greek
-        <strong>ο</strong> and fullwidth <strong>Ａ</strong> look-alikes hiding in
-        plain sight. Every mixed-script letter is highlighted with its
-        <strong>U+XXXX</strong> code point, you can see the Unicode
-        <strong>skeleton</strong> a machine really reads, and one click
-        <strong>normalizes</strong> everything back to clean Latin - never to beat
-        a detector, just to keep your writing genuine.
+      <p class="lede mt-4 max-w-2xl">
+        Catch the Cyrillic <strong>а</strong>, Greek <strong>ο</strong> and
+        fullwidth <strong>Ａ</strong> look-alikes hiding in plain sight. Every
+        mixed-script letter is flagged with its <strong>U+XXXX</strong> code
+        point, you can read the Unicode <strong>skeleton</strong> a machine
+        really sees, and one click <strong>normalizes</strong> everything back to
+        clean Latin &mdash; never to beat a detector, just to keep your writing genuine.
+      </p>
+      <p class="mt-4 max-w-2xl muted text-base">
+        A <strong>homoglyph detector</strong> is a free online tool that finds confusable
+        characters &mdash; letters from Cyrillic, Greek or other scripts that look identical
+        to Latin ones &mdash; and normalizes them back to plain, clean text.
       </p>
     </header>
 
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
     <HomoglyphConfusablesDetector />
+
+    <!-- Who it's for -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">Who it's for</p>
+      <h2 class="mt-2 text-2xl font-bold">Built for anyone fighting look-alike letters</h2>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+        <li class="card p-4"><strong>Writers &amp; editors</strong> &mdash; scan pasted or AI-generated drafts for hidden Cyrillic letters before publishing.</li>
+        <li class="card p-4"><strong>Students</strong> &mdash; find fake letters in a Word document so spellcheck and plagiarism checks read your essay correctly.</li>
+        <li class="card p-4"><strong>SEO &amp; content teams</strong> &mdash; detect non-Latin characters in text that quietly break search, sorting and find-and-replace.</li>
+        <li class="card p-4"><strong>Developers &amp; security folks</strong> &mdash; check usernames, domains and emails for homoglyph spoofing and mixed-script confusables.</li>
+        <li class="card p-4"><strong>Anyone copy-pasting</strong> &mdash; from PDFs, Google Docs or bilingual keyboards, where scripts silently mix together.</li>
+      </ul>
+    </section>
+
+    <!-- How to use -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">How to use</p>
+      <h2 class="mt-2 text-2xl font-bold">How to detect &amp; remove confusable characters</h2>
+      <ol class="mt-4 list-decimal space-y-3 pl-6">
+        <li><strong>Paste your text</strong> into the box above &mdash; an essay, a username, a URL, or anything copied from another app.</li>
+        <li><strong>Review the flagged letters.</strong> Every confusable is highlighted inline with its U+XXXX code point and the script it came from.</li>
+        <li><strong>Check the skeleton</strong> view to see the canonical form a machine reads, then keep any glyph that is genuinely meant to be there.</li>
+        <li><strong>Normalize</strong> to map every look-alike back to its plain Latin equivalent.</li>
+        <li><strong>Copy clean</strong> text back out &mdash; ready to paste into your document, form or codebase.</li>
+      </ol>
+    </section>
 
     <TrustStrip />
 
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
       <h2 class="text-2xl font-bold">What are homoglyphs and confusable characters?</h2>
       <p class="muted">
         A <strong>homoglyph</strong> is a character that looks the same as another
@@ -140,7 +200,11 @@ const faqSchema = {
         otherwise-Latin words get rewritten. And if a particular glyph is meant to
         be there - a real Greek π in a math note, an authentic Cyrillic name - click
         it in the Flagged view to <strong>keep</strong> it out of normalization.
-        Clean copy, with nothing legitimate destroyed.
+        Clean copy, with nothing legitimate destroyed. For zero-width and invisible
+        Unicode rather than visible look-alikes, pair this with our
+        <a href="/tools/invisible-watermark-character-inspector">invisible character &amp; watermark inspector</a>,
+        and run a final <a href="/tools/paste-from-word-docs-cleaner">paste-from-Word cleaner</a>
+        pass to strip formatting soup before publishing.
       </p>
 
       <h2 class="text-2xl font-bold">Why look-alike letters show up in AI and pasted text</h2>
@@ -148,8 +212,9 @@ const faqSchema = {
         Confusables creep in for several reasons. Copy-pasting from a webpage, PDF,
         or bilingual keyboard can silently mix scripts. Some "humanizer" tools
         deliberately swap Latin letters for identical-looking Cyrillic or Greek ones
-        to try to dodge AI detection - the homoglyph attack documented in the
-        SilverSpeak research. Either way, the result is text that fails search and
+        to try to dodge AI detection - the technique covered in our explainer on
+        <a href="/blog/homoglyph-attacks-explained">homoglyph attacks and how they work</a>.
+        Either way, the result is text that fails search and
         replace, breaks spellcheck, mis-sorts, and reads as manipulated. Our stance
         is simple and on-brand: we help you <strong>clean</strong> that text back to
         honest, all-Latin prose so it is legitimate everywhere - we never help create
@@ -169,7 +234,8 @@ const faqSchema = {
     </article>
 
     <!-- FAQ -->
-    <section class="mx-auto mt-16 max-w-3xl px-4">
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
       <h2 class="text-2xl font-bold">Frequently asked questions</h2>
       <div class="mt-6 divide-y divide-ink/10">
         {faqs.map((f) => (
@@ -188,7 +254,10 @@ const faqSchema = {
 
     <RelatedTools currentSlug="homoglyph-confusables-detector" />
 
+    <p class="mt-10 text-center text-sm muted">Last updated: June 2026</p>
+
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </main>
 
@@ -196,5 +265,12 @@ const faqSchema = {
   <style is:global>
     @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
     .seo a { color: var(--color-accent); text-decoration: underline; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
   </style>
 </Base>

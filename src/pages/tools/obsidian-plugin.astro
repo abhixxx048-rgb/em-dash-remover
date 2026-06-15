@@ -109,6 +109,22 @@ const faqs = [
     q: 'How is this different from Clean AI Paste or Paste Reformatter?',
     a: 'Those focus on Markdown structure, emoji or DIY regex you author yourself. This plugin adds grammar-aware em-dash replacement, built-in invisible-character stripping and an AI-tell scan, with a trusted web companion that shares the exact same cleaning engine - so there’s no rule drift.',
   },
+  {
+    q: 'How do I remove em dashes in Obsidian?',
+    a: 'Once enabled, the plugin removes em dashes from notes automatically every time you paste AI text - swapping each em dash for a grammar-appropriate comma, semicolon, colon or spaced hyphen. To fix text already in a note, select it and run the “Clean selection” command or use the right-click menu.',
+  },
+  {
+    q: 'Can it strip emojis and remove extra blank lines on paste?',
+    a: 'Yes. Alongside em dashes and curly quotes, the cleaning engine strips decorative emojis and collapses the extra blank lines and stray whitespace that ChatGPT and Claude output add, so pasted notes arrive as tidy Markdown instead of double-spaced, emoji-littered text.',
+  },
+  {
+    q: 'Does the plugin work offline, and is it free?',
+    a: 'Yes to both. It is a free, open-source community plugin that runs entirely on your device with zero network calls, so it works fully offline. There is no signup, no account and no paid tier - the same approach as the free web tool.',
+  },
+  {
+    q: 'How do I install the plugin in Obsidian?',
+    a: 'Open Settings → Community plugins → Browse, search for “Em Dash Remover”, click Install, then Enable. Before it clears community-plugin review you can install the beta manually or through BRAT by pointing it at the GitHub repo.',
+  },
 ];
 
 const pageUrl = `${Astro.site}tools/obsidian-plugin`;
@@ -119,10 +135,11 @@ const softwareApp = {
   '@id': `${pageUrl}#app`,
   name: 'Em Dash Remover for Obsidian',
   url: pageUrl,
-  applicationCategory: 'BrowserApplication',
+  applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Obsidian (Windows, macOS, Linux, iOS, Android)',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Clean-on-paste interception for ChatGPT, Claude and Gemini text',
     'Grammar-aware em dash and en dash replacement',
@@ -145,43 +162,57 @@ const faqSchema = {
   })),
 };
 
+const howToSteps = [
+  {
+    name: 'Install and enable the plugin',
+    text: 'Open Settings → Community plugins → Browse, search “Em Dash Remover”, install it and toggle it on (or use the BRAT beta meanwhile).',
+  },
+  {
+    name: 'Paste your AI text',
+    text: 'Copy a draft from ChatGPT, Claude or Gemini and paste it into any note — clean-on-paste fixes em dashes, curly quotes, emojis and invisible characters before the text lands.',
+  },
+  {
+    name: 'Read the cleaned toast',
+    text: 'A brief notice shows exactly what was removed, so you can see the plugin worked at a glance.',
+  },
+  {
+    name: 'Act on the result',
+    text: 'Keep the clean Markdown, hit Undo to restore the original, or run “Scan note for AI tells” to find anything left to fix.',
+  },
+];
+
 const howToSchema = {
   '@context': 'https://schema.org',
   '@type': 'HowTo',
-  name: 'How to clean AI paste in Obsidian',
-  step: howItWorks.map((s) => ({
+  name: 'How to use the Obsidian clean AI paste plugin',
+  step: howToSteps.map((s, i) => ({
     '@type': 'HowToStep',
-    position: Number(s.step),
-    name: s.title,
-    text: s.body,
+    position: i + 1,
+    name: s.name,
+    text: s.text,
   })),
 };
 ---
 
 <Base
-  title="Em Dash Remover for Obsidian - Clean AI Paste, Locally"
-  description="An Obsidian plugin that cleans AI paste the instant you paste it - grammar-aware em dash removal, curly quotes, invisible watermark characters and whitespace, 100% local. Coming soon."
+  title="Obsidian Clean AI Paste Plugin - Free, Local & Private"
+  description="An Obsidian clean AI paste plugin that strips em dashes, curly quotes, emojis and invisible characters the instant you paste ChatGPT or Claude text. Free, 100% local."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <p class="mb-3">
-        <a href="/tools" class="text-sm font-medium text-accent hover:underline">← All tools</a>
-      </p>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        Obsidian plugin · 100% local · free · coming soon
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Em Dash Remover for Obsidian - clean AI paste, locally.
+    <!-- Editorial header -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="eyebrow text-accent hover:underline">← All tools</a>
+      <p class="eyebrow text-mark mt-6">Copydesk · Obsidian · in development</p>
+      <h1 class="mt-3 text-4xl sm:text-5xl">
+        Clean AI paste, locally — inside your vault.
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Paste a draft from ChatGPT, Claude or Gemini into a note and the
-        <strong>em dashes, curly quotes and invisible watermark characters</strong>
-        are gone before a single character lands - with the same
-        <strong>grammar-aware</strong> cleaning engine as the website, running
-        entirely inside Obsidian. Nothing ever leaves your vault.
+      <p class="mt-4 max-w-2xl text-base leading-relaxed" style="color: var(--c-ink);">
+        An <strong>Obsidian clean AI paste plugin</strong> is a community plugin that automatically removes em dashes, curly quotes, emojis and invisible characters from ChatGPT, Claude or Gemini text the moment you paste it into a note — so your vault stays clean without a single extra keystroke.
       </p>
-      <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed muted">
+        Paste a draft from ChatGPT, Claude or Gemini into a note and the <strong style="color: var(--c-ink); font-weight: 600;">em dashes, curly quotes and invisible watermark characters</strong> are gone before a single character lands — with the same <strong style="color: var(--c-ink); font-weight: 600;">grammar-aware</strong> cleaning engine as the website, running entirely inside Obsidian. Nothing ever leaves your vault.
+      </p>
+      <div class="mt-7 flex flex-wrap items-center gap-3">
         <span
           class="inline-flex min-h-11 cursor-not-allowed items-center rounded-xl px-5 font-semibold text-white opacity-60"
           style="background: var(--color-accent);"
@@ -195,15 +226,15 @@ const howToSchema = {
       </div>
     </header>
 
+    <hr class="rule-dash mx-auto mb-2 max-w-3xl" />
+
     <TrustStrip />
 
     <!-- What it does -->
     <section class="mx-auto mt-12 max-w-3xl px-4">
       <div class="card p-6 sm:p-8">
-        <h2 class="text-2xl font-bold">What it will do</h2>
-        <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-          In development - features below describe the planned plugin
-        </p>
+        <p class="eyebrow text-mark">In development · features below describe the planned plugin</p>
+        <h2 class="mt-2 text-2xl font-bold">What it will do</h2>
         <p class="mt-3 muted">
           The plugin is in development. When you paste text copied from an AI chat
           into a note, it will catch Obsidian’s <code>editor-paste</code> event, run
@@ -219,6 +250,30 @@ const howToSchema = {
           you actually draft.
         </p>
       </div>
+    </section>
+
+    <!-- Who it's for -->
+    <section class="mx-auto mt-12 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Who it’s for</h2>
+      <p class="mt-2 muted">Anyone who drafts in an AI chat and keeps a permanent Obsidian vault:</p>
+      <ul class="mt-4 grid gap-3 sm:grid-cols-2">
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">Students &amp; researchers</strong> who paste ChatGPT summaries into study notes and want clean Markdown, not stray em dashes.</li>
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">Writers &amp; bloggers</strong> who use Obsidian to remove em dash from notes and keep a consistent house style.</li>
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">PKM &amp; Zettelkasten users</strong> who want to clean up pasted notes automatically and strip emojis from AI text.</li>
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">Developers &amp; technical note-takers</strong> who need code blocks protected while curly quotes and blank lines get fixed.</li>
+        <li class="card p-4 text-sm muted"><strong style="color: var(--c-ink);">Privacy-minded professionals</strong> doing client or legal work who need a clean-paste plugin that works fully offline.</li>
+      </ul>
+    </section>
+
+    <!-- How to use -->
+    <section class="mx-auto mt-12 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">How to use the Obsidian clean AI paste plugin</h2>
+      <ol class="mt-4 list-decimal space-y-3 pl-5 muted">
+        <li><strong style="color: var(--c-ink);">Install &amp; enable it.</strong> Open <strong>Settings → Community plugins → Browse</strong>, search “Em Dash Remover”, install and toggle it on (or use the BRAT beta meanwhile).</li>
+        <li><strong style="color: var(--c-ink);">Paste your AI text.</strong> Copy a draft from ChatGPT, Claude or Gemini and paste it into any note — clean-on-paste fixes em dashes, curly quotes, emojis and invisible characters before the text lands.</li>
+        <li><strong style="color: var(--c-ink);">Read the “cleaned” toast.</strong> A brief notice shows exactly what was removed, so you can see the plugin worked at a glance.</li>
+        <li><strong style="color: var(--c-ink);">Act on the result.</strong> Keep the clean Markdown, hit <strong>Undo</strong> to restore the original, or run <strong>Scan note for AI tells</strong> to find anything left to fix.</li>
+      </ol>
     </section>
 
     <!-- Features -->
@@ -315,6 +370,11 @@ const howToSchema = {
         random website - the same local-only approach as the web cleaner, with all
         processing on your device.
       </p>
+      <p class="muted">
+        Want the same cleanup outside your vault? The <a href="/tools/browser-extension">browser extension to clean em dashes as you type</a> brings clean-on-paste to any text box on the web, while the <a href="/tools/paste-from-word-docs-cleaner">paste-from-Word formatting cleaner</a> handles the messy markup that comes out of Word and Google Docs. For a deeper walkthrough of the problem and the fix, read our guide on <a href="/blog/clean-ai-paste-in-obsidian">how to clean AI paste in Obsidian</a>.
+      </p>
+
+      <p class="mt-8 text-xs muted">Last updated: June 2026</p>
     </article>
 
     <!-- FAQ -->

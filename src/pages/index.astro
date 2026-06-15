@@ -4,32 +4,40 @@ import Cleaner from '../components/Cleaner.astro';
 
 const faqs = [
   {
-    q: 'Why do people remove em dashes from AI text?',
-    a: 'Heavy em-dash use (-) is one of the most recognizable "tells" of AI-generated writing. Models like ChatGPT and Claude lean on em dashes far more than most human writers, so cleaning them up helps your text read naturally.',
+    q: 'How do I remove em dashes from text?',
+    a: 'Paste your text into the em dash remover box above, choose how em dashes should be replaced (Smart mode picks the grammatically correct fix automatically), then click Copy. The whole paste-clean-copy flow takes a few seconds and runs entirely in your browser.',
+  },
+  {
+    q: 'How do I remove em dashes from ChatGPT text?',
+    a: 'Copy the reply out of ChatGPT, paste it into the cleaner above, and the em dashes (along with smart quotes and invisible watermark characters that AI tools add) are removed in one pass. It works the same for text from Claude, Gemini or any other AI writing tool.',
+  },
+  {
+    q: 'How do I remove em dashes in Word or Google Docs?',
+    a: 'The fastest way is to paste your text into this tool, copy the cleaned result, and paste it back into your document. You can also use Find & Replace in Word or Google Docs and search for the em dash character (—), but that does a blind replace and will not fix the grammar around it. See our step-by-step guide for the exact Find & Replace codes.',
   },
   {
     q: 'How is this different from other em dash removers?',
     a: 'Most tools do a blind find-and-replace (every em dash becomes a comma), which creates comma splices and broken sentences. Our Smart mode looks at the surrounding words and picks the right fix - a comma, semicolon, colon, period, or parentheses - so the grammar stays correct.',
   },
   {
-    q: 'Does my text get sent to a server?',
-    a: 'No. All cleaning happens entirely in your browser. Nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. The tool even works offline.',
+    q: 'How do I replace an em dash with a comma or hyphen?',
+    a: 'Use the replacement selector above. Pick a comma, hyphen, en dash, period or space to force every em dash to one character, or leave it on Smart mode to let the tool choose the right replacement for each sentence automatically.',
+  },
+  {
+    q: 'What is the difference between an em dash, en dash and hyphen?',
+    a: 'A hyphen (-) joins words like "well-known". An en dash (–) is slightly longer and marks ranges like "10–20". An em dash (—) is the longest and sets off pauses or asides. AI tools overuse the em dash specifically, which is why it stands out.',
+  },
+  {
+    q: 'Why does ChatGPT use so many em dashes?',
+    a: 'Large language models learn punctuation from huge amounts of web and book text and gravitate to the em dash because it is a flexible, always-grammatical connector. The result is text peppered with dashes far more often than a human would use, which is why pasted AI text usually needs a cleanup.',
+  },
+  {
+    q: 'Is this tool private, free and does it store my text?',
+    a: 'It is completely free with no signup and no limits, and nothing is stored. All cleaning happens in your browser - open the DevTools Network tab while you use it and you will see zero requests. It even works offline.',
   },
   {
     q: 'What else does it clean besides em dashes?',
     a: 'En dashes, curly "smart" quotes, ellipsis characters, non-breaking spaces, invisible zero-width / watermark characters, extra whitespace, and (optionally) leftover markdown. It also scans for AI cliché phrases and overused vocabulary.',
-  },
-  {
-    q: 'How do I remove em dashes in Word or Google Docs?',
-    a: 'The fastest way is to paste your text into this tool, copy the cleaned result, and paste it back. You can also use Find & Replace in Word or Google Docs and search for the em dash character (-), but that does a blind replace and will not fix the grammar around it.',
-  },
-  {
-    q: 'Does removing em dashes bypass AI detectors?',
-    a: 'No - and it is not meant to. AI detectors look at statistical patterns like perplexity and burstiness, not punctuation, so stripping em dashes or invisible characters will not fool them. This is a quality tool: it keeps your real writing from being mistaken for a robot\'s, it is not a "humanizer" for hiding AI. See our guide for the full explanation.',
-  },
-  {
-    q: 'Is it free?',
-    a: 'Yes - completely free, no signup, no limits.',
   },
 ];
 
@@ -44,6 +52,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Remove em dashes from text',
     'Grammar-aware em dash replacement',
@@ -63,57 +72,114 @@ const faqSchema = {
     acceptedAnswer: { '@type': 'Answer', text: f.a },
   })),
 };
+
+const howToSteps = [
+  { name: 'Paste your text', text: 'Paste the AI or pasted text you want to fix into the cleaner box, or click an example to try it.' },
+  { name: 'Choose how em dashes are replaced', text: 'Pick a replacement, or leave Smart mode on to let the tool choose a grammar-correct comma, colon, semicolon or parentheses for each sentence.' },
+  { name: 'Clean and review', text: 'The em dashes are removed instantly along with smart quotes and invisible characters. Switch to Diff view to see exactly what changed.' },
+  { name: 'Copy the clean text', text: 'Click Copy and paste the cleaned text back into Word, Google Docs, Notion or anywhere you need it.' },
+];
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to remove em dashes from text',
+  step: howToSteps.map((s) => ({ '@type': 'HowToStep', name: s.name, text: s.text })),
+};
 ---
 
 <Base
-  title="Em Dash Remover – Free AI Text Cleaner (No Signup)"
-  description="Instantly remove em dashes, smart quotes and invisible characters from ChatGPT and AI text. Grammar-aware, free, no signup - runs 100% in your browser."
+  title="Em Dash Remover – Free Online Tool, No Signup"
+  description="Em dash remover that strips em dashes from ChatGPT and AI text with grammar-aware fixes. Free, no signup, runs 100% in your browser. Paste, clean, copy."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-6xl px-4 pt-12 pb-7 sm:pt-16">
-      <p class="eyebrow text-mark">Proofread · your voice, restored</p>
-      <h1 class="mt-4 max-w-3xl text-4xl sm:text-5xl lg:text-6xl">
-        Delete the <span class="struck">tells</span>.<br />Keep the voice.
-      </h1>
-      <p class="mt-5 max-w-2xl text-lg leading-relaxed muted">
-        Paste AI writing and this editor marks it up like a copyeditor — striking
-        em dashes, smart quotes, invisible characters and other tells, with
-        <strong style="color: var(--c-ink); font-weight: 600;">grammar-aware</strong>
-        fixes instead of a blind find-and-replace. You keep your own words.
-      </p>
-      <p class="eyebrow muted mt-5 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <span>100% in your browser</span>
-        <span aria-hidden="true" class="text-mark">—</span>
-        <span>free</span>
-        <span aria-hidden="true" class="text-mark">—</span>
-        <span>no signup</span>
-      </p>
+    <!-- Hero: a galley proof being marked up in red pen -->
+    <header class="mx-auto max-w-6xl px-4 pt-10 pb-8 sm:pt-14">
+      <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
+        <!-- Thesis -->
+        <div class="lg:col-span-5">
+          <p class="eyebrow text-mark">Proofread · your voice, restored</p>
+          <h1 class="mt-4 text-4xl sm:text-5xl lg:text-6xl">
+            Cut the <span class="struck">tells</span>.<br />Keep the voice.
+          </h1>
+          <p class="mt-4 max-w-xl text-base leading-relaxed muted">
+            An em dash remover is a free online tool that strips em dashes (—) and
+            other AI tells from your text, replacing them with grammar-correct
+            punctuation in one click.
+          </p>
+          <p class="mt-3 max-w-xl text-lg leading-relaxed muted">
+            Paste AI writing and watch it get marked up like a galley proof — em
+            dashes struck, puffery flagged, invisible characters caught — with
+            <strong style="color: var(--c-ink); font-weight: 600;">grammar-aware</strong>
+            fixes, not a blind find-and-replace.
+          </p>
+          <div class="mt-7 flex flex-wrap items-center gap-4">
+            <a href="#paste" class="inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-semibold text-white shadow-sm transition hover:opacity-90" style="background: var(--color-mark);">
+              Paste your draft <span aria-hidden="true">▸</span>
+            </a>
+            <span class="eyebrow muted">100% private · no signup</span>
+          </div>
+        </div>
+
+        <!-- The signature: a marked-up galley proof -->
+        <div class="lg:col-span-7">
+          <figure class="galley card" aria-label="Example of an AI draft being copyedited into clean text">
+            <figcaption class="galley-bar">
+              <span class="eyebrow">draft.txt · marked up</span>
+              <span class="galley-legend" aria-hidden="true"><i class="cut-key">cut</i><i class="add-key">kept</i></span>
+            </figcaption>
+            <div class="galley-body">
+              <p class="galley-line"><span class="ln">1</span><span class="gl">We <span class="cut" style="--d:.6s" data-note="used">leveraged</span> a robust strategy</span></p>
+              <p class="galley-line"><span class="ln">2</span><span class="gl">to unlock synergies <span class="cut" style="--d:1.2s" data-note=",">—</span> one that</span></p>
+              <p class="galley-line"><span class="ln">3</span><span class="gl">is <span class="flag" data-note="cliché">truly game-changing</span>.</span></p>
+              <p class="galley-line galley-out"><span class="ln" aria-hidden="true">✓</span><span class="gl">We used a strong strategy that connects teams.</span></p>
+            </div>
+          </figure>
+        </div>
+      </div>
     </header>
 
-    <Cleaner />
+    <div id="paste">
+      <Cleaner />
+    </div>
 
     <!-- Value props -->
-    <section class="mx-auto mt-16 max-w-5xl px-4">
-      <div class="grid gap-6 sm:grid-cols-3">
-        <div class="card p-5">
-          <h2 class="font-semibold">Grammar-correct, not just deleted</h2>
-          <p class="mt-1.5 text-sm muted">An em dash does many jobs. Smart mode picks a comma, colon, semicolon or parentheses based on the sentence - so you never get a comma splice.</p>
+    <section class="mx-auto mt-20 max-w-5xl px-4">
+      <p class="eyebrow text-mark">Why it reads differently</p>
+      <div class="mt-6 grid overflow-hidden rounded-xl border sm:grid-cols-3" style="border-color: color-mix(in srgb, var(--c-ink) 12%, transparent); gap: 1px; background: color-mix(in srgb, var(--c-ink) 12%, transparent);">
+        <div class="p-6" style="background: var(--c-surface);">
+          <h2 class="text-xl">Grammar-correct, not just deleted</h2>
+          <p class="mt-2 text-[0.95rem] muted">An em dash does many jobs. Smart mode reads the sentence around it and picks a comma, colon, semicolon or parentheses — so you never get a comma splice.</p>
         </div>
-        <div class="card p-5">
-          <h2 class="font-semibold">Your text never leaves your browser</h2>
-          <p class="mt-1.5 text-sm muted">No upload, no server, no logging. Provable privacy - check the Network tab. Safe for confidential work.</p>
+        <div class="p-6" style="background: var(--c-surface);">
+          <h2 class="text-xl">Your words never leave the page</h2>
+          <p class="mt-2 text-[0.95rem] muted">No upload, no server, no logging. Open the Network tab and watch — zero requests. Safe for confidential drafts, works offline.</p>
         </div>
-        <div class="card p-5">
-          <h2 class="font-semibold">More than dashes</h2>
-          <p class="mt-1.5 text-sm muted">Invisible watermark characters, smart quotes, AI cliché phrases and overused words - all caught in one pass, with a live AI-tell score.</p>
+        <div class="p-6" style="background: var(--c-surface);">
+          <h2 class="text-xl">More than dashes</h2>
+          <p class="mt-2 text-[0.95rem] muted">Invisible watermark characters, smart quotes, cliché phrases and overused words — all caught in one pass, with a live AI-tell score.</p>
         </div>
       </div>
     </section>
 
+    <!-- Who it's for -->
+    <section class="mx-auto mt-20 max-w-3xl px-4">
+      <p class="eyebrow text-mark">Who it's for</p>
+      <h2 class="mt-2 text-2xl font-bold">Who uses an em dash remover?</h2>
+      <ul class="mt-5 grid gap-3 sm:grid-cols-2">
+        <li class="card p-4 text-[0.95rem] muted"><strong style="color: var(--c-ink);">Students &amp; essay writers</strong> cleaning em dashes out of ChatGPT drafts so the writing reads in their own voice.</li>
+        <li class="card p-4 text-[0.95rem] muted"><strong style="color: var(--c-ink);">Bloggers &amp; SEO writers</strong> who want to remove em dashes from AI text before it goes live.</li>
+        <li class="card p-4 text-[0.95rem] muted"><strong style="color: var(--c-ink);">Developers &amp; technical writers</strong> stripping smart quotes and invisible characters that break code and snippets.</li>
+        <li class="card p-4 text-[0.95rem] muted"><strong style="color: var(--c-ink);">Freelancers &amp; marketers</strong> polishing client copy, emails and LinkedIn posts so they don't read like AI.</li>
+      </ul>
+    </section>
+
+    <hr class="rule-dash mx-auto mt-20 max-w-3xl" />
+
     <!-- SEO content -->
-    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
-      <h2 class="text-2xl font-bold">What is an em dash (-) and why remove it?</h2>
+    <article class="seo mx-auto mt-12 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The em dash, explained</p>
+      <h2 class="text-2xl font-bold">What is an em dash (—) and why remove it?</h2>
       <p class="muted">
         An em dash (-) is the longest dash in typography, wider than a hyphen (-)
         and an en dash (–). Writers use it to add a dramatic pause, insert an aside,
@@ -136,10 +202,9 @@ const faqSchema = {
 
       <h2 class="text-2xl font-bold">How to remove em dashes from text</h2>
       <ol class="list-decimal space-y-2 pl-6 muted">
-        <li>Paste your text into the cleaner box above (or click an example).</li>
-        <li>Choose how em dashes should be replaced - <strong>Smart</strong> mode picks the grammatically correct fix automatically.</li>
-        <li>Review the cleaned result, or switch to <strong>Diff</strong> view to see exactly what changed.</li>
-        <li>Click <strong>Copy</strong> and paste the clean text wherever you need it.</li>
+        {howToSteps.map((s) => (
+          <li><strong>{s.name}.</strong> {s.text}</li>
+        ))}
       </ol>
       <p class="muted">
         It works the same whether your text came from ChatGPT, an email draft, a
@@ -150,9 +215,11 @@ const faqSchema = {
       <h3 class="text-lg font-semibold">Removing em dashes in Word or Google Docs</h3>
       <p class="muted">
         Microsoft Word and Google Docs both have Find &amp; Replace, but searching for
-        "-" and replacing it with a comma is a blind swap that often breaks your
+        "—" and replacing it with a comma is a blind swap that often breaks your
         sentences. For correct results, paste your text here first, let Smart mode fix
-        the grammar, then copy it back into your document.
+        the grammar, then copy it back into your document. Our step-by-step guide to
+        <a href="/blog/how-to-remove-em-dashes-in-word-and-google-docs">removing em dashes in Word and Google Docs</a>
+        covers the exact Find &amp; Replace character codes if you'd rather do it inside the app.
       </p>
 
       <h2 class="text-2xl font-bold">What else this tool cleans</h2>
@@ -164,11 +231,22 @@ const faqSchema = {
         It also scores your text for clichéd phrases and overused AI vocabulary so you
         can see - and fix - what makes writing sound robotic.
       </p>
+      <p class="muted">
+        To go deeper, the
+        <a href="/tools/invisible-watermark-character-inspector">invisible character inspector</a>
+        reveals every hidden zero-width and watermark character that AI tools slip into
+        text, and the
+        <a href="/tools/before-after-diff-viewer">before/after diff viewer</a>
+        lets you review each em dash fix and accept or reject it line by line.
+      </p>
+
+      <p class="mt-6 text-sm muted">Last updated: June 2026.</p>
     </article>
 
     <!-- More tools -->
     <section class="mx-auto mt-20 max-w-5xl px-4">
-      <div class="flex items-end justify-between">
+      <p class="eyebrow text-mark">The rest of the desk</p>
+      <div class="mt-2 flex items-end justify-between">
         <h2 class="text-2xl font-bold">More free text tools</h2>
         <a href="/tools" class="text-sm font-medium text-accent hover:underline">See all 20 →</a>
       </div>
@@ -194,8 +272,9 @@ const faqSchema = {
     </section>
 
     <!-- FAQ -->
-    <section class="mx-auto mt-16 max-w-3xl px-4">
-      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+    <section class="mx-auto mt-20 max-w-3xl px-4">
+      <p class="eyebrow text-mark">Questions, answered</p>
+      <h2 class="mt-2 text-2xl font-bold">Frequently asked questions</h2>
       <div class="mt-6 divide-y divide-ink/10">
         {faqs.map((f) => (
           <details class="group py-4">
@@ -213,11 +292,80 @@ const faqSchema = {
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
   </main>
 
   <!-- Clear the fixed mobile action bar so the footer is reachable. -->
   <style is:global>
     @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
     .seo a { color: var(--color-accent); text-decoration: underline; }
+
+    /* ── Galley proof: the signature element ───────────────────── */
+    .galley { padding: 0; overflow: hidden; }
+    .galley-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0.55rem 0.9rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--c-ink) 11%, transparent);
+      background: color-mix(in srgb, var(--c-ink) 3%, transparent);
+    }
+    .galley-legend { display: inline-flex; gap: 0.4rem; }
+    .cut-key, .add-key {
+      font-family: var(--font-mono); font-size: 0.6rem; font-weight: 500;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      padding: 0.12rem 0.4rem; border-radius: 4px;
+    }
+    .cut-key { color: var(--color-mark); background: var(--c-mark-soft); }
+    .add-key { color: var(--color-accent); background: var(--c-accent-soft); }
+
+    .galley-body { padding: 1.2rem 1.2rem 1.4rem; font-family: var(--font-sans); font-size: 1.2rem; }
+    .galley-line { display: flex; align-items: flex-start; gap: 0.85rem; line-height: 2.4; }
+    .galley-line + .galley-line { margin-top: 0.1rem; }
+    .ln {
+      font-family: var(--font-mono); font-size: 0.7rem; color: var(--c-muted);
+      width: 1.3rem; flex: none; text-align: right; padding-right: 0.6rem; padding-top: 0.55rem;
+      border-right: 1px solid color-mix(in srgb, var(--c-ink) 10%, transparent);
+    }
+    .gl { padding-top: 0.1rem; }
+    .galley-out {
+      margin-top: 0.5rem; padding-top: 0.7rem;
+      border-top: 1px dashed color-mix(in srgb, var(--c-ink) 14%, transparent);
+    }
+    .galley-out .ln { color: var(--color-ok); border-right-color: transparent; }
+    .galley-out .gl { color: var(--c-muted); font-style: italic; }
+
+    /* A word cut in red pen: animated strike + a margin note above. */
+    .cut { position: relative; color: var(--color-mark); white-space: nowrap; }
+    .cut::before {
+      content: ''; position: absolute; left: -0.05em; right: -0.05em; top: 55%;
+      height: 0.1em; background: var(--color-mark); border-radius: 2px;
+      transform: scaleX(0); transform-origin: left;
+      animation: gstrike 0.45s cubic-bezier(.6,0,.2,1) forwards; animation-delay: var(--d, 0.6s);
+    }
+    .cut::after {
+      content: attr(data-note); position: absolute; right: 0; top: -1.15em;
+      font-family: var(--font-mono); font-size: 0.62rem; color: var(--color-mark);
+      opacity: 0; animation: gfade 0.4s ease forwards; animation-delay: calc(var(--d, 0.6s) + 0.3s);
+    }
+    /* A cliché flagged with a wavy underline + tag. */
+    .flag {
+      position: relative; text-decoration: underline wavy var(--color-mark);
+      text-decoration-thickness: 1.5px; text-underline-offset: 3px;
+    }
+    .flag::after {
+      content: attr(data-note); position: absolute; right: 0; top: -1.15em;
+      font-family: var(--font-mono); font-size: 0.62rem; color: var(--color-mark);
+      opacity: 0; animation: gfade 0.4s ease forwards; animation-delay: 1.8s;
+    }
+    @keyframes gstrike { to { transform: scaleX(1); } }
+    @keyframes gfade { to { opacity: 1; } }
+
+    @media (max-width: 767px) {
+      .galley-body { font-size: 1.05rem; padding: 1rem; }
+      .galley-line { line-height: 2.2; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .cut::before { transform: scaleX(1); animation: none; }
+      .cut::after, .flag::after { opacity: 1; animation: none; }
+    }
   </style>
 </Base>

@@ -1,0 +1,238 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cleaner from '../../components/Cleaner.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+
+const faqs = [
+  {
+    q: 'How do I remove em dashes in Word?',
+    a: 'The fastest way is to paste your Word text into the cleaner above, let Smart mode replace each em dash with grammar-correct punctuation, then copy the result back into your document. If you prefer to stay inside Word, open Find & Replace (Ctrl + H), type ^+ in the Find box to match the em dash, and type your replacement - but a blind swap like that does not fix the grammar around the dash.',
+  },
+  {
+    q: 'What is the Find & Replace code for an em dash in Word?',
+    a: 'In Microsoft Word, the em dash code is ^+ (caret plus) and the en dash code is ^= (caret equals). Type ^+ into the Find what box of Find & Replace (Ctrl + H) and leave or set the Replace with box, then choose Replace All. The catch is that Word replaces every em dash identically, so you can end up with comma splices - which is why pasting through the tool above is usually cleaner.',
+  },
+  {
+    q: 'How do I remove em dashes from ChatGPT text pasted into Word?',
+    a: 'Paste the ChatGPT reply straight into the box above instead of into Word. The tool removes em dashes along with the smart quotes, ellipsis characters and invisible zero-width characters that come bundled with AI text, then you copy clean, Word-ready text into your document in one step.',
+  },
+  {
+    q: 'Why does Word turn two hyphens into an em dash?',
+    a: 'Word’s AutoCorrect "Replace as you type" setting converts a double hyphen (--) between words into an em dash automatically. To stop it, go to File > Options > Proofing > AutoCorrect Options > AutoFormat As You Type and uncheck "Hyphens (--) with dash". Existing em dashes still need removing, which the tool above handles.',
+  },
+  {
+    q: 'Will pasting back into Word keep my formatting?',
+    a: 'The cleaner outputs plain text, so when you paste it back, use Keep Text Only (or Ctrl + Shift + V) to merge it into your document’s existing styles. Your headings, bold and paragraph styles in Word are untouched - only the punctuation in the text you cleaned changes.',
+  },
+  {
+    q: 'Does replacing the em dash break my sentences?',
+    a: 'Not in Smart mode. A blind Word Find & Replace turns every em dash into the same character, which creates comma splices and run-ons. The tool above reads the words around each dash and chooses a comma, semicolon, colon, period or parentheses so the sentence stays grammatical.',
+  },
+  {
+    q: 'Is this Word em dash remover free and private?',
+    a: 'Yes - it is completely free, needs no signup, and nothing is uploaded. All cleaning runs in your browser with plain JavaScript, so you can clean confidential Word documents safely. Open the DevTools Network tab while you use it and you will see zero requests, and it even works offline.',
+  },
+  {
+    q: 'Can I remove em dashes in Google Docs the same way?',
+    a: 'Yes. The paste-clean-copy flow works identically for Google Docs, Notion, Outlook and email. For the exact in-app Find & Replace steps for both editors, see our guide to removing em dashes in Word and Google Docs.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/remove-em-dash-in-word#app`,
+  name: 'Remove Em Dashes in Word - Free Online Cleaner',
+  url: `${Astro.site}tools/remove-em-dash-in-word`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  dateModified: '2026-06-15',
+  featureList: [
+    'Remove em dashes from Microsoft Word text',
+    'Grammar-aware em dash replacement (no comma splices)',
+    'Clean ChatGPT text pasted into Word',
+    'Strip smart quotes, ellipsis and invisible characters',
+    'Word Find & Replace code reference (^+)',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSteps = [
+  { name: 'Copy your text out of Word', text: 'Select the text in your Word document (or the ChatGPT reply you were about to paste in) and copy it.' },
+  { name: 'Paste it into the cleaner', text: 'Paste the text into the box above. Em dashes, smart quotes and invisible characters are flagged instantly.' },
+  { name: 'Let Smart mode fix the punctuation', text: 'Leave Smart mode on so each em dash becomes a grammar-correct comma, colon, semicolon or period - or pick a single replacement if you prefer.' },
+  { name: 'Copy clean text back into Word', text: 'Click Copy, then paste into your document with Keep Text Only (Ctrl + Shift + V) so it adopts your existing Word styles.' },
+];
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to remove em dashes in Microsoft Word',
+  step: howToSteps.map((s) => ({ '@type': 'HowToStep', name: s.name, text: s.text })),
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Remove Em Dashes in Word - Free Online Tool, No Signup"
+  description="Remove em dashes in Microsoft Word the easy way: paste, clean, copy back. Grammar-aware fixes for ChatGPT text, plus the Word Find & Replace code (^+). Free, in-browser."
+>
+  <main class="halo">
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Microsoft Word &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Remove Em Dashes in Word
+      </h1>
+      <p class="lede mt-4 max-w-2xl">
+        Stop fighting Word&rsquo;s Find &amp; Replace. Paste your document or your
+        pasted-in ChatGPT text below, and every em dash (&mdash;) is swapped for
+        <strong>grammar-correct punctuation</strong> &mdash; then copy it straight
+        back into Word. No comma splices, no signup, nothing uploaded.
+      </p>
+      <p class="definition mt-4 max-w-2xl muted">
+        Removing em dashes in Word means replacing the em dash character (&mdash;)
+        with a comma, hyphen, colon or period throughout your document - this tool
+        does it in one paste instead of a blind Find &amp; Replace.
+      </p>
+    </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
+    <Cleaner />
+
+    <TrustStrip />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">Why Word makes this hard</p>
+      <hr class="rule-dash" />
+
+      <h2 class="text-2xl font-bold">The problem with Find &amp; Replace in Word</h2>
+      <p class="muted">
+        Microsoft Word can find an em dash - the code is <code>^+</code> in the
+        Find &amp; Replace dialog (Ctrl + H) - but it can only do a blind swap.
+        Replace every <code>^+</code> with a comma and you get comma splices;
+        replace it with a hyphen and ranges and asides read wrong. Word has no
+        idea whether a given dash should become a comma, a semicolon, a colon, a
+        full stop or a pair of parentheses, so a single Replace All almost always
+        leaves you re-editing sentences by hand.
+      </p>
+      <p class="muted">
+        Pasting your text into the
+        <a href="/">grammar-aware em dash remover</a>
+        solves that: Smart mode reads the words on either side of each dash and
+        picks the punctuation a copyeditor would, so the meaning is preserved and
+        nothing turns into a run-on.
+      </p>
+
+      <h2 class="text-2xl font-bold">ChatGPT text pasted into Word</h2>
+      <p class="muted">
+        The most common reason a Word document is suddenly full of em dashes is
+        pasted AI text. When you copy a reply out of ChatGPT, Claude or Gemini, it
+        arrives with em dashes, curly &ldquo;smart&rdquo; quotes, ellipsis
+        characters and invisible zero-width characters - all of which land in Word
+        intact. Clean it <em>before</em> it goes into your document: paste the AI
+        reply into the box above, and the em dashes and the other tells are stripped
+        in one pass, leaving Word-ready plain text.
+      </p>
+
+      <h2 class="text-2xl font-bold">How to remove em dashes in Word</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        {howToSteps.map((s) => (
+          <li><strong>{s.name}.</strong> {s.text}</li>
+        ))}
+      </ol>
+      <p class="muted">
+        Prefer to stay inside Word for a quick job? Open Find &amp; Replace with
+        Ctrl + H, type <code>^+</code> in the <em>Find what</em> box, set your
+        <em>Replace with</em> character, and choose Replace All - just expect to
+        proofread the sentences afterward. The full
+        <a href="/blog/how-to-remove-em-dashes-in-word-and-google-docs">guide to removing em dashes in Word and Google Docs</a>
+        lists every Find &amp; Replace code (including <code>^=</code> for the en dash)
+        and the exact menu steps for both editors.
+      </p>
+
+      <h2 class="text-2xl font-bold">Stop Word from making em dashes</h2>
+      <p class="muted">
+        Word also creates em dashes on its own: AutoCorrect turns a double hyphen
+        (<code>--</code>) between words into an em dash as you type. To switch it off,
+        go to <strong>File &gt; Options &gt; Proofing &gt; AutoCorrect Options &gt;
+        AutoFormat As You Type</strong> and uncheck &ldquo;Hyphens (--) with dash&rdquo;.
+        That prevents new dashes; the ones already in your document still need
+        removing, which the tool above handles in seconds.
+      </p>
+
+      <h2 class="text-2xl font-bold">Pasting clean text back without losing formatting</h2>
+      <p class="muted">
+        The cleaner outputs plain text, so when you paste the result back into Word,
+        use <strong>Keep Text Only</strong> or press Ctrl + Shift + V. The cleaned
+        punctuation merges into your document&rsquo;s existing heading, bold and
+        paragraph styles instead of overriding them. Because everything runs in your
+        browser, you can do this with confidential or unpublished Word documents -
+        nothing is uploaded, and it works offline.
+      </p>
+      <p class="muted">
+        If your text picked up other artifacts from a copy-paste, the
+        <a href="/tools/paste-from-word-docs-cleaner">paste-from-Word &amp; Docs cleaner</a>
+        strips the leftover styling and stray characters that come with pasted
+        document text, so it slots cleanly into a new file.
+      </p>
+
+      <p class="updated muted text-sm">Last updated: June 2026</p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedTools currentSlug="remove-em-dash-in-word" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+  </style>
+</Base>

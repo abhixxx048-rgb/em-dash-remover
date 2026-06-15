@@ -6,10 +6,11 @@
 <section id="tool" aria-label="Text cleaner" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
   <div class="card overflow-hidden">
     <!-- Toolbar -->
-    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 sm:gap-3 sm:px-4">
+      <span class="eyebrow text-mark mr-1 hidden sm:inline">Markup</span>
       <label class="flex min-w-0 items-center gap-2">
-        <span class="font-medium">Em dash →</span>
-        <select id="opt-dash" class="ctl px-3">
+        <span class="eyebrow muted">Em dash →</span>
+        <select id="opt-dash" class="ctl px-3 font-mono text-sm">
           <option value="smart">Smart (context-aware)</option>
           <option value="comma">Comma</option>
           <option value="period">Period</option>
@@ -21,35 +22,36 @@
       </label>
 
       <details class="group relative w-full sm:w-auto">
-        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
-          ⚙ Cleanup options <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 text-sm marker:hidden sm:w-auto">
+          <span class="eyebrow muted">Cleanup rules</span> <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
         </summary>
-        <div class="card mt-2 w-full space-y-1 p-2 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-64 sm:p-3 sm:shadow-lg">
-          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-en" checked class="h-5 w-5" /> En dashes</label>
-          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-quotes" checked class="h-5 w-5" /> Smart → straight quotes</label>
-          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-ellipsis" checked class="h-5 w-5" /> Ellipsis character → ...</label>
-          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-invis" checked class="h-5 w-5" /> Invisible / watermark chars</label>
-          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-ws" checked class="h-5 w-5" /> Collapse extra whitespace</label>
-          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-md" class="h-5 w-5" /> Strip markdown (**, ##)</label>
+        <div class="card mt-2 w-full space-y-0.5 p-2 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-72 sm:p-3 sm:shadow-lg">
+          <p class="eyebrow muted mb-1.5 px-2 hidden sm:block">Marks to make</p>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-accent-soft"><input type="checkbox" id="opt-en" checked class="h-5 w-5 accent-[var(--color-accent)]" /> En dashes</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-accent-soft"><input type="checkbox" id="opt-quotes" checked class="h-5 w-5 accent-[var(--color-accent)]" /> Smart → straight quotes</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-accent-soft"><input type="checkbox" id="opt-ellipsis" checked class="h-5 w-5 accent-[var(--color-accent)]" /> Ellipsis character → ...</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-accent-soft"><input type="checkbox" id="opt-invis" checked class="h-5 w-5 accent-[var(--color-accent)]" /> Invisible / watermark chars</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-accent-soft"><input type="checkbox" id="opt-ws" checked class="h-5 w-5 accent-[var(--color-accent)]" /> Collapse extra whitespace</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-accent-soft"><input type="checkbox" id="opt-md" class="h-5 w-5 accent-[var(--color-accent)]" /> Strip markdown (**, ##)</label>
         </div>
       </details>
 
-      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+      <button id="reset" class="ctl ml-auto inline-flex min-h-11 items-center justify-center px-3 font-mono text-sm transition hover:border-mark hover:text-mark">↺ Clear</button>
     </div>
 
     <!-- Mobile pane switcher -->
     <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
-      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
-      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Result</button>
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="eyebrow min-h-11 flex-1 rounded-lg px-3">Draft</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="eyebrow min-h-11 flex-1 rounded-lg px-3 muted">Proof</button>
     </div>
 
     <!-- Panes -->
     <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
       <!-- Input -->
       <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
-        <div class="mb-2 flex items-center justify-between">
-          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your text</h2>
-          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        <div class="mb-3 flex items-center justify-between border-b border-ink/8 pb-2">
+          <h2 class="eyebrow text-mark">Paste your draft</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 font-mono text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
         </div>
         <div class="relative">
           <textarea
@@ -59,28 +61,28 @@
             class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
           ></textarea>
           <!-- Empty state -->
-          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste AI text - or try an example:</p>
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-4 p-4 text-center">
+            <p class="muted max-w-xs text-[15px] leading-relaxed">Drop an AI draft on the desk — or pull a sample manuscript:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
-              <button data-sample="email" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✉️ AI email</button>
-              <button data-sample="linkedin" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💼 LinkedIn post</button>
-              <button data-sample="essay" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📝 Essay</button>
+              <button data-sample="email" class="ctl inline-flex min-h-11 items-center px-4 font-mono text-sm transition hover:border-accent hover:text-accent">✉ AI email</button>
+              <button data-sample="linkedin" class="ctl inline-flex min-h-11 items-center px-4 font-mono text-sm transition hover:border-accent hover:text-accent">💼 LinkedIn post</button>
+              <button data-sample="essay" class="ctl inline-flex min-h-11 items-center px-4 font-mono text-sm transition hover:border-accent hover:text-accent">📝 Essay</button>
             </div>
           </div>
         </div>
-        <p class="mt-2 text-xs muted" id="in-stats">0 words · 0 chars</p>
+        <p class="mt-2 font-mono text-xs muted" id="in-stats">0 words · 0 chars</p>
       </div>
 
       <!-- Output -->
       <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
-        <div class="mb-2 flex items-center justify-between">
-          <div class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
-            <button id="view-clean" class="min-h-9 rounded-md px-3 font-medium">Cleaned</button>
-            <button id="view-diff" class="min-h-9 rounded-md px-3 font-medium muted">Diff</button>
+        <div class="mb-3 flex items-center justify-between border-b border-ink/8 pb-2">
+          <div class="inline-flex rounded-lg border border-ink/15 p-0.5">
+            <button id="view-clean" class="eyebrow min-h-9 rounded-md px-3">Clean copy</button>
+            <button id="view-diff" class="eyebrow min-h-9 rounded-md px-3 muted">Marked-up</button>
           </div>
           <div class="flex items-center gap-1.5">
-            <button id="download" aria-label="Download cleaned text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
-            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+            <button id="download" aria-label="Download cleaned text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-accent-soft hover:text-accent" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 font-mono text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
           </div>
         </div>
         <textarea id="output" rows="14" readonly aria-label="Cleaned text"
@@ -89,12 +91,16 @@
         <div id="diff" hidden
           class="h-[calc(14*1.625em+1.5rem)] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed"
           style="background: var(--c-paper);"></div>
+        <p class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs muted">
+          <span class="inline-flex items-center gap-1.5"><span class="diff-del">cut</span> removed</span>
+          <span class="inline-flex items-center gap-1.5"><span class="diff-ins">kept</span> added</span>
+        </p>
       </div>
     </div>
 
     <!-- Score + summary -->
-    <div class="grid items-center gap-5 border-t border-ink/8 px-4 py-4 sm:grid-cols-[auto_1fr]">
-      <div class="flex items-center gap-4">
+    <div class="grid items-center gap-x-8 gap-y-5 border-t border-ink/8 px-4 py-5 sm:grid-cols-[auto_1fr]">
+      <div class="flex items-center gap-4 sm:border-r sm:border-ink/8 sm:pr-8">
         <div class="relative h-20 w-20 shrink-0">
           <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
             <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
@@ -103,26 +109,26 @@
               style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">-</span>
-            <span class="text-[9px] muted">/ 100</span>
+            <span id="score-num" class="font-mono text-2xl font-bold leading-none" data-v="0">-</span>
+            <span class="font-mono text-[9px] muted">/ 100</span>
           </div>
         </div>
         <div>
-          <p class="text-xs font-semibold uppercase tracking-wide muted">AI-tell score</p>
-          <p id="band" class="text-sm font-semibold">Paste text to scan</p>
-          <p id="fixed" class="mt-0.5 text-xs text-emerald-600" aria-live="polite"></p>
-          <button id="share" class="mt-1 text-xs font-medium text-accent hover:underline" hidden>↗ Share my score</button>
+          <p class="eyebrow text-mark">AI-tell score</p>
+          <p id="band" class="mt-1 text-lg font-semibold leading-tight" style="font-family: var(--font-display);">Paste text to scan</p>
+          <p id="fixed" class="mt-0.5 font-mono text-xs" style="color: var(--color-ok);" aria-live="polite"></p>
+          <button id="share" class="mt-1 font-mono text-xs font-medium text-accent hover:underline" hidden>↗ Share my score</button>
         </div>
       </div>
       <div>
-        <span class="text-xs font-semibold uppercase tracking-wide muted">What we found</span>
-        <ul id="tells" class="mt-1.5 flex flex-wrap gap-1.5 text-xs" aria-live="polite"></ul>
+        <span class="eyebrow muted">Margin notes</span>
+        <ul id="tells" class="mt-2 flex flex-wrap gap-1.5 font-mono text-xs" aria-live="polite"></ul>
       </div>
     </div>
   </div>
 
-  <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline.
+  <p class="mt-4 text-center font-mono text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
   </p>
 </section>
 
@@ -133,9 +139,9 @@
 <!-- Sticky thumb-reachable action bar (mobile only) -->
 <div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
   style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
-  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
-  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
-  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-lg border border-ink/15 font-mono font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-lg border border-ink/15 px-5 font-mono font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-lg bg-accent font-mono font-semibold text-white disabled:opacity-40" disabled>Copy</button>
 </div>
 
 <script>
@@ -267,12 +273,18 @@
     if (!src.trim()) {
       tellsEl.innerHTML = '<li class="muted">Paste text to scan.</li>';
     } else if (report.tells.length === 0) {
-      tellsEl.innerHTML = '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">No tells found - reads human ✓</li>';
+      const li = document.createElement('li');
+      li.className = 'rounded-md px-2 py-0.5 font-medium';
+      li.style.background = 'color-mix(in srgb, var(--color-ok) 14%, transparent)';
+      li.style.color = 'var(--color-ok)';
+      li.textContent = 'No tells found — reads human ✓';
+      tellsEl.appendChild(li);
     } else {
       for (const t of report.tells) {
         const li = document.createElement('li');
-        li.className = 'rounded-full bg-accent-soft px-2 py-0.5 text-accent';
-        li.style.background = 'var(--c-accent-soft)';
+        li.className = 'rounded-md px-2 py-0.5';
+        li.style.background = 'var(--c-mark-soft)';
+        li.style.color = 'var(--color-mark)';
         li.textContent = `${t.label}: ${t.count}`;
         if (t.examples.length) li.title = t.examples.join(' · ');
         tellsEl.appendChild(li);

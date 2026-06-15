@@ -1,0 +1,219 @@
+---
+import Base from '../../layouts/Base.astro';
+import Cleaner from '../../components/Cleaner.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+
+const faqs = [
+  {
+    q: 'How do I remove em dashes from ChatGPT text?',
+    a: 'Copy the reply out of ChatGPT, paste it into the cleaner above, and the em dashes are stripped in one pass - along with the smart quotes, ellipsis characters and invisible watermark characters that AI tools leave behind. Leave Smart mode on and each em dash is swapped for a grammar-correct comma, colon, semicolon or set of parentheses, then click Copy and paste the clean text back into ChatGPT, Word, Notion or wherever you need it.',
+  },
+  {
+    q: 'Does ChatGPT still add em dashes after the November 2025 fix?',
+    a: 'OpenAI added a setting in November 2025 that lets ChatGPT honour a request to stop using em dashes, so new chats can use fewer of them. But the toggle does not touch text you generated earlier, it does not apply to every model or app, and Claude and Gemini still produce em dashes heavily. Any pasted or legacy AI output still needs a cleanup, which is exactly what this tool does.',
+  },
+  {
+    q: 'Will this also clean text from Claude, Gemini or Copilot?',
+    a: 'Yes. The cleaner is model-agnostic - it works on text from Claude, Gemini, Copilot, DeepSeek, Llama or any other writing assistant. Claude and Gemini in particular still lean on em dashes, so paste their output here the same way you would ChatGPT text.',
+  },
+  {
+    q: 'Why does ChatGPT use so many em dashes in the first place?',
+    a: 'Large language models learn punctuation from huge amounts of web and book text and gravitate to the em dash because it is a flexible, always-grammatical connector that fits almost anywhere. The result is prose peppered with dashes far more often than a person would write, which is why pasted ChatGPT text stands out and reads like AI.',
+  },
+  {
+    q: 'How is this different from a blind find-and-replace?',
+    a: 'Replacing every em dash with a comma creates comma splices and run-on sentences. Smart mode reads the words around each dash and picks the punctuation that keeps the sentence grammatical - a comma, semicolon, colon, period or parentheses - so the cleaned ChatGPT text still reads correctly instead of just being patched.',
+  },
+  {
+    q: 'What else does it remove besides em dashes?',
+    a: 'En dashes, curly "smart" quotes and apostrophes, the ellipsis character (…), non-breaking spaces, and the invisible zero-width and watermark characters that AI tools slip into output. It also scores your text for clichéd phrases and overused AI vocabulary so the writing reads in your own voice.',
+  },
+  {
+    q: 'Is it free, and is my ChatGPT text uploaded anywhere?',
+    a: 'It is completely free with no signup and no limits, and nothing is uploaded. All cleaning happens in your browser with plain JavaScript - open the DevTools Network tab while you use it and you will see zero requests. It even works offline, so you can clean confidential or unpublished AI drafts safely.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/remove-em-dash-from-chatgpt#app`,
+  name: 'Remove Em Dashes from ChatGPT Text - Free Cleaner',
+  url: `${Astro.site}tools/remove-em-dash-from-chatgpt`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  dateModified: '2026-06-15',
+  featureList: [
+    'Remove em dashes from ChatGPT and AI-generated text',
+    'Grammar-aware em dash replacement (Smart mode)',
+    'Clean text from ChatGPT, Claude, Gemini and Copilot',
+    'Strip invisible zero-width and watermark characters',
+    'Convert curly smart quotes to straight quotes',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSteps = [
+  { name: 'Copy your ChatGPT reply', text: 'Select the reply in ChatGPT (or Claude, Gemini, Copilot) and copy it, then paste it into the cleaner box above.' },
+  { name: 'Choose how em dashes are replaced', text: 'Leave Smart mode on to get a grammar-correct comma, colon, semicolon or parentheses for each sentence, or force every em dash to a single character like a comma or hyphen.' },
+  { name: 'Clean and review', text: 'The em dashes are removed instantly along with smart quotes and invisible watermark characters. Switch to Diff view to see exactly what changed.' },
+  { name: 'Copy the clean text', text: 'Click Copy and paste the cleaned text back into ChatGPT, Word, Google Docs, Notion or anywhere else.' },
+];
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to remove em dashes from ChatGPT text',
+  step: howToSteps.map((s) => ({ '@type': 'HowToStep', name: s.name, text: s.text })),
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Remove Em Dashes from ChatGPT Text - Free Online Tool"
+  description="Paste ChatGPT or AI text and remove em dashes instantly with grammar-aware fixes. Also strips smart quotes and invisible characters. Free, no signup, in-browser."
+>
+  <main class="halo">
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">ChatGPT cleanup &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Remove Em Dashes from ChatGPT Text
+      </h1>
+      <p class="lede mt-4 max-w-2xl">
+        Paste a ChatGPT reply and strip every em dash (&mdash;) in one click, with
+        <strong>grammar-aware</strong> fixes instead of a blind find-and-replace
+        &mdash; plus the smart quotes and invisible watermark characters AI leaves
+        behind. Nothing is uploaded; it all runs in your browser.
+      </p>
+      <p class="definition mt-4 max-w-2xl muted">
+        Removing em dashes from ChatGPT text means pasting the AI output into a
+        cleaner that replaces each em dash with grammar-correct punctuation, so the
+        writing reads in your own voice rather than looking machine-generated.
+      </p>
+    </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
+    <Cleaner />
+
+    <TrustStrip />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">Why pasted ChatGPT text needs a pass</p>
+      <hr class="rule-dash" />
+
+      <h2 class="text-2xl font-bold">The em dash is ChatGPT's biggest tell</h2>
+      <p class="muted">
+        Of all the punctuation ChatGPT reaches for, the em dash is the giveaway.
+        Models pick it up because it is a flexible, always-grammatical connector,
+        so a single reply can carry several &mdash; far more than a person would
+        write &mdash; and readers notice. Clearing them out is the fastest way to
+        make a draft stop reading like AI. The grammar-aware
+        <a href="/">em dash remover</a> on this site is built for exactly that:
+        paste, clean, copy, in seconds.
+      </p>
+
+      <h2 class="text-2xl font-bold">How to remove em dashes from ChatGPT text</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        {howToSteps.map((s) => (
+          <li><strong>{s.name}.</strong> {s.text}</li>
+        ))}
+      </ol>
+
+      <h2 class="text-2xl font-bold">Didn't OpenAI fix the em dash problem?</h2>
+      <p class="muted">
+        Partly. In November 2025 OpenAI added a setting that lets ChatGPT actually
+        honour a request to stop using em dashes, so brand-new chats can produce
+        fewer of them. But the toggle does nothing for the mountains of text you
+        already generated, it isn't applied everywhere, and people routinely paste
+        from older threads, shared documents and multiple tools at once. The
+        cleanup-the-existing-text problem hasn't gone away &mdash; our write-up on
+        how <a href="/blog/openai-fixed-the-em-dash">OpenAI fixed the em dash</a>
+        explains why pasted and legacy AI output still needs a pass.
+      </p>
+
+      <h2 class="text-2xl font-bold">Claude and Gemini still add them too</h2>
+      <p class="muted">
+        ChatGPT gets the blame, but it isn't alone. Claude and Gemini still lean on
+        em dashes heavily, and Copilot, DeepSeek and the rest are no different.
+        Because this cleaner is model-agnostic, the same paste-clean-copy flow works
+        on any of them &mdash; the tool fixes the punctuation regardless of which
+        assistant produced it.
+      </p>
+
+      <h2 class="text-2xl font-bold">Grammar-aware, not a blind swap</h2>
+      <p class="muted">
+        An em dash does many jobs, so replacing every one with a comma is how you
+        end up with comma splices and run-on sentences. Smart mode reads the words
+        around each dash and chooses the punctuation that keeps the sentence
+        correct &mdash; a comma, semicolon, colon, period or parentheses. The result
+        is clean ChatGPT text that still reads properly, not text that's merely been
+        patched.
+      </p>
+
+      <h2 class="text-2xl font-bold">More than dashes: the rest of the AI cleanup</h2>
+      <p class="muted">
+        Pasted ChatGPT output carries more than em dashes. The cleaner also removes
+        en dashes, converts curly "smart" quotes and apostrophes to straight ones,
+        expands the ellipsis character (…) to three dots, strips non-breaking spaces,
+        and catches the invisible zero-width and watermark characters AI tools embed.
+        To see those hidden characters first, run the text through the
+        <a href="/tools/invisible-watermark-character-inspector">invisible character inspector</a>,
+        then come back here to clean everything in one pass.
+      </p>
+
+      <p class="updated muted text-sm">Last updated: June 2026.</p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">Questions, answered</p>
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+  </style>
+</Base>

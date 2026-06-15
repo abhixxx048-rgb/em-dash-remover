@@ -6,7 +6,7 @@ import Base from '../../layouts/Base.astro';
 const tiers = [
   {
     name: 'Clean & convert',
-    blurb: 'Fast, everyday text cleanup and conversion - each runs entirely in your browser.',
+    blurb: 'Everyday cleanup and conversion — the marks an editor makes first, each running entirely in your browser.',
     tools: [
       { href: '/tools/invisible-watermark-character-inspector', icon: '👻', title: 'Invisible Character Inspector', desc: 'See and strip hidden zero-width, watermark and bidi characters.' },
       { href: '/tools/word-reading-time-counter', icon: '🔢', title: 'Word & Reading-Time Counter', desc: 'Live word, character, sentence counts, reading time and platform limits.' },
@@ -22,7 +22,7 @@ const tiers = [
   },
   {
     name: 'Analyze & improve',
-    blurb: 'Understand what makes writing read like AI - and fix it for quality, not detector-bypass.',
+    blurb: 'Read the draft the way an editor reads it — find what makes writing sound like AI, then fix it for quality, not detector-bypass.',
     tools: [
       { href: '/tools/human-voice-ai-tell-report', icon: '🫀', title: 'Human-Voice / AI-Tell Report', desc: 'Flag cadence, clichés and patterns that make a draft read like AI.' },
       { href: '/tools/homoglyph-confusables-detector', icon: '🕵️', title: 'Homoglyph Detector', desc: 'Find Cyrillic/Greek look-alike characters hiding in Latin text.' },
@@ -33,7 +33,7 @@ const tiers = [
   },
   {
     name: 'Power tools & apps',
-    blurb: 'Bigger workflows and companion apps. Still 100% on your device.',
+    blurb: 'Bigger workflows and companion apps for the whole desk — still 100% on your device.',
     tools: [
       { href: '/tools/bulk-multi-file-cleaner', icon: '🗂️', title: 'Bulk / Multi-File Cleaner', desc: 'Drop multiple files, clean each in-browser, download the results.' },
       { href: '/tools/on-device-ai-rewrite', icon: '✨', title: 'On-Device AI Rewrite', desc: 'One-click tone/length rewrite via your browser’s built-in AI.' },
@@ -63,6 +63,14 @@ const collectionSchema = {
     }))
   ),
 };
+
+// Continuous numbering across groups, like entries in a galley index.
+let entry = 0;
+const groups = tiers.map((tier) => ({
+  ...tier,
+  tools: tier.tools.map((tool) => ({ ...tool, n: ++entry })),
+}));
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
 <Base
@@ -70,47 +78,105 @@ const collectionSchema = {
   description={`${total} free tools to clean, convert and improve AI and human writing - remove invisible characters, count words, check readability, strip emoji and more. Every tool runs entirely in your browser.`}
 >
   <main class="halo">
-    <header class="mx-auto max-w-3xl px-4 pt-12 pb-8 text-center">
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        {total} tools · 100% in your browser · free · no signup
+    <header class="mx-auto max-w-3xl px-4 pt-12 pb-6 sm:pt-16">
+      <p class="eyebrow text-mark">The desk · {total} tools, no signup</p>
+      <h1 class="mt-4 text-4xl sm:text-5xl">The toolkit</h1>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed muted">
+        Every instrument on the copyeditor’s desk — for cleaning, converting and
+        reading your writing the way an editor would. Each one runs entirely on
+        your device. Your text never leaves the browser.
       </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">All Text Tools</h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        A growing toolkit for cleaning, converting and improving your writing.
-        Every tool runs entirely on your device - your text never leaves your browser.
-      </p>
-      <p class="mt-4 text-sm">
-        <a href="/" class="font-medium text-accent hover:underline">← Back to the Em Dash Remover</a>
+      <p class="eyebrow muted mt-6">
+        <a href="/" class="text-accent hover:underline">← Back to the Em Dash Remover</a>
       </p>
     </header>
 
-    {tiers.map((tier) => (
-      <section class="mx-auto mt-6 max-w-5xl px-4">
-        <div class="mb-4">
-          <h2 class="text-xl font-bold">{tier.name}</h2>
-          <p class="mt-1 text-sm muted">{tier.blurb}</p>
+    <div class="mx-auto max-w-3xl px-4">
+      <hr class="rule-dash" />
+    </div>
+
+    {groups.map((group, i) => (
+      <section class="mx-auto max-w-3xl px-4">
+        <div class="pt-10 sm:pt-12">
+          <p class="eyebrow text-mark">{pad(i + 1)} · {group.tools.length} entries</p>
+          <h2 class="mt-2 text-2xl sm:text-3xl">{group.name}</h2>
+          <p class="mt-2 max-w-2xl text-base leading-relaxed muted">{group.blurb}</p>
         </div>
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {tier.tools.map((tool) => (
-            <a href={tool.href} class="card group flex gap-3 p-4 transition hover:border-accent" style="text-decoration: none;">
-              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg" style="background: var(--c-accent-soft);">{tool.icon}</span>
-              <span class="min-w-0">
-                <span class="block font-semibold group-hover:text-accent">{tool.title}</span>
-                <span class="mt-0.5 block text-sm muted">{tool.desc}</span>
-              </span>
-            </a>
+
+        <ul class="mt-7">
+          {group.tools.map((tool) => (
+            <li>
+              <a
+                href={tool.href}
+                class="tool-row group flex items-baseline gap-4 py-4"
+                style="text-decoration: none;"
+              >
+                <span class="eyebrow tool-no shrink-0" style="color: var(--c-muted);">{pad(tool.n)}</span>
+                <span class="min-w-0 flex-1">
+                  <span class="flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+                    <span class="tool-title text-lg font-semibold group-hover:text-accent" style="font-family: var(--font-display);">{tool.title}</span>
+                    <span aria-hidden="true" class="tool-emoji text-sm opacity-70">{tool.icon}</span>
+                  </span>
+                  <span class="mt-1 block text-sm leading-relaxed muted">{tool.desc}</span>
+                </span>
+                <span aria-hidden="true" class="tool-arrow eyebrow shrink-0 self-center text-accent">→</span>
+              </a>
+            </li>
           ))}
-        </div>
+        </ul>
+
+        {i < groups.length - 1 && <hr class="rule-dash mt-6" />}
       </section>
     ))}
 
-    <section class="mx-auto mt-16 max-w-3xl px-4 text-center">
-      <p class="text-sm muted">
-        🔒 Every tool here is 100% client-side. Open your browser’s DevTools → Network
-        while you use any of them and you’ll see zero requests. They even work offline.
-      </p>
+    <div class="mx-auto max-w-3xl px-4">
+      <hr class="rule-dash mt-12" />
+    </div>
+
+    <section class="mx-auto max-w-3xl px-4 pb-20">
+      <div class="card mt-12 p-6 sm:p-7">
+        <p class="eyebrow text-mark">Margin note</p>
+        <p class="mt-3 text-base leading-relaxed">
+          Every tool here is 100% client-side. Open your browser’s DevTools →
+          Network while you use any of them and you’ll see zero requests. They
+          even work offline.
+        </p>
+      </div>
     </section>
 
     <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
   </main>
 </Base>
+
+<style>
+  /* Index rows: a ruled ledger of entries, hairline between each. */
+  .tool-row {
+    border-top: 1px solid color-mix(in srgb, var(--c-ink) 10%, transparent);
+    transition: background-color 0.15s ease, padding-left 0.15s ease;
+    padding-inline: 0.5rem;
+    margin-inline: -0.5rem;
+    border-radius: 6px;
+  }
+  ul > li:last-child .tool-row {
+    border-bottom: 1px solid color-mix(in srgb, var(--c-ink) 10%, transparent);
+  }
+  .tool-row:hover {
+    background: var(--c-accent-soft);
+    padding-left: 0.85rem;
+  }
+  .tool-no {
+    font-size: 0.78rem;
+    letter-spacing: 0.12em;
+    padding-top: 0.15rem;
+  }
+  .tool-arrow {
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  .tool-row:hover .tool-arrow,
+  .tool-row:focus-visible .tool-arrow {
+    opacity: 1;
+    transform: translateX(0);
+  }
+</style>

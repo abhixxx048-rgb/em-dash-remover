@@ -1,0 +1,238 @@
+---
+import Base from '../../layouts/Base.astro';
+import CaseConverter from '../../components/tools/CaseConverter.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+
+const faqs = [
+  {
+    q: 'How do I convert uppercase to lowercase without retyping?',
+    a: 'Paste your text into the box above and click the "lower case" button - the whole block, however long, is rewritten in lowercase instantly. Then press Copy and paste it back wherever you need it. You never have to delete and retype a single word.',
+  },
+  {
+    q: 'How do I change all caps to lowercase that was typed by accident?',
+    a: 'If a sentence got stuck in ALL CAPS, "lower case" flattens everything, but you usually want "Sentence case" instead - it lowercases the shouting text and then re-capitalizes the first letter of each sentence plus proper nouns, so you get readable prose back rather than an all-lowercase blob.',
+  },
+  {
+    q: 'What is the difference between lower case and Sentence case here?',
+    a: 'lower case makes every letter small (great for hashtags, slugs, code and stylistic all-lowercase text). Sentence case makes everything small first and then restores the capital at the start of each sentence, the way normal writing looks. Choose lower case for a pure dump, Sentence case to rescue a paragraph that was shouted in caps.',
+  },
+  {
+    q: 'Is the uppercase to lowercase converter free and signup-free?',
+    a: 'Yes. It is 100% free with no signup, no registration and no download. There are no character limits, watermarks or paywalls - open the page and convert as much text as you want.',
+  },
+  {
+    q: 'Is it safe to paste sensitive text to convert to lowercase?',
+    a: 'Yes. The conversion runs entirely in your browser with plain JavaScript, so your text is never uploaded, stored or logged. Open your browser DevTools Network tab while you convert and you will see zero requests. It even works offline.',
+  },
+  {
+    q: 'Can I convert lowercase back to uppercase or Title Case?',
+    a: 'Yes. The same tool has UPPER CASE, Sentence case, Title Case (AP, Chicago, APA, MLA), Capitalize Each Word and developer cases. Just click a different button - the conversion is reversible because it always reads from your original text.',
+  },
+  {
+    q: 'How do I change uppercase to lowercase in Word or Google Docs?',
+    a: 'In Word, select the text and press Shift + F3 to cycle case, or use Home > Change Case > lowercase. In Google Docs, use Format > Text > Capitalization > lowercase. If you want a quick, app-independent way that also gives you Sentence and Title case, paste into the converter above and click lower case.',
+  },
+  {
+    q: 'Will it keep brand names like iPhone or NASA correct?',
+    a: 'Pure "lower case" lowercases everything, including iPhone and NASA, because that is what lowercase means. If you want brand names preserved, use Sentence case or Title Case with "Keep brand names" enabled, which leaves terms like iPhone, NASA and JavaScript intact.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/uppercase-to-lowercase#app`,
+  name: 'Uppercase to Lowercase Converter',
+  url: `${Astro.site}tools/uppercase-to-lowercase`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  dateModified: '2026-06-15',
+  featureList: [
+    'Convert UPPERCASE text to lowercase in one click',
+    'Fix all-caps text with Sentence case',
+    'Convert lowercase back to UPPER, Title or Sentence case',
+    'Brand-name and acronym preservation',
+    'Runs entirely in your browser - no upload',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howToSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to convert uppercase to lowercase online',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Paste your uppercase text',
+      text: 'Type or paste your UPPERCASE or all-caps text into the converter box.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Click lower case',
+      text: 'Click the "lower case" button to rewrite the whole block in lowercase instantly.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Or pick Sentence case',
+      text: 'To rescue an accidental all-caps sentence, click "Sentence case" instead so the first letter of each sentence stays capitalized.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Copy the result',
+      text: 'Press Copy (or Ctrl/Cmd + Enter) and paste the lowercase text wherever you need it.',
+    },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Uppercase to Lowercase Converter - Free, In-Browser"
+  description="Free uppercase to lowercase converter: paste ALL-CAPS text and change it to lowercase in one click. Fix accidental all caps with Sentence case too. No signup, runs in your browser."
+>
+  <main class="halo">
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Capitalization &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Uppercase to Lowercase Converter
+      </h1>
+      <p class="lede mt-4 max-w-2xl">
+        Paste text that is stuck in UPPERCASE and turn it into lowercase in a
+        single click &mdash; no deleting, no retyping. Need readable prose back
+        from an accidental all-caps sentence? Switch to <strong>Sentence
+        case</strong> and the capitals land in the right places. Everything runs
+        in your browser and your text never leaves your device.
+      </p>
+      <p class="definition mt-4 max-w-2xl muted">
+        An uppercase to lowercase converter is a free online tool that instantly
+        changes ALL-CAPS or UPPERCASE text into lowercase letters, so you can fix
+        shouting text or create all-lowercase copy without retyping it.
+      </p>
+    </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
+    <CaseConverter />
+
+    <TrustStrip />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
+
+      <h2 class="text-2xl font-bold">How to convert uppercase to lowercase</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Type or paste your UPPERCASE or all-caps text into the box above.</li>
+        <li>Click <strong>lower case</strong> to flatten every letter to lowercase instantly.</li>
+        <li>If the text was shouted by accident, click <strong>Sentence case</strong> instead so each sentence keeps its leading capital.</li>
+        <li>Hit <strong>Copy</strong> (or Ctrl/Cmd + Enter) and paste the result wherever you need it.</li>
+      </ol>
+
+      <h2 class="text-2xl font-bold">lower case vs Sentence case: which should you pick?</h2>
+      <p class="muted">
+        These two solve different problems. <strong>lower case</strong> makes
+        <em>every</em> letter small - perfect for hashtags, URL slugs, code
+        identifiers, or a deliberately all-lowercase aesthetic.
+        <strong>Sentence case</strong> lowercases everything first and then
+        restores the capital at the start of each sentence (plus proper nouns),
+        which is what you want when a paragraph got typed with Caps Lock on. If
+        your goal is to <em>fix</em> shouting text and keep it readable, reach for
+        Sentence case; if you genuinely want all-lowercase output, use lower case.
+      </p>
+
+      <h2 class="text-2xl font-bold">Fixing accidental all-caps text</h2>
+      <p class="muted">
+        Caps Lock left on, a pasted heading that was set in ALL CAPS, a CSS
+        <code>text-transform: uppercase</code> copy that came across as literal
+        capitals - these are the usual culprits. Because the converter always
+        reads from your original input, the change is non-destructive: convert to
+        lowercase, preview it, and if you over-flattened a sentence you can click
+        <strong>Sentence case</strong> or <strong>Title Case</strong> on the same
+        text without re-pasting anything.
+      </p>
+
+      <h2 class="text-2xl font-bold">Need more than lowercase?</h2>
+      <p class="muted">
+        This page is the fast lane for one job: uppercase to lowercase. When you
+        need the full toolkit - UPPER CASE, Title Case for
+        <strong>AP, Chicago, APA and MLA</strong>, Capitalize Each Word, or
+        developer cases like camelCase and snake_case - use the full
+        <a href="/tools/case-converter">case converter</a>, which has every mode
+        and a live style-guide picker. And if you are deciding how to capitalize a
+        headline rather than lowercase it, our guide to
+        <a href="/blog/title-case-rules-ap-vs-chicago">title case rules and AP vs Chicago capitalization</a>
+        explains exactly why each word is capitalized.
+      </p>
+
+      <h2 class="text-2xl font-bold">Privacy - everything runs in your browser</h2>
+      <p class="muted">
+        There is no server and no upload. All casing happens with plain
+        JavaScript on your own device, so you can safely convert confidential or
+        unpublished text to lowercase. Open your browser's DevTools Network tab
+        while you work and you'll see zero requests - and the tool keeps working
+        with your connection turned off. Cleaning up a paste from Word or Google
+        Docs? Once the case is right, the
+        <a href="/tools/whitespace-line-break-reflow-fixer">whitespace and line-break reflow fixer</a>
+        tidies stray spacing into clean paragraphs.
+      </p>
+
+      <p class="updated muted text-sm">Last updated: June 2026</p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <RelatedTools currentSlug="case-converter" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howToSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+  </style>
+</Base>

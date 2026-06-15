@@ -29,6 +29,18 @@ const faqs = [
     q: 'What does the "flag" button do?',
     a: 'While you listen, tapping 🚩 (or pressing F) drops a marker on the sentence you just heard into a side fix-list. You can do a full listen-through without stopping to edit, then fix everything at the end and copy or download the list as a markdown checklist. That listen-and-flag workflow is what turns plain text-to-speech into a real proofreading pass.',
   },
+  {
+    q: 'How do I make Word or Google Docs read my document out loud?',
+    a: 'Word has a built-in Read Aloud button on the Review tab, and Google Docs can read a document through the Screen Reader / Accessibility setting - but both read the whole document at one pace with no way to flag a sentence for fixing. To proofread by listening, copy your text out of Word, Docs or a PDF and paste it here: you get slow-proof speeds, word highlighting and a flag-and-fix list built for catching errors rather than just narrating.',
+  },
+  {
+    q: 'Can text-to-speech catch missing words and run-on sentences?',
+    a: 'That is exactly what it is best at. A read-aloud voice speaks only the words that are actually on the page, so a dropped word leaves an audible gap your eyes would have filled in silently. Run-on sentences betray themselves too - you hear the read keep going long past where a full stop should be. Listening for missing words and run-ons is far more reliable than re-reading your own draft on screen.',
+  },
+  {
+    q: 'How can I hear my essay read aloud for free before submitting?',
+    a: 'Paste your essay into the box above and press Play - it is completely free, with no signup, no account and no download. Reading your paper out loud before submitting is one of the highest-value final checks you can do: it catches the typos, missing words and clumsy sentences a spell-checker misses. Use the slow-proof 0.75× speed for a careful last pass.',
+  },
 ];
 
 const webApp = {
@@ -42,6 +54,7 @@ const webApp = {
   browserRequirements: 'Requires JavaScript and a browser with the Web Speech API.',
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
+  dateModified: '2026-06-15',
   featureList: [
     'Read any text aloud in your browser for proofreading',
     'Word-by-word and sentence highlighting while it reads',
@@ -68,6 +81,16 @@ const howTo = {
   ],
 };
 
+const speakable = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: `${Astro.site}tools/read-aloud-proofreader`,
+  speakable: {
+    '@type': 'SpeakableSpecification',
+    cssSelector: ['#read-aloud-h1', '#read-aloud-intro'],
+  },
+};
+
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -80,28 +103,26 @@ const faqSchema = {
 ---
 
 <Base
-  title="Read-Aloud Proofreader - Hear Your Writing & Catch What Your Eyes Miss"
-  description="Free read-aloud proofreader. Hear your essay, post or draft read aloud with word highlighting to catch dropped words, run-ons and typos by ear - 100% in your browser, no signup."
+  title="Read-Aloud Proofreader - Hear Your Text & Catch Typos Free"
+  description="Free read-aloud proofreader: hear your essay or draft read aloud with word highlighting to catch dropped words, run-ons and typos. In-browser, no signup."
 >
   <main class="halo">
-    <!-- Hero -->
-    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
-      <div class="mb-3 flex justify-center">
-        <a href="/tools" class="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">← All tools</a>
-      </div>
-      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-        100% in your browser · free · no signup
-      </p>
-      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Read-Aloud Proofreader - hear your writing, catch what your eyes miss.
+    <!-- Editorial header -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-2">
+      <a href="/tools" class="eyebrow text-accent hover:underline">← All tools</a>
+      <p class="eyebrow text-mark mt-6">Copydesk · read-aloud proof</p>
+      <h1 id="read-aloud-h1" class="mt-3 text-4xl sm:text-5xl">
+        Hear your writing. Catch what your eyes <span class="struck">skim</span>.
       </h1>
-      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Paste any text and hear it read back to you with <strong>word-by-word
-        highlighting</strong>. Your ear catches the dropped words, run-ons and
-        repeats your eyes skim right past. Flag what sounds off, fix it at the
-        end - and with an on-device voice, nothing is ever uploaded.
+      <p class="mt-4 max-w-2xl text-base leading-relaxed muted">
+        A <strong style="color: var(--c-ink); font-weight: 600;">read-aloud proofreader</strong> is a tool that reads your text out loud with text-to-speech so you can proofread by listening — catching dropped words, run-on sentences and typos your eyes skip when reading silently.
+      </p>
+      <p id="read-aloud-intro" class="mt-4 max-w-2xl text-lg leading-relaxed muted">
+        Paste any text and hear it read back with <strong style="color: var(--c-ink); font-weight: 600;">word-by-word highlighting</strong>. Your ear catches the dropped words, run-ons and repeats your eyes slide right past. Flag what sounds off, fix it at the end — and with an on-device voice, nothing is ever uploaded.
       </p>
     </header>
+
+    <hr class="rule-dash mx-auto my-8 max-w-3xl" />
 
     <ReadAloudProofreader />
 
@@ -125,6 +146,19 @@ const faqSchema = {
       </div>
     </section>
 
+    <!-- Who it's for -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Who reads aloud to proofread</h2>
+      <p class="mt-2 muted">If you have ever wanted to listen to your writing read aloud to find what your eyes miss, this is for you.</p>
+      <ul class="mt-5 grid gap-3 text-sm muted sm:grid-cols-2">
+        <li class="card p-4"><strong style="color: var(--c-ink);">Students</strong> reading a paper out loud before submitting, to catch typos and missing words a spell-check skips.</li>
+        <li class="card p-4"><strong style="color: var(--c-ink);">Writers and bloggers</strong> who proofread by listening to hear awkward sentences and clunky transitions.</li>
+        <li class="card p-4"><strong style="color: var(--c-ink);">Editors and freelancers</strong> doing a final read-aloud check on client copy pasted from Word, Google Docs or a PDF.</li>
+        <li class="card p-4"><strong style="color: var(--c-ink);">Anyone with dyslexia</strong> who proofreads more confidently by ear than by eye, with word-by-word highlighting to follow along.</li>
+        <li class="card p-4"><strong style="color: var(--c-ink);">People editing AI drafts</strong> who paste ChatGPT text to hear where it runs on or stops sounding human.</li>
+      </ul>
+    </section>
+
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
       <h2 class="text-2xl font-bold">Why reading your writing aloud catches more errors</h2>
@@ -137,7 +171,8 @@ const faqSchema = {
         than reading it on screen. Even better, a text-to-speech voice reads the
         <em>literal</em> words on the page, with none of the autocorrect your own inner
         voice quietly applies. If a word is missing, you hear the gap. If a sentence
-        runs on, you hear yourself run out of breath.
+        runs on, you hear yourself run out of breath. For the full story on why this
+        works, see our guide to <a href="/blog/proofreading-by-reading-aloud">proofreading by reading aloud</a>.
       </p>
 
       <h2 class="text-2xl font-bold">How to proofread by listening (in five steps)</h2>
@@ -178,11 +213,17 @@ const faqSchema = {
         Listening surfaces dropped words, doubled words, run-on sentences, awkward
         transitions and tone problems that spell-check never sees. The built-in
         pre-scan gives you a head start, flagging very long sentences, repeated words
-        like "the the", and double spaces before you even press Play. Once your draft
-        sounds right, run it through our <a href="/">Em Dash Remover and AI-text
+        like "the the", and double spaces before you even press Play. To find run-on
+        sentences visually first, run your draft through the
+        <a href="/tools/sentence-splitter">sentence splitter</a>, then come back and
+        listen; to spot limp, hedgy phrasing, pair this with the
+        <a href="/tools/passive-voice-weasel-word-highlighter">passive-voice and weasel-word highlighter</a>.
+        Once your draft sounds right, run it through our <a href="/">Em Dash Remover and AI-text
         cleaner</a> to strip AI tells, then paste the cleaned text back here and listen
         again - clean it, then hear that your human voice survived the edit.
       </p>
+
+      <p class="muted text-sm">Last updated: June 2026</p>
     </article>
 
     <!-- FAQ -->
@@ -207,6 +248,7 @@ const faqSchema = {
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
     <script type="application/ld+json" set:html={JSON.stringify(howTo)} />
+    <script type="application/ld+json" set:html={JSON.stringify(speakable)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
   </main>
 
