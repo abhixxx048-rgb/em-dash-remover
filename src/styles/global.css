@@ -2,20 +2,29 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+/* ─────────────────────────────────────────────────────────────
+   "Marked-up manuscript" — the copyeditor's desk.
+   Paper + ink, blue pencil for actions, red pen for deletions.
+   ───────────────────────────────────────────────────────────── */
 @theme {
-  --color-ink: #15161a;
-  --color-paper: #fbfaf7;
-  --color-surface: #ffffff;
-  --color-muted: #5f6672;
-  --color-accent: #6d5efc;
-  --color-accent-soft: #eef0ff;
-  --color-ok: #10b981;
-  --color-warn: #f59e0b;
-  --color-bad: #f43f5e;
-  --font-sans: 'Inter var', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Cascadia Code', Menlo, monospace;
-  --radius-card: 16px;
-  --shadow-card: 0 1px 2px rgb(15 22 41 / 0.04), 0 8px 24px -8px rgb(15 22 41 / 0.10);
+  --color-ink: #221b14;          /* warm printer's-ink near-black */
+  --color-paper: #faf5ea;        /* warm manuscript paper          */
+  --color-surface: #fffdf7;      /* a fresh sheet (cards)          */
+  --color-muted: #6f6757;        /* pencil-grey                    */
+  --color-accent: #2f5da8;       /* blue pencil — actions, links   */
+  --color-accent-soft: #e7eefb;  /* blue wash                      */
+  --color-mark: #c5362c;         /* red pen — deletions, signature */
+  --color-mark-soft: #f7e4e0;    /* red wash                       */
+  --color-ok: #2f7d52;           /* proof-green "clean"            */
+  --color-warn: #b27a1d;
+  --color-bad: #c5362c;
+
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-sans: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --radius-card: 12px;
+  --shadow-card: 0 1px 0 rgb(34 27 20 / 0.04), 0 10px 30px -16px rgb(34 27 20 / 0.28);
 }
 
 :root {
@@ -24,24 +33,44 @@
   --c-surface: var(--color-surface);
   --c-muted: var(--color-muted);
   --c-accent-soft: var(--color-accent-soft);
-  --shadow-card: 0 1px 2px rgb(15 22 41 / 0.04), 0 8px 24px -8px rgb(15 22 41 / 0.10);
+  --c-mark-soft: var(--color-mark-soft);
+  --shadow-card: 0 1px 0 rgb(34 27 20 / 0.04), 0 10px 30px -16px rgb(34 27 20 / 0.28);
 }
 
 .dark {
-  --c-ink: #e7e8ea;
-  --c-paper: #0c0d10;
-  --c-surface: #16181d;
-  --c-muted: #9aa0aa;
-  --c-accent-soft: #1e1b3a;
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.4), 0 12px 32px -12px rgb(0 0 0 / 0.6);
+  --c-ink: #ece3d3;              /* paper-coloured text on dark    */
+  --c-paper: #16120d;            /* the desk at night              */
+  --c-surface: #201a12;          /* sheet under lamplight          */
+  --c-muted: #a59b87;
+  --color-accent: #82a6e6;       /* blue pencil, brighter for dark */
+  --c-accent-soft: #1d2740;
+  --color-mark: #ef6a5e;         /* red pen, brighter for dark     */
+  --c-mark-soft: #3a201c;
+  --color-ok: #57b07e;
+  --shadow-card: 0 1px 0 rgb(0 0 0 / 0.4), 0 14px 36px -16px rgb(0 0 0 / 0.7);
 }
 
 html {
   scroll-behavior: smooth;
   background: var(--c-paper);
   color: var(--c-ink);
-  letter-spacing: -0.011em;
+  font-size: 17px;            /* editorial reading size */
 }
+
+body {
+  background: var(--c-paper);
+  color: var(--c-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Display face carries the personality; tight, confident headings. */
+h1, h2, h3, .font-display {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  letter-spacing: -0.015em;
+}
+h1 { font-weight: 600; line-height: 1.04; }
+h2, h3 { font-weight: 600; }
 
 /* Never allow a stray child to create a horizontal scrollbar on mobile. */
 html, body { overflow-x: clip; max-width: 100%; }
@@ -55,51 +84,86 @@ html, body { overflow-x: clip; max-width: 100%; }
   outline-offset: 2px;
 }
 
-body {
-  background: var(--c-paper);
-  color: var(--c-ink);
+/* Editorial eyebrow: a typed margin-note label. */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
-/* Subtle accent halo behind the hero/tool. */
+/* The signature: a word struck out in red pen, the way an editor cuts a tell. */
+.struck {
+  position: relative;
+  color: var(--color-mark);
+  white-space: nowrap;
+}
+.struck::after {
+  content: '';
+  position: absolute;
+  left: -0.04em; right: -0.04em; top: 54%;
+  height: 0.09em;
+  background: var(--color-mark);
+  transform: rotate(-2.2deg);
+  border-radius: 2px;
+}
+
+/* A faint ruled-paper wash behind the hero — quiet, not a purple glow. */
 .halo {
-  background: radial-gradient(ellipse 80% 60% at 50% 0%, var(--c-accent-soft), transparent 70%);
+  background:
+    radial-gradient(140% 80% at 50% -10%, color-mix(in srgb, var(--color-accent) 7%, transparent), transparent 60%);
+}
+
+/* An em-dash divider used as a structural rule. */
+.rule-dash {
+  border: 0;
+  height: 0;
+  text-align: center;
+  overflow: visible;
+  color: color-mix(in srgb, var(--c-ink) 30%, transparent);
+}
+.rule-dash::before {
+  content: '—';
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 0.2em;
 }
 
 .card {
   background: var(--c-surface);
-  border: 1px solid color-mix(in srgb, var(--c-ink) 9%, transparent);
+  border: 1px solid color-mix(in srgb, var(--c-ink) 11%, transparent);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
 }
 
 .ctl {
-  background: var(--c-paper);
-  border: 1px solid color-mix(in srgb, var(--c-ink) 16%, transparent);
+  background: var(--c-surface);
+  border: 1px solid color-mix(in srgb, var(--c-ink) 18%, transparent);
   color: var(--c-ink);
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 .muted { color: var(--c-muted); }
 
-/* Diff highlights do not rely on color alone (WCAG 1.4.1). */
+/* Diff highlights — red pen cuts, blue pencil adds. Never colour alone (WCAG 1.4.1). */
 .diff-del {
-  background: #fde2e1;
-  color: #9f1239;
+  background: var(--c-mark-soft);
+  color: var(--color-mark);
   text-decoration: line-through;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 1.5px;
   border-radius: 3px;
   padding: 0 1px;
 }
 .diff-ins {
-  background: #d7f5dd;
-  color: #065f46;
+  background: var(--c-accent-soft);
+  color: var(--color-accent);
   text-decoration: underline;
-  text-decoration-thickness: 1px;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
   border-radius: 3px;
   padding: 0 1px;
 }
-.dark .diff-del { background: rgb(244 63 94 / 0.20); color: #fda4af; }
-.dark .diff-ins { background: rgb(16 185 129 / 0.20); color: #6ee7b7; }
 
 /* Score ring. */
 .ring-track { stroke: color-mix(in srgb, var(--c-ink) 12%, transparent); }
