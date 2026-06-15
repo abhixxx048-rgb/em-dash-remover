@@ -7,19 +7,19 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Does reading your writing aloud really help proofreading?',
-    a: 'Yes. Reading aloud routes your text through the auditory cortex instead of the visual cortex, and that different processing path is what makes errors stand out. Studies of proofreading find people catch significantly more mistakes when they hear the text than when they read silently. A text-to-speech voice reads exactly what is on the page — not what you meant to write — so dropped words, doubled words, run-ons and awkward phrasing become audible.',
+    a: 'Yes. Reading aloud routes your text through the auditory cortex instead of the visual cortex, and that different processing path is what makes errors stand out. Studies of proofreading find people catch significantly more mistakes when they hear the text than when they read silently. A text-to-speech voice reads exactly what is on the page - not what you meant to write - so dropped words, doubled words, run-ons and awkward phrasing become audible.',
   },
   {
     q: 'Is my text sent anywhere?',
-    a: 'Not when you pick an on-device voice. The tool uses your browser\'s built-in speech engine (the Web Speech API). Voices marked "on-device" speak entirely locally — nothing is uploaded. Some browsers also offer "cloud" voices that send the text to a vendor to synthesize; we label those clearly and show a warning so you can choose a fully-local voice for sensitive work.',
+    a: 'Not when you pick an on-device voice. The tool uses your browser\'s built-in speech engine (the Web Speech API). Voices marked "on-device" speak entirely locally - nothing is uploaded. Some browsers also offer "cloud" voices that send the text to a vendor to synthesize; we label those clearly and show a warning so you can choose a fully-local voice for sensitive work.',
   },
   {
     q: 'Which browsers support word-by-word highlighting?',
-    a: 'Word-level highlighting relies on the speech engine\'s "boundary" events, which fire reliably on Safari (macOS) and Chromium on Windows. On Linux and Android those events are often missing, so the tool falls back to sentence-level highlighting — it always knows which sentence is speaking because it reads sentence by sentence. You never lose your place; the granularity just changes.',
+    a: 'Word-level highlighting relies on the speech engine\'s "boundary" events, which fire reliably on Safari (macOS) and Chromium on Windows. On Linux and Android those events are often missing, so the tool falls back to sentence-level highlighting - it always knows which sentence is speaking because it reads sentence by sentence. You never lose your place; the granularity just changes.',
   },
   {
     q: 'Why does text-to-speech slow down or stop on long documents?',
-    a: 'Desktop Chrome cancels a single utterance after roughly fifteen seconds or two hundred characters — a long-standing browser bug. This tool defeats it by splitting your text into sentence-sized chunks and reading them back to back, with a periodic keep-alive tick and a screen wake-lock so a long read does not silently die. You hear one continuous read.',
+    a: 'Desktop Chrome cancels a single utterance after roughly fifteen seconds or two hundred characters - a long-standing browser bug. This tool defeats it by splitting your text into sentence-sized chunks and reading them back to back, with a periodic keep-alive tick and a screen wake-lock so a long read does not silently die. You hear one continuous read.',
   },
   {
     q: 'Can I change the voice, speed and pitch? Is it free?',
@@ -49,7 +49,7 @@ const webApp = {
     'Flag what you hear into an exportable fix-list',
     'Long-text chunking to defeat the Chrome utterance cutoff',
     'Awkwardness pre-scan: long sentences, repeated words, double spaces',
-    'On-device voices — text never leaves your browser',
+    'On-device voices - text never leaves your browser',
   ],
   publisher: { '@id': `${Astro.site}#org` },
 };
@@ -80,8 +80,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Read-Aloud Proofreader — Hear Your Writing & Catch What Your Eyes Miss"
-  description="Free read-aloud proofreader. Hear your essay, post or draft read aloud with word highlighting to catch dropped words, run-ons and typos by ear — 100% in your browser, no signup."
+  title="Read-Aloud Proofreader - Hear Your Writing & Catch What Your Eyes Miss"
+  description="Free read-aloud proofreader. Hear your essay, post or draft read aloud with word highlighting to catch dropped words, run-ons and typos by ear - 100% in your browser, no signup."
 >
   <main class="halo">
     <!-- Hero -->
@@ -93,13 +93,13 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Read-Aloud Proofreader — hear your writing, catch what your eyes miss.
+        Read-Aloud Proofreader - hear your writing, catch what your eyes miss.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Paste any text and hear it read back to you with <strong>word-by-word
         highlighting</strong>. Your ear catches the dropped words, run-ons and
         repeats your eyes skim right past. Flag what sounds off, fix it at the
-        end — and with an on-device voice, nothing is ever uploaded.
+        end - and with an on-device voice, nothing is ever uploaded.
       </p>
     </header>
 
@@ -116,7 +116,7 @@ const faqSchema = {
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Your text never leaves your browser</h2>
-          <p class="mt-1.5 text-sm muted">On-device voices speak entirely locally — no upload, no account. We label cloud voices clearly so you can keep sensitive drafts private.</p>
+          <p class="mt-1.5 text-sm muted">On-device voices speak entirely locally - no upload, no account. We label cloud voices clearly so you can keep sensitive drafts private.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Reliable on long documents</h2>
@@ -131,8 +131,8 @@ const faqSchema = {
       <p class="muted">
         When you read silently, your brain fills in what you <em>meant</em> to write,
         so missing words and clumsy phrasing slide by unnoticed. Reading aloud
-        forces the text through your <strong>auditory cortex</strong> — a different
-        processing path — and that is exactly why errors stand out. Proofreading
+        forces the text through your <strong>auditory cortex</strong> - a different
+        processing path - and that is exactly why errors stand out. Proofreading
         research has found people catch significantly more mistakes hearing a passage
         than reading it on screen. Even better, a text-to-speech voice reads the
         <em>literal</em> words on the page, with none of the autocorrect your own inner
@@ -143,9 +143,9 @@ const faqSchema = {
       <h2 class="text-2xl font-bold">How to proofread by listening (in five steps)</h2>
       <ol class="list-decimal space-y-2 pl-6 muted">
         <li>Paste your text into the box above, or load one of the deliberately flawed samples.</li>
-        <li>Pick an <strong>on-device voice</strong> and set a slow proofing speed (0.75×) — slower than you'd listen for fun.</li>
+        <li>Pick an <strong>on-device voice</strong> and set a slow proofing speed (0.75×) - slower than you'd listen for fun.</li>
         <li>Press <strong>Play</strong> and follow the highlight with your eyes while your ear listens.</li>
-        <li>The instant a line sounds off, tap <strong>🚩 Flag</strong> (or press <kbd>F</kbd>) — don't stop to edit, keep the flow.</li>
+        <li>The instant a line sounds off, tap <strong>🚩 Flag</strong> (or press <kbd>F</kbd>) - don't stop to edit, keep the flow.</li>
         <li>When the read finishes, work through your fix-list and <strong>copy or download</strong> it as a checklist.</li>
       </ol>
 
@@ -161,19 +161,19 @@ const faqSchema = {
         tool falls back to sentence-level highlighting so you never lose your place.
       </p>
 
-      <h2 class="text-2xl font-bold">100% private — speech runs in your browser</h2>
+      <h2 class="text-2xl font-bold">100% private - speech runs in your browser</h2>
       <p class="muted">
         Read-aloud is one of the few text tools where a naive build could quietly
         send your writing to a vendor, so we make the choice visible. Pick a voice
         marked <strong>on-device</strong> and the speech is generated entirely on your
-        machine — nothing is uploaded, and it works offline. Some browsers also offer
+        machine - nothing is uploaded, and it works offline. Some browsers also offer
         higher-quality <strong>cloud</strong> voices that do send the text away to be
         synthesized; we flag those with a warning so you can decide. For a graded
         essay, an embargoed draft, or confidential copy, a local voice keeps it on
         your device.
       </p>
 
-      <h2 class="text-2xl font-bold">What it catches — and reading the cleaned version</h2>
+      <h2 class="text-2xl font-bold">What it catches - and reading the cleaned version</h2>
       <p class="muted">
         Listening surfaces dropped words, doubled words, run-on sentences, awkward
         transitions and tone problems that spell-check never sees. The built-in
@@ -181,7 +181,7 @@ const faqSchema = {
         like "the the", and double spaces before you even press Play. Once your draft
         sounds right, run it through our <a href="/">Em Dash Remover and AI-text
         cleaner</a> to strip AI tells, then paste the cleaned text back here and listen
-        again — clean it, then hear that your human voice survived the edit.
+        again - clean it, then hear that your human voice survived the edit.
       </p>
     </article>
 

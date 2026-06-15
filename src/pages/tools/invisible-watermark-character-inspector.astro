@@ -7,27 +7,27 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Does ChatGPT add invisible watermarks to my text?',
-    a: 'Not a secret, unbreakable watermark. What people notice are mostly artifacts — like the narrow no-break space (U+202F) that GPT-5 often emits instead of a normal space, or zero-width characters picked up from web copy. They are easy to see with this inspector and trivial to remove. True probabilistic watermarks (e.g. Google SynthID Text) need model internals and cannot be detected in your browser.',
+    a: 'Not a secret, unbreakable watermark. What people notice are mostly artifacts - like the narrow no-break space (U+202F) that GPT-5 often emits instead of a normal space, or zero-width characters picked up from web copy. They are easy to see with this inspector and trivial to remove. True probabilistic watermarks (e.g. Google SynthID Text) need model internals and cannot be detected in your browser.',
   },
   {
     q: 'What is U+202F and why is it in my text?',
-    a: 'U+202F is the narrow no-break space (NNBSP). It looks almost identical to a normal space but never breaks across a line. It has become a recognizable tell because some AI models insert it instead of a regular space. It is harmless, but it can break word counts, regex, and diffs — so converting it to a normal space is a good idea.',
+    a: 'U+202F is the narrow no-break space (NNBSP). It looks almost identical to a normal space but never breaks across a line. It has become a recognizable tell because some AI models insert it instead of a regular space. It is harmless, but it can break word counts, regex, and diffs - so converting it to a normal space is a good idea.',
   },
   {
     q: 'Will removing invisible characters break emoji or non-English text?',
     a: 'It can if you strip the wrong ones. The zero-width joiner (U+200D) legitimately holds multi-person emoji together (👨‍👩‍👧), and variation selectors (U+FE0F) control emoji presentation. This tool labels those clearly and leaves variation selectors untouched by default, so you can review before stripping. Non-breaking spaces in French/ESL typography are also flagged, not silently nuked.',
   },
   {
-    q: 'Is this safe — does my text get uploaded?',
+    q: 'Is this safe - does my text get uploaded?',
     a: 'No. The entire inspection and cleanup runs in your browser with zero network calls. Open DevTools → Network while you use it and you will see no requests. It even works offline. Your preferences are saved locally; your text never is.',
   },
   {
     q: "What's the difference between NBSP and a normal space?",
-    a: 'A normal space (U+0020) can break to the next line and is what word counters expect. A non-breaking space (NBSP, U+00A0) renders the same but forces the words around it to stay together. NBSP is common from PDFs and Word, and it frequently breaks layout, search, and word counts — which is why the inspector flags it.',
+    a: 'A normal space (U+0020) can break to the next line and is what word counters expect. A non-breaking space (NBSP, U+00A0) renders the same but forces the words around it to stay together. NBSP is common from PDFs and Word, and it frequently breaks layout, search, and word counts - which is why the inspector flags it.',
   },
   {
     q: 'Can you detect SynthID or probabilistic watermarks?',
-    a: 'Honestly, no — and no client-side tool can. SynthID-style watermarks are embedded statistically across token choices and require the model’s keys/internals to verify. This inspector detects literal hidden characters in the text, not statistical signals. We say so plainly rather than overpromise.',
+    a: 'Honestly, no - and no client-side tool can. SynthID-style watermarks are embedded statistically across token choices and require the model’s keys/internals to verify. This inspector detects literal hidden characters in the text, not statistical signals. We say so plainly rather than overpromise.',
   },
   {
     q: 'What are bidi / Trojan-Source characters?',
@@ -70,7 +70,7 @@ const faqSchema = {
 
 <Base
   title="Invisible Character Viewer & AI Watermark Checker (U+202F, ZWSP)"
-  description="See every hidden Unicode character in your text — zero-width spaces, NBSP, the U+202F GPT tell, bidi / Trojan-Source and tag chars — highlighted inline with its code point. Free, 100% in your browser."
+  description="See every hidden Unicode character in your text - zero-width spaces, NBSP, the U+202F GPT tell, bidi / Trojan-Source and tag chars - highlighted inline with its code point. Free, 100% in your browser."
 >
   <main class="halo">
     <!-- Hero -->
@@ -82,13 +82,13 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Invisible &amp; Watermark Character Inspector — see hidden Unicode before you strip it.
+        Invisible &amp; Watermark Character Inspector - see hidden Unicode before you strip it.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Paste any text to reveal every zero-width, look-alike-whitespace, bidi or
-        tag character — each one highlighted inline with its <strong>U+XXXX</strong>
+        tag character - each one highlighted inline with its <strong>U+XXXX</strong>
         code point and a plain-English note. See the <strong>U+202F</strong> GPT
-        spacing tell, zero-width watermarks, and Trojan-Source risks — then clean
+        spacing tell, zero-width watermarks, and Trojan-Source risks - then clean
         them in one click. Real transparency, not a black box.
       </p>
     </header>
@@ -104,11 +104,11 @@ const faqSchema = {
         An invisible character is a Unicode code point that takes up no visible glyph
         (or one that looks identical to an ordinary space) yet still lives in your
         text. They fall into a few families. <strong>Zero-width / format</strong>
-        characters — the zero-width space (U+200B), word joiner (U+2060), byte-order
-        mark (U+FEFF) and soft hyphen (U+00AD) — usually arrive from copy-pasting off
+        characters - the zero-width space (U+200B), word joiner (U+2060), byte-order
+        mark (U+FEFF) and soft hyphen (U+00AD) - usually arrive from copy-pasting off
         the web or out of a PDF. <strong>Look-alike whitespace</strong> includes the
         non-breaking space (U+00A0) and the narrow no-break space (U+202F), plus en,
-        em, thin and hair spaces — they render like a normal space but behave
+        em, thin and hair spaces - they render like a normal space but behave
         differently. <strong>Bidirectional controls</strong>, <strong>variation
         selectors</strong> and <strong>tag characters</strong> are rarer and carry
         more risk. The inspector highlights every one of them in place so you can see
@@ -119,12 +119,12 @@ const faqSchema = {
       <p class="muted">
         Almost certainly not a real watermark. The thing people most often spot is the
         <strong>narrow no-break space (U+202F)</strong>, which some models emit in
-        place of a normal space — a recognizable spacing pattern, but a training
+        place of a normal space - a recognizable spacing pattern, but a training
         artifact, not a hidden signature. The same goes for stray zero-width spaces.
         They are visible the moment you paste here, and they come out cleanly. We are
         deliberately honest about the limit: genuine probabilistic watermarks such as
         Google's <em>SynthID Text</em> are embedded statistically across a model's
-        token choices and can only be verified with the model's own keys — no
+        token choices and can only be verified with the model's own keys - no
         client-side tool, including this one, can detect them. We flag the literal
         characters that are actually in your text and leave the marketing fear to
         others.
@@ -134,35 +134,35 @@ const faqSchema = {
       <p class="muted">
         A few invisible characters are a genuine security concern. Bidirectional
         controls like the right-to-left override (U+202E) can reorder how text is
-        displayed without changing what is stored — the basis of the
+        displayed without changing what is stored - the basis of the
         <strong>Trojan Source</strong> attack (CVE-2021-42574) that can hide logic in
         source code or disguise an account number in plain text. Unicode
         <strong>tag characters</strong> (U+E0000–E007F) are invisible mirrors of
         ASCII bytes that have been used to smuggle hidden instructions into LLM prompts,
         and <strong>variation selectors</strong> can carry the same kind of hidden
         payload. When the inspector finds any of these it raises a red security banner
-        so you triage the risky ones first — coverage that writer-focused tools usually
+        so you triage the risky ones first - coverage that writer-focused tools usually
         skip.
       </p>
 
       <h2 class="text-2xl font-bold">How to remove invisible characters safely (and when to keep them)</h2>
       <p class="muted">
         Switch to the <strong>Cleaned</strong> view to preview text with the hidden
-        characters stripped or converted — look-alike spaces become normal spaces,
+        characters stripped or converted - look-alike spaces become normal spaces,
         line/paragraph separators become newlines, and zero-width, bidi and tag
         characters are removed. Then copy or download the result. Cleaning is the easy
         part; knowing what to keep matters more. The zero-width joiner (U+200D) holds
         multi-person emoji together, variation selectors style emoji, and non-breaking
         and thin spaces are intentional typography in French and other languages. The
         inspector labels these clearly and leaves variation selectors alone by default,
-        so you keep meaningful characters and remove only the junk — keeping your human
+        so you keep meaningful characters and remove only the junk - keeping your human
         voice, not bypassing a detector.
       </p>
 
-      <h2 class="text-2xl font-bold">100% private — runs in your browser</h2>
+      <h2 class="text-2xl font-bold">100% private - runs in your browser</h2>
       <p class="muted">
         Every part of the inspection and cleanup happens locally in your browser with
-        no network calls. Your text is never uploaded, stored, or logged — open
+        no network calls. Your text is never uploaded, stored, or logged - open
         DevTools → Network and you will see zero requests, and the tool keeps working
         offline. Only your display preferences are saved (locally); the text itself
         never is. That makes it safe for confidential documents, source code, résumés

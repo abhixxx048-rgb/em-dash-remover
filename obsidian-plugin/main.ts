@@ -1,5 +1,5 @@
 /**
- * Em Dash Remover — Obsidian plugin (MVP scaffold).
+ * Em Dash Remover - Obsidian plugin (MVP scaffold).
  *
  * MVP, per spec Section 4:
  *   - Clean-on-paste interception (editor-paste event).
@@ -60,7 +60,7 @@ export default class EmDashRemoverPlugin extends Plugin {
 
           const { text, counts } = clean(raw, this.settings.rules);
 
-          // No-op: do NOT preventDefault — let Obsidian handle the native paste.
+          // No-op: do NOT preventDefault - let Obsidian handle the native paste.
           if (text === raw) return;
 
           evt.preventDefault();

@@ -54,7 +54,7 @@
         class="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-ink/20 px-4 py-10 text-center transition hover:border-accent focus-visible:border-accent"
       >
         <div class="text-3xl" aria-hidden="true">📂</div>
-        <p class="font-medium">Drop your files here<span class="muted"> — or click to choose</span></p>
+        <p class="font-medium">Drop your files here<span class="muted"> - or click to choose</span></p>
         <p class="text-xs muted"><code>.txt</code> · <code>.md</code> &nbsp; (<code>.docx</code> · <code>.zip</code> coming soon)</p>
         <div class="mt-1 flex flex-wrap justify-center gap-2">
           <button type="button" data-sample="batch" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✨ Try with samples</button>
@@ -66,7 +66,7 @@
 
       <!-- Aggregate summary strip (filled after a run) -->
       <div id="summary" hidden class="mt-4 rounded-xl border border-ink/10 px-4 py-3" style="background: var(--c-paper);">
-        <p class="text-sm font-semibold"><span id="summary-headline">—</span></p>
+        <p class="text-sm font-semibold"><span id="summary-headline">-</span></p>
         <p id="summary-insight" class="mt-0.5 text-xs muted" aria-live="polite"></p>
         <div class="mt-3 flex flex-wrap gap-2">
           <button id="download-all" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40">⬇ Download all cleaned</button>
@@ -82,7 +82,7 @@
     <!-- Footer privacy line -->
     <div class="border-t border-ink/8 px-4 py-3">
       <p class="text-xs muted">
-        🔒 Every file is read and cleaned in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+        🔒 Every file is read and cleaned in your browser - open DevTools → Network and you'll see zero requests. Works offline.
       </p>
     </div>
   </div>
@@ -218,7 +218,7 @@
     if (sum.skipped) parts.push(`${sum.skipped} skipped`);
     if (sum.errored) parts.push(`${sum.errored} error${sum.errored === 1 ? '' : 's'}`);
     $<HTMLSpanElement>('summary-headline').textContent =
-      parts.join(' · ') + ` — ${sum.totalChanges} change${sum.totalChanges === 1 ? '' : 's'} total`;
+      parts.join(' · ') + ` - ${sum.totalChanges} change${sum.totalChanges === 1 ? '' : 's'} total`;
 
     // insight strip: name the two biggest artifact buckets
     const c = sum.counts;
@@ -230,7 +230,7 @@
     const top = buckets.filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 2);
     $<HTMLParagraphElement>('summary-insight').textContent = top.length
       ? 'Removed ' + top.map(([label, n]) => `${n} ${label}`).join(' and ') + ` across ${sum.total} file${sum.total === 1 ? '' : 's'}.`
-      : 'No AI tells found in this batch — everything already reads clean.';
+      : 'No AI tells found in this batch - everything already reads clean.';
 
     $<HTMLButtonElement>('download-all').disabled = sum.cleaned + sum.unchanged === 0;
 
@@ -287,12 +287,12 @@
     for (const file of files) {
       const ext = extensionOf(file.name);
       if (isComingSoonExtension(ext)) {
-        // Don't read the bytes — we can't process them yet. Stage a placeholder.
+        // Don't read the bytes - we can't process them yet. Stage a placeholder.
         staged.push({ name: file.name, size: file.size, text: '' });
         continue;
       }
       if (!isTextExtension(ext)) {
-        // Stage so the user sees a "skipped — unsupported" row, not silence.
+        // Stage so the user sees a "skipped - unsupported" row, not silence.
         staged.push({ name: file.name, size: file.size, text: '' });
         continue;
       }
@@ -328,7 +328,7 @@
   function downloadAll() {
     // No-dep MVP: trigger an individual download per cleaned file (a real ZIP
     // needs JSZip, which we have not bundled). Browsers may prompt to allow
-    // multiple downloads — that's expected and stated in the UI copy.
+    // multiple downloads - that's expected and stated in the UI copy.
     const out = reports.filter((r) => r.status === 'cleaned' || r.status === 'unchanged');
     if (!out.length) { toast('Nothing to download yet'); return; }
     out.forEach((r, k) => {
@@ -343,7 +343,7 @@
     const csv = reportToCsv(reports);
     navigator.clipboard.writeText(csv)
       .then(() => toast('Report copied to clipboard'))
-      .catch(() => toast('Could not copy — try Download report'));
+      .catch(() => toast('Could not copy - try Download report'));
   }
   function downloadReport() {
     const stamp = new Date().toISOString().slice(0, 10);
@@ -370,17 +370,17 @@
     {
       name: 'blog-post.md',
       size: 0,
-      text: `# Why this matters\n\nLet's be honest — most teams get this wrong. It's not just about speed, it's about clarity. We've leveraged a robust, multifaceted approach to unlock our full potential — and it's a testament to everyone's work. Moreover, it's worth noting that our seamless rollout paved the way for success.`,
+      text: `# Why this matters\n\nLet's be honest - most teams get this wrong. It's not just about speed, it's about clarity. We've leveraged a robust, multifaceted approach to unlock our full potential - and it's a testament to everyone's work. Moreover, it's worth noting that our seamless rollout paved the way for success.`,
     },
     {
       name: 'product-description.txt',
       size: 0,
-      text: `Introducing our flagship device — engineered to delve into the details that matter. In today's fast-paced world, you need a tool that's both elegant and powerful… and this one delivers. The future belongs to those who harness focus.`,
+      text: `Introducing our flagship device - engineered to delve into the details that matter. In today's fast-paced world, you need a tool that's both elegant and powerful… and this one delivers. The future belongs to those who harness focus.`,
     },
     {
       name: 'notes.md',
       size: 0,
-      text: `The Industrial Revolution stands as a testament to human ingenuity. It reshaped society — transforming economies, redefining labor, and revolutionizing daily life. Ultimately, it's important to note that this transformative era laid the cornerstone for the modern world.`,
+      text: `The Industrial Revolution stands as a testament to human ingenuity. It reshaped society - transforming economies, redefining labor, and revolutionizing daily life. Ultimately, it's important to note that this transformative era laid the cornerstone for the modern world.`,
     },
   ];
   function loadSamples() {

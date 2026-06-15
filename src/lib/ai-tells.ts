@@ -25,7 +25,7 @@ export interface TellReport {
 
 /* ---------------------------------------------------------------- word lists */
 
-// Signature words — rare in human prose, so meaningful even at low counts.
+// Signature words - rare in human prose, so meaningful even at low counts.
 // [E] = empirically validated (Kobak et al.); others curated.
 const AI_WORDS_STRONG = [
   'delve', 'delves', 'delving', 'underscore', 'underscores', 'underscoring',
@@ -37,7 +37,7 @@ const AI_WORDS_STRONG = [
   'commendable', 'paramount', 'indelible', 'unwavering', 'myriad', 'plethora',
 ];
 
-// Common "AI accent" words — appear in real prose too, so density-gated.
+// Common "AI accent" words - appear in real prose too, so density-gated.
 const AI_WORDS_SOFT = [
   'leverage', 'leverages', 'leveraging', 'harness', 'harnessing', 'navigate',
   'navigating', 'enhance', 'enhancing', 'foster', 'fostering', 'embark',
@@ -50,7 +50,7 @@ const AI_WORDS_SOFT = [
   'notable', 'countless', 'vast', 'array', 'spectrum', 'landscape',
 ];
 
-// Transitions / certainty — very high false-positive; counted for density only.
+// Transitions / certainty - very high false-positive; counted for density only.
 const AI_TRANSITIONS = [
   'moreover', 'furthermore', 'additionally', 'consequently', 'nevertheless',
   'nonetheless', 'subsequently', 'accordingly', 'notably', 'importantly',
@@ -204,11 +204,11 @@ export function scan(text: string): TellReport {
     if (count > 0) tells.push({ id, label, count, weight, examples });
   };
 
-  // Tier 0 — near-conclusive.
+  // Tier 0 - near-conclusive.
   push('invis', 'Invisible / watermark chars', countMatches(text, /[​-‏⁠﻿­ ]/g).count, 5);
 
   // Punctuation tells.
-  push('emdash', 'Em dashes', countMatches(text, /—/g).count, 3);
+  push('emdash', 'Em dashes', countMatches(text, /-/g).count, 3);
   push('endash', 'En dashes', countMatches(text, /–/g).count, 1);
   push('curly', 'Curly quotes', countMatches(text, /[‘’“”]/g).count, 1);
 
@@ -244,7 +244,7 @@ export function scan(text: string): TellReport {
   const three = countMatches(text, /\b[\w-]+,\s+[\w-]+,\s+and\s+[\w-]+\b/gi);
   if (three.count >= 2) push('three', 'Rule-of-three lists', three.count, 1, three.examples);
 
-  // Burstiness (statistical, corroborating only — needs enough text).
+  // Burstiness (statistical, corroborating only - needs enough text).
   const { cv, sentences } = burstiness(text);
   if (sentences >= 6 && cv < 0.4) {
     push('burstiness', 'Uniform sentence length', 1, 2, [`variation ${cv.toFixed(2)}`]);

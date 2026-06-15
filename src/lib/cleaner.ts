@@ -12,7 +12,7 @@
 export type DashStyle = 'smart' | 'comma' | 'period' | 'colon' | 'parentheses' | 'space' | 'remove';
 
 export interface CleanOptions {
-  /** How to handle em dashes (—). 'smart' = context-aware. */
+  /** How to handle em dashes (-). 'smart' = context-aware. */
   dashStyle: DashStyle;
   /** Convert en dashes (–) used as punctuation the same way as em dashes. */
   enDashes: boolean;
@@ -52,7 +52,7 @@ export interface CleanResult {
   };
 }
 
-const EM = '—'; // —
+const EM = '-'; // -
 const EN = '–'; // –
 
 // Zero-width & invisible characters frequently left in AI / web-copied text.
@@ -72,7 +72,7 @@ function smartSingle(before: string, after: string, hadSpace: boolean): string {
   const left = before.trimEnd();
   const right = after.trimStart();
 
-  // Range like "May—September" or "10—20" (no surrounding spaces, letters/digits
+  // Range like "May-September" or "10-20" (no surrounding spaces, letters/digits
   // on both sides): this is really an en-dash usage, not a sentence break.
   if (!hadSpace && /[\p{L}\p{N}]$/u.test(left) && /^[\p{L}\p{N}]/u.test(right)) {
     return EN; // keep as a proper (unspaced) en dash range
@@ -100,10 +100,10 @@ function replaceDashes(text: string, style: DashStyle, includeEn: boolean): { te
   let en = 0;
 
   // Build a matcher for the dash chars in scope. We handle optional surrounding
-  // spaces so " — " collapses cleanly to the replacement.
+  // spaces so " - " collapses cleanly to the replacement.
   const dashClass = includeEn ? `[${EM}${EN}]` : EM;
-  // Capture surrounding whitespace so we can tell a real range ("May—September")
-  // from a spaced sentence break (" — ").
+  // Capture surrounding whitespace so we can tell a real range ("May-September")
+  // from a spaced sentence break (" - ").
   const re = new RegExp(`(\\s*)(${dashClass})(\\s*)`, 'gu');
 
   // First pass: detect parenthetical PAIRS within a sentence and convert both

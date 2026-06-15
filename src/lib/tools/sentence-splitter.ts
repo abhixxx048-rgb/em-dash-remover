@@ -1,10 +1,10 @@
 /**
- * Sentence Splitter — pure client-side segmentation engine.
+ * Sentence Splitter - pure client-side segmentation engine.
  *
  * Design goals (see docs/tools/sentence-splitter.md):
  *  - Split prose into one sentence per line *correctly*. The hard part is that a
  *    period can end a sentence, an abbreviation (Dr.), a decimal (3.14), an
- *    initial (J. R. R.), an ellipsis, or a URL/email — and only one of those is a
+ *    initial (J. R. R.), an ellipsis, or a URL/email - and only one of those is a
  *    real boundary.
  *  - Use the browser's built-in `Intl.Segmenter` (granularity: 'sentence') as the
  *    base tokenizer where available, because it is UAX #29-based and Baseline
@@ -176,7 +176,7 @@ function shouldMergeForward(segment: string, abbrev: Set<string>): boolean {
   if (/\.\s\.\s\.$/.test(effectiveEnd)) return true;
 
   // Decimal / currency / version: a digit immediately before the final period's
-  // group, e.g. "3.14", "$1,000.50", "v1.2.3" — the trailing "." here is rare,
+  // group, e.g. "3.14", "$1,000.50", "v1.2.3" - the trailing "." here is rare,
   // but guard digit-period-digit runs ending the segment.
   if (/\d\.\d[\d.]*\.?$/.test(effectiveEnd)) return true;
 
@@ -277,7 +277,7 @@ function monotonyFrom(stdDev: number, mean: number): { score: number; label: str
   let label: string;
   if (score < 35) label = 'Varied ✓';
   else if (score < 65) label = 'Somewhat uniform';
-  else label = 'Uniform — vary your lengths';
+  else label = 'Uniform - vary your lengths';
   return { score, label };
 }
 

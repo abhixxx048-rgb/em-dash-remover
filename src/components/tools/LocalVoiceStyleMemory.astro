@@ -96,7 +96,7 @@
             <textarea id="input" rows="14" aria-label="Draft to check against your voice"
               class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"></textarea>
             <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-              <p class="muted text-sm">Paste a draft — or try a sample. We check it against your saved voice.</p>
+              <p class="muted text-sm">Paste a draft - or try a sample. We check it against your saved voice.</p>
               <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
                 <button data-sample="ai" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 AI-ish draft</button>
                 <button data-sample="demo" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✨ Demo off-voice</button>
@@ -135,7 +135,7 @@
                   style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
               </svg>
               <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+                <span id="score-num" class="text-xl font-bold leading-none" data-v="0">-</span>
                 <span class="text-[9px] muted">/ 100</span>
               </div>
             </div>
@@ -169,7 +169,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Your samples and drafts never leave your browser — profiles live in IndexedDB on this device.
+    🔒 Your samples and drafts never leave your browser - profiles live in IndexedDB on this device.
     Open DevTools → Network and you'll see zero requests. Works offline.
   </p>
 </section>
@@ -191,7 +191,7 @@
     </div>
     <div class="mt-5 rounded-lg border border-ink/10 p-3 text-xs muted" style="background: var(--c-paper);">
       <p class="font-semibold">Privacy receipt</p>
-      <p class="mt-1" id="privacy-receipt">0 network requests made for profiling. Your data lives only in this browser's IndexedDB — export it for a backup, or wipe it here at any time.</p>
+      <p class="mt-1" id="privacy-receipt">0 network requests made for profiling. Your data lives only in this browser's IndexedDB - export it for a backup, or wipe it here at any time.</p>
     </div>
   </div>
 </div>
@@ -225,7 +225,7 @@
   };
 
   // ===================================================================
-  // Persistence — IndexedDB with a localStorage fallback (private mode).
+  // Persistence - IndexedDB with a localStorage fallback (private mode).
   // Promise-wrapped raw IndexedDB; no dependency.
   // ===================================================================
   const DB_NAME = 'voice-style-memory';
@@ -289,7 +289,7 @@
     });
   }
 
-  // Storage facade — try IndexedDB, fall back to localStorage on failure.
+  // Storage facade - try IndexedDB, fall back to localStorage on failure.
   async function loadAll(): Promise<Profile[]> {
     if (useIDB) {
       try { return await idbAll(); }
@@ -359,7 +359,7 @@
     wrap.innerHTML = `
       <textarea rows="4" data-sample-input aria-label="Writing sample"
         class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 text-[15px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
-        placeholder="Paste something you actually wrote — an email, a note, a post…"></textarea>
+        placeholder="Paste something you actually wrote - an email, a note, a post…"></textarea>
       <button type="button" data-remove aria-label="Remove sample"
         class="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-md text-sm muted transition hover:bg-ink/5">✕</button>`;
     (wrap.querySelector('textarea') as HTMLTextAreaElement).value = value;
@@ -396,13 +396,13 @@
     await putProfile(p);
     localStorage.setItem(ACTIVE_KEY, p.id);
     refreshProfileUI();
-    toast(p.lowConfidence ? 'Saved — add more writing for a sharper fingerprint.' : `Saved "${p.name}" ✓`);
+    toast(p.lowConfidence ? 'Saved - add more writing for a sharper fingerprint.' : `Saved "${p.name}" ✓`);
     setMode('check');
     run();
   }
 
   // ===================================================================
-  // CHECK MODE — live scan
+  // CHECK MODE - live scan
   // ===================================================================
   const RING = 213.6;
   let lastScan: ScanResult | null = null;
@@ -421,7 +421,7 @@
     renderTrend(profile);
 
     if (!src.trim()) {
-      $<HTMLSpanElement>('score-num').textContent = '—';
+      $<HTMLSpanElement>('score-num').textContent = '-';
       $<HTMLSpanElement>('score-num').dataset.v = '0';
       ($('ring') as unknown as SVGCircleElement).style.strokeDashoffset = String(RING);
       $<HTMLParagraphElement>('band').textContent = 'Paste a draft to scan';
@@ -484,7 +484,7 @@
     ul.innerHTML = '';
     $<HTMLSpanElement>('flag-count').textContent = r.flags.length ? `${r.flags.length} spot${r.flags.length === 1 ? '' : 's'}` : '';
     if (!r.flags.length) {
-      ul.innerHTML = '<li class="rounded-lg px-2 py-1 text-emerald-700" style="background: color-mix(in srgb, var(--color-ok) 14%, transparent);">Nothing off-voice found — nice. ✓</li>';
+      ul.innerHTML = '<li class="rounded-lg px-2 py-1 text-emerald-700" style="background: color-mix(in srgb, var(--color-ok) 14%, transparent);">Nothing off-voice found - nice. ✓</li>';
       return;
     }
     const icon: Record<Flag['kind'], string> = {
@@ -578,7 +578,7 @@
       ...r.deltas.map((d) => `  ${d.label.padEnd(20)} you ${d.you} · draft ${d.draft} (z ${d.z})`),
       '',
       `OFF-VOICE SPOTS (${r.flags.length})`,
-      ...(r.flags.length ? r.flags.map((f) => `  • ${f.reason}`) : ['  None — this sounds like you.']),
+      ...(r.flags.length ? r.flags.map((f) => `  • ${f.reason}`) : ['  None - this sounds like you.']),
     ];
     return lines.join('\n');
   }
@@ -708,7 +708,7 @@
     input.value = DEMO_DRAFT;
     run();
     setPane('output');
-    toast('Demo profile loaded — try editing the draft.');
+    toast('Demo profile loaded - try editing the draft.');
   }
 
   // ===================================================================
@@ -780,7 +780,7 @@
       profiles.push(p); activeId = p.id;
       await putProfile(p); localStorage.setItem(ACTIVE_KEY, p.id);
       refreshProfileUI(); run(); toast(`Imported "${p.name}" ✓`);
-    } catch (err) { toast('Could not import — not a valid profile file.'); }
+    } catch (err) { toast('Could not import - not a valid profile file.'); }
     (e.target as HTMLInputElement).value = '';
   });
 
@@ -824,7 +824,7 @@
     if (profiles.length) {
       setMode('check');
       const p = activeProfile();
-      if (p) toast(`Welcome back — checking against "${p.name}".`);
+      if (p) toast(`Welcome back - checking against "${p.name}".`);
     } else {
       setMode('check'); // shows the no-profile empty state with build/demo CTAs
     }

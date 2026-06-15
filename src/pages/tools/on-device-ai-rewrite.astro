@@ -7,7 +7,7 @@ import RelatedTools from '../../components/RelatedTools.astro';
 const faqs = [
   {
     q: 'Does my text get sent anywhere?',
-    a: 'No. When on-device AI is available, the rewrite runs locally in your browser using Chrome\'s built-in Rewriter API (Gemini Nano) — your text never leaves your device. You can verify it yourself: open DevTools, switch to the Network tab, and run a rewrite; you will see zero requests. The only thing that ever touches the network is Chrome\'s one-time download of the model itself. There is no cloud fallback.',
+    a: 'No. When on-device AI is available, the rewrite runs locally in your browser using Chrome\'s built-in Rewriter API (Gemini Nano) - your text never leaves your device. You can verify it yourself: open DevTools, switch to the Network tab, and run a rewrite; you will see zero requests. The only thing that ever touches the network is Chrome\'s one-time download of the model itself. There is no cloud fallback.',
   },
   {
     q: 'Which browsers and versions support on-device rewriting?',
@@ -19,7 +19,7 @@ const faqs = [
   },
   {
     q: 'What if my device cannot run the on-device model?',
-    a: 'The hardware bar is fairly high — broadly a capable GPU or 16+ GB RAM with several gigabytes of free disk for the model. If your device cannot run it, the tool degrades gracefully to a deterministic cleanup pass (em dashes, curly quotes, ellipses, invisible characters and a couple of hedging AI tells), clearly labelled as cleanup rather than an AI rewrite.',
+    a: 'The hardware bar is fairly high - broadly a capable GPU or 16+ GB RAM with several gigabytes of free disk for the model. If your device cannot run it, the tool degrades gracefully to a deterministic cleanup pass (em dashes, curly quotes, ellipses, invisible characters and a couple of hedging AI tells), clearly labelled as cleanup rather than an AI rewrite.',
   },
   {
     q: 'Is this an AI-detector bypass tool?',
@@ -35,7 +35,7 @@ const webApp = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   '@id': `${Astro.site}tools/on-device-ai-rewrite#app`,
-  name: 'On-Device AI Rewrite — Private, Browser-Based Tone & Length Rewriting',
+  name: 'On-Device AI Rewrite - Private, Browser-Based Tone & Length Rewriting',
   url: `${Astro.site}tools/on-device-ai-rewrite`,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
@@ -44,7 +44,7 @@ const webApp = {
   isAccessibleForFree: true,
   featureList: [
     'Rewrite text tone and length on-device with Chrome\'s built-in Rewriter API',
-    'Private AI text rewriter — no text is sent to any server',
+    'Private AI text rewriter - no text is sent to any server',
     'Tone control: more formal, as-is, more casual',
     'Length control: shorter, as-is, longer',
     'One-click presets: polish, tighten, soften, expand, humanize',
@@ -66,8 +66,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="On-Device AI Rewriter — Private, Browser-Based Tone & Length Rewriting"
-  description="Free on-device AI rewriter: rephrase tone and length with Chrome's built-in Rewriter API (Gemini Nano). Private — your text never leaves your browser. No upload, no signup, with a deterministic fallback."
+  title="On-Device AI Rewriter - Private, Browser-Based Tone & Length Rewriting"
+  description="Free on-device AI rewriter: rephrase tone and length with Chrome's built-in Rewriter API (Gemini Nano). Private - your text never leaves your browser. No upload, no signup, with a deterministic fallback."
 >
   <main class="halo">
     <!-- Hero -->
@@ -77,14 +77,14 @@ const faqSchema = {
         On your device · free · no signup · no upload
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        On-Device AI Rewrite — private tone &amp; length rewriting.
+        On-Device AI Rewrite - private tone &amp; length rewriting.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Rephrase your text — more formal or more casual, shorter or longer —
+        Rephrase your text - more formal or more casual, shorter or longer -
         using Chrome's <strong>built-in Rewriter API (Gemini Nano)</strong>, which
         runs entirely on your own device. No upload, no server, no signup. When
         on-device AI isn't available, we fall back to a deterministic cleanup so
-        the tool still works for everyone. Clean AI writing for real quality —
+        the tool still works for everyone. Clean AI writing for real quality -
         keep your human voice.
       </p>
     </header>
@@ -95,7 +95,7 @@ const faqSchema = {
 
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
-      <h2 class="text-2xl font-bold">Rewrite tone and length on your device — no upload</h2>
+      <h2 class="text-2xl font-bold">Rewrite tone and length on your device - no upload</h2>
       <p class="muted">
         An <strong>on-device AI rewriter</strong> does the rephrasing on your own
         computer instead of a remote server. Pick a tone (more formal, as-is or
@@ -117,16 +117,16 @@ const faqSchema = {
         rewrite, it opens a session, streams the output, and cleans up the session
         afterwards. The model runs on your GPU or CPU, so once it is downloaded the
         feature also works offline. We hand the model a small, fixed instruction to
-        preserve your voice and strip robotic AI tells — never to "beat a detector."
+        preserve your voice and strip robotic AI tells - never to "beat a detector."
       </p>
 
-      <h2 class="text-2xl font-bold">100% client-side — verify it yourself</h2>
+      <h2 class="text-2xl font-bold">100% client-side - verify it yourself</h2>
       <p class="muted">
         Privacy here is provable, not a promise. Open your browser's DevTools,
         switch to the <strong>Network</strong> tab, and run a rewrite: you will see
         zero network requests while the text is processed. The only time anything
         touches the network is Chrome's one-time download of the Gemini Nano model.
-        There is deliberately <em>no</em> cloud fallback — when on-device AI is not
+        There is deliberately <em>no</em> cloud fallback - when on-device AI is not
         available we use a local, rule-based cleanup instead of secretly sending
         your text somewhere.
       </p>
@@ -143,10 +143,10 @@ const faqSchema = {
         style survived, so you can avoid over-rewriting.
       </p>
 
-      <h2 class="text-2xl font-bold">When AI isn't available — deterministic fallback</h2>
+      <h2 class="text-2xl font-bold">When AI isn't available - deterministic fallback</h2>
       <p class="muted">
-        On-device AI is still rolling out, so many visitors — non-Chrome browsers,
-        mobile, or hardware that cannot run the model — will not have it. Instead of
+        On-device AI is still rolling out, so many visitors - non-Chrome browsers,
+        mobile, or hardware that cannot run the model - will not have it. Instead of
         failing silently, the tool detects this up front and applies a deterministic
         cleanup pass: it replaces em and en dashes, converts curly quotes to
         straight, expands ellipsis characters, strips invisible and watermark

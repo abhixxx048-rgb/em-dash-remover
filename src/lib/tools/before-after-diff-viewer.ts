@@ -42,7 +42,7 @@ export type Decision = 'accepted' | 'rejected';
  *    replacement (`after`); either may be empty (pure insert / pure delete).
  */
 export interface Segment {
-  /** Stable index — used as the segment's id for keyboard nav + DOM keys. */
+  /** Stable index - used as the segment's id for keyboard nav + DOM keys. */
   index: number;
   type: 'unchanged' | 'change';
   /** Original substring (what was removed). Empty for a pure insertion. */
@@ -70,10 +70,10 @@ export interface DiffSummary {
 }
 
 // Character classes reused from the cleaner so labels stay consistent.
-const RE_EM = /[—–]/;                 // em / en dash
+const RE_EM = /[-–]/;                 // em / en dash
 const RE_QUOTE = /[‘’‚‛“”„‟]/;        // curly quotes & apostrophes
 const RE_ELLIPSIS = /…/;              // ellipsis character
-// Zero-width / invisible / bidi marks — same set the cleaner strips.
+// Zero-width / invisible / bidi marks - same set the cleaner strips.
 const RE_INVISIBLE = /[​-‏⁠﻿­‪-‮⁦-⁩]/;
 const RE_NBSP = /[ ]/;           // non-breaking space
 const RE_MARKDOWN = /(\*\*|__|`|^#{1,6}\s|\*)/;
@@ -111,7 +111,7 @@ export function kindLabel(kind: ChangeKind): string {
 }
 
 /**
- * A short educational explanation for a single change — the "why" tooltip.
+ * A short educational explanation for a single change - the "why" tooltip.
  * Reinforces the brand promise: quality + keeping your voice, never bypass.
  */
 export function explainChange(kind: ChangeKind, before: string, after: string): string {
@@ -159,7 +159,7 @@ export function visualizeInvisibles(s: string): string {
  *
  * jsdiff emits added/removed parts adjacent to each other; we coalesce a
  * removed-immediately-followed-by-added run into a single `change` segment so
- * one conceptual edit ("—" → ", ") is one reviewable unit rather than two.
+ * one conceptual edit ("-" → ", ") is one reviewable unit rather than two.
  */
 export function partsToSegments(parts: DiffPart[]): Segment[] {
   const segments: Segment[] = [];
@@ -170,7 +170,7 @@ export function partsToSegments(parts: DiffPart[]): Segment[] {
     const part = parts[i];
 
     if (!part.added && !part.removed) {
-      // Shared text — no decision needed.
+      // Shared text - no decision needed.
       segments.push({
         index: index++,
         type: 'unchanged',
@@ -199,7 +199,7 @@ export function partsToSegments(parts: DiffPart[]): Segment[] {
       before,
       after,
       kind,
-      // Default to accepting (the cleaned version) — the user reviews/rejects.
+      // Default to accepting (the cleaned version) - the user reviews/rejects.
       decision: 'accepted',
     });
   }
@@ -273,7 +273,7 @@ export function escapeHtml(s: string): string {
 
 /**
  * Export the diff as Markdown using ~~strike~~ for removals and **bold** for
- * additions — a portable, paste-anywhere representation of the changes.
+ * additions - a portable, paste-anywhere representation of the changes.
  */
 export function toMarkdown(segments: Segment[]): string {
   let out = '';

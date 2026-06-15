@@ -14,13 +14,13 @@ export const AUTHOR = 'The Em Dash Remover Team';
 // Replace the empty string with your real ID, then rebuild.
 export const ADSENSE_PUB_ID = '';
 
-// Umami analytics (privacy-safe, cookieless — sends COUNTS/metadata only,
+// Umami analytics (privacy-safe, cookieless - sends COUNTS/metadata only,
 // never user text).
 // Leave EMPTY until you create the Umami Cloud (or self-hosted) website and
 // have its website id. While empty, analytics are DISABLED: the <Analytics>
 // scripts are not injected and track() becomes a safe no-op.
 export const UMAMI_WEBSITE_ID = '';
-// Script src — override only if you self-host Umami; the default points at
+// Script src - override only if you self-host Umami; the default points at
 // Umami Cloud.
 export const UMAMI_SRC = 'https://cloud.umami.is/script.js';
 

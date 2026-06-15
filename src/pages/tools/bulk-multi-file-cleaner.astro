@@ -7,7 +7,7 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Are my files uploaded anywhere?',
-    a: 'No. Every file is read and cleaned entirely in your browser with plain JavaScript and the FileReader API — nothing is uploaded, stored or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. The tool also works fully offline, which is the whole point for confidential drafts.',
+    a: 'No. Every file is read and cleaned entirely in your browser with plain JavaScript and the FileReader API - nothing is uploaded, stored or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. The tool also works fully offline, which is the whole point for confidential drafts.',
   },
   {
     q: 'How many files can I clean at once?',
@@ -15,11 +15,11 @@ const faqs = [
   },
   {
     q: 'Which file formats are supported?',
-    a: 'Right now: plain text (.txt) and Markdown (.md, .markdown, .mdx). Word .docx and .zip archives are recognised and shown as "coming soon" rather than silently dropped — repacking a valid .docx in the browser needs an extra library we have not bundled yet, so we feature-detect and tell you instead of producing a broken file.',
+    a: 'Right now: plain text (.txt) and Markdown (.md, .markdown, .mdx). Word .docx and .zip archives are recognised and shown as "coming soon" rather than silently dropped - repacking a valid .docx in the browser needs an extra library we have not bundled yet, so we feature-detect and tell you instead of producing a broken file.',
   },
   {
     q: 'Why does Smart mode sometimes use a semicolon instead of a comma?',
-    a: 'Because an em dash often joins two complete clauses, and replacing it with a comma there creates a comma splice — a grammar error every blind find-and-replace tool produces. Smart mode reads the words on each side of the dash and picks a comma, semicolon, colon, period or parentheses so the sentence stays correct across every file in the batch.',
+    a: 'Because an em dash often joins two complete clauses, and replacing it with a comma there creates a comma splice - a grammar error every blind find-and-replace tool produces. Smart mode reads the words on each side of the dash and picks a comma, semicolon, colon, period or parentheses so the sentence stays correct across every file in the batch.',
   },
   {
     q: 'Does it strip my Markdown formatting?',
@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: 'What happens to an empty or unreadable file?',
-    a: 'It fails only itself. An empty file is marked "already clean", an unsupported type is "skipped" with the reason shown, and a file that cannot be read is flagged as an error — while every other file in the batch still cleans and downloads normally.',
+    a: 'It fails only itself. An empty file is marked "already clean", an unsupported type is "skipped" with the reason shown, and a file that cannot be read is flagged as an error - while every other file in the batch still cleans and downloads normally.',
   },
   {
     q: 'Can I download everything at once?',
@@ -39,7 +39,7 @@ const webApp = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   '@id': `${Astro.site}tools/bulk-multi-file-cleaner#app`,
-  name: 'Bulk Text Cleaner — Clean Multiple Files at Once',
+  name: 'Bulk Text Cleaner - Clean Multiple Files at Once',
   url: `${Astro.site}tools/bulk-multi-file-cleaner`,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
@@ -54,7 +54,7 @@ const webApp = {
     'Grammar-aware em dash replacement across a whole folder',
     'Per-file cleanup report with counts',
     'Download cleaned files individually',
-    '100% in your browser — files never uploaded',
+    '100% in your browser - files never uploaded',
   ],
   publisher: { '@id': `${Astro.site}#org` },
 };
@@ -71,7 +71,7 @@ const faqSchema = {
 ---
 
 <Base
-  title="Bulk Text Cleaner — Clean Multiple Files at Once, Privately"
+  title="Bulk Text Cleaner - Clean Multiple Files at Once, Privately"
   description="Free bulk text cleaner: drop multiple .txt and .md files and remove em dashes, smart quotes and invisible characters from every one with grammar-aware rules. Per-file report, individual downloads, 100% in your browser."
 >
   <main class="halo">
@@ -82,12 +82,12 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Bulk Text Cleaner — Clean Many Files at Once, Privately
+        Bulk Text Cleaner - Clean Many Files at Once, Privately
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Drop a whole folder of <code>.txt</code> and <code>.md</code> files and
         clean every one with the same <strong>grammar-aware</strong> rules as the
-        single-paste tool — em dashes, smart quotes, invisible characters and
+        single-paste tool - em dashes, smart quotes, invisible characters and
         more. You get a per-file report and can download each cleaned file. Your
         files never leave your browser.
       </p>
@@ -106,11 +106,11 @@ const faqSchema = {
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Your files never leave your browser</h2>
-          <p class="mt-1.5 text-sm muted">Read and cleaned on-device with FileReader — no upload, no server, no logging. Check the Network tab. Safe for confidential manuscripts and client work.</p>
+          <p class="mt-1.5 text-sm muted">Read and cleaned on-device with FileReader - no upload, no server, no logging. Check the Network tab. Safe for confidential manuscripts and client work.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Grammar-aware, not blind replace</h2>
-          <p class="mt-1.5 text-sm muted">Smart mode picks a comma, semicolon, colon or parentheses per sentence — so a batch of files never comes back full of comma splices.</p>
+          <p class="mt-1.5 text-sm muted">Smart mode picks a comma, semicolon, colon or parentheses per sentence - so a batch of files never comes back full of comma splices.</p>
         </div>
       </div>
     </section>
@@ -122,8 +122,8 @@ const faqSchema = {
         Most AI text cleaners are paste-box only: one document at a time, copy,
         clean, paste back, repeat. If you just had ChatGPT or Claude draft twenty
         blog posts, product descriptions or chapters, that is twenty round trips.
-        This <strong>bulk text cleaner</strong> takes the whole set at once —
-        select a folder in the picker or drag many files onto the page — and runs
+        This <strong>bulk text cleaner</strong> takes the whole set at once -
+        select a folder in the picker or drag many files onto the page - and runs
         the same de-AI cleaning engine over each file locally, so the output
         matches the single-paste tool exactly.
       </p>
@@ -140,12 +140,12 @@ const faqSchema = {
         formatting and see exactly how much was cleaned.
       </p>
 
-      <h2 class="text-2xl font-bold">100% in your browser — files never uploaded</h2>
+      <h2 class="text-2xl font-bold">100% in your browser - files never uploaded</h2>
       <p class="muted">
         Dropping a folder of client manuscripts or confidential drafts onto a
         website is exactly the moment people fear an upload. Here there is none.
         Every file is read with the browser&rsquo;s FileReader API and cleaned with
-        plain JavaScript — there is no <code>fetch</code>, no server and no LLM in
+        plain JavaScript - there is no <code>fetch</code>, no server and no LLM in
         the loop. Open DevTools, watch the Network tab, then turn off your
         Wi-Fi: it keeps working. For legal, medical, HR and academic users, that
         provable, offline guarantee is the deciding feature, not decoration.
@@ -154,7 +154,7 @@ const faqSchema = {
       <h2 class="text-2xl font-bold">Download cleaned files and a cleanup report</h2>
       <p class="muted">
         When the batch finishes you can download any single file from its row, or
-        hit <strong>Download all cleaned</strong> to save the whole set at once —
+        hit <strong>Download all cleaned</strong> to save the whole set at once -
         original names preserved with a <code>-clean</code> suffix so you always
         know which file is which. You can also copy or download a CSV report of
         exactly what was normalized in each file, which is handy when an editor or

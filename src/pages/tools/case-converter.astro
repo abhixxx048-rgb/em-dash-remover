@@ -7,7 +7,7 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Is "and" capitalized in a title?',
-    a: 'No. "And" is a coordinating conjunction, so AP, Chicago, APA and MLA all lowercase it in the middle of a title — unless it happens to be the first or last word, which is always capitalized.',
+    a: 'No. "And" is a coordinating conjunction, so AP, Chicago, APA and MLA all lowercase it in the middle of a title - unless it happens to be the first or last word, which is always capitalized.',
   },
   {
     q: 'What is the difference between AP and Chicago title case?',
@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: 'How do I capitalize the first word after a colon?',
-    a: 'You do not have to — the converter does it automatically. Across all four style guides, the first word of a subtitle (the word right after a colon) is always capitalized.',
+    a: 'You do not have to - the converter does it automatically. Across all four style guides, the first word of a subtitle (the word right after a colon) is always capitalized.',
   },
   {
     q: 'Does it keep brand names like iPhone correct?',
@@ -39,7 +39,7 @@ const webApp = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   '@id': `${Astro.site}tools/case-converter#app`,
-  name: 'Case Converter — UPPER, lower, Sentence & Title Case',
+  name: 'Case Converter - UPPER, lower, Sentence & Title Case',
   url: `${Astro.site}tools/case-converter`,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
@@ -69,8 +69,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Case Converter — UPPER, lower, Sentence & Title Case (AP, Chicago, APA, MLA)"
-  description="Free case converter: convert text to UPPER CASE, lower case, Sentence case and Title Case (AP, Chicago, APA, MLA), plus camelCase and snake_case — instantly, 100% in your browser."
+  title="Case Converter - UPPER, lower, Sentence & Title Case (AP, Chicago, APA, MLA)"
+  description="Free case converter: convert text to UPPER CASE, lower case, Sentence case and Title Case (AP, Chicago, APA, MLA), plus camelCase and snake_case - instantly, 100% in your browser."
 >
   <main class="halo">
     <!-- Hero -->
@@ -80,12 +80,12 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Case Converter — UPPER, lower, Sentence &amp; Title Case
+        Case Converter - UPPER, lower, Sentence &amp; Title Case
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Convert any text to UPPER CASE, lower case, Sentence case or Title Case —
+        Convert any text to UPPER CASE, lower case, Sentence case or Title Case -
         with real, style-guide-accurate capitalization for
-        <strong>AP, Chicago, APA and MLA</strong> — plus developer cases like
+        <strong>AP, Chicago, APA and MLA</strong> - plus developer cases like
         camelCase and snake_case. Done right, instantly, and your text never
         leaves your browser.
       </p>
@@ -100,14 +100,14 @@ const faqSchema = {
       <h2 class="text-2xl font-bold">How to use the case converter</h2>
       <ol class="list-decimal space-y-2 pl-6 muted">
         <li>Type or paste your text into the box above (or tap an example).</li>
-        <li>Click the case you want — <strong>UPPER</strong>, <strong>lower</strong>, <strong>Sentence</strong>, <strong>Title</strong>, or a developer case.</li>
+        <li>Click the case you want - <strong>UPPER</strong>, <strong>lower</strong>, <strong>Sentence</strong>, <strong>Title</strong>, or a developer case.</li>
         <li>For Title Case, pick your style guide (AP, Chicago, APA or MLA); the result updates live.</li>
         <li>Hit <strong>Copy</strong> (or Ctrl/Cmd + Enter) and paste the result wherever you need it.</li>
       </ol>
 
       <h2 class="text-2xl font-bold">Title case rules by style guide</h2>
       <p class="muted">
-        "Title case" is not one rule — each style guide capitalizes the little
+        "Title case" is not one rule - each style guide capitalizes the little
         words differently, which is why a naive "capitalize every word" tool gets
         headlines wrong. All four styles always capitalize the first word, the
         last word, and the first word after a colon, and they all lowercase the
@@ -115,17 +115,17 @@ const faqSchema = {
         for</em>. The differences are in the prepositions:
       </p>
       <ul class="list-disc space-y-2 pl-6 muted">
-        <li><strong>AP</strong> — lowercases prepositions of three letters or fewer (<em>of, in, to, at</em>) but capitalizes those of four or more letters (<em>From, With, Into</em>). It also lowercases <em>yet</em> and <em>so</em>.</li>
-        <li><strong>Chicago (CMOS)</strong> — lowercases <em>all</em> prepositions regardless of length, and capitalizes only the first part of a hyphenated word (<em>Self-care</em>).</li>
-        <li><strong>APA 7</strong> — lowercases prepositions of three letters or fewer and capitalizes any major word of four letters or more.</li>
-        <li><strong>MLA</strong> — lowercases prepositions of any length, along with articles and coordinating conjunctions.</li>
+        <li><strong>AP</strong> - lowercases prepositions of three letters or fewer (<em>of, in, to, at</em>) but capitalizes those of four or more letters (<em>From, With, Into</em>). It also lowercases <em>yet</em> and <em>so</em>.</li>
+        <li><strong>Chicago (CMOS)</strong> - lowercases <em>all</em> prepositions regardless of length, and capitalizes only the first part of a hyphenated word (<em>Self-care</em>).</li>
+        <li><strong>APA 7</strong> - lowercases prepositions of three letters or fewer and capitalizes any major word of four letters or more.</li>
+        <li><strong>MLA</strong> - lowercases prepositions of any length, along with articles and coordinating conjunctions.</li>
       </ul>
 
       <h2 class="text-2xl font-bold">Sentence case vs Capitalize Each Word</h2>
       <p class="muted">
         These two are easy to confuse. <strong>Sentence case</strong> capitalizes
-        only the first letter of each sentence (and proper nouns) — exactly how
-        normal prose is written — so it is the right choice for fixing text that
+        only the first letter of each sentence (and proper nouns) - exactly how
+        normal prose is written - so it is the right choice for fixing text that
         was typed in ALL CAPS or all lowercase. <strong>Capitalize Each Word</strong>
         capitalizes the first letter of every single word, which looks like a
         title but ignores the small-word rules; it is rarely correct for real
@@ -144,12 +144,12 @@ const faqSchema = {
         for environment variables, and <strong>dot.case</strong> for config keys.
       </p>
 
-      <h2 class="text-2xl font-bold">Privacy — everything runs in your browser</h2>
+      <h2 class="text-2xl font-bold">Privacy - everything runs in your browser</h2>
       <p class="muted">
         There is no server and no upload. All casing is done with plain
         JavaScript on your device, so you can safely convert confidential or
         unpublished text. Open your browser's DevTools Network tab while you work
-        and you'll see zero requests — and the tool keeps working with your
+        and you'll see zero requests - and the tool keeps working with your
         connection turned off.
       </p>
     </article>

@@ -7,7 +7,7 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: "Why does a normal splitter break on 'Dr.' or 'e.g.'?",
-    a: 'Most "split text into sentences" tools simply break on every period. But a period also ends abbreviations (Dr., e.g., U.S.), decimals (3.14), initials (J. R. R.), and URLs — so naive splitters cut "Dr. Smith went home." into two wrong lines. This tool uses the browser\'s Unicode-aware sentence segmenter and then re-joins anything that was split on a known non-boundary period, so abbreviations stay intact.',
+    a: 'Most "split text into sentences" tools simply break on every period. But a period also ends abbreviations (Dr., e.g., U.S.), decimals (3.14), initials (J. R. R.), and URLs - so naive splitters cut "Dr. Smith went home." into two wrong lines. This tool uses the browser\'s Unicode-aware sentence segmenter and then re-joins anything that was split on a known non-boundary period, so abbreviations stay intact.',
   },
   {
     q: 'How does this handle decimals, dates, currency and quotes?',
@@ -27,11 +27,11 @@ const faqs = [
   },
   {
     q: 'How do I turn one-per-line back into a paragraph?',
-    a: 'Click the rejoin button (↩) above the output. It reverses the split, joining your sentences back into flowing paragraphs and preserving blank lines between paragraphs — handy when you have finished editing in one-sentence-per-line mode.',
+    a: 'Click the rejoin button (↩) above the output. It reverses the split, joining your sentences back into flowing paragraphs and preserving blank lines between paragraphs - handy when you have finished editing in one-sentence-per-line mode.',
   },
   {
     q: 'Why are uniform sentence lengths a sign of AI writing?',
-    a: 'Human prose naturally varies: a long, winding sentence gives way to a short punchy one. AI-generated text often defaults to a steady medium length, sentence after sentence. The uniformity meter scores the variation in your sentence lengths so you can see — and break up — that robotic, metronomic cadence.',
+    a: 'Human prose naturally varies: a long, winding sentence gives way to a short punchy one. AI-generated text often defaults to a steady medium length, sentence after sentence. The uniformity meter scores the variation in your sentence lengths so you can see - and break up - that robotic, metronomic cadence.',
   },
 ];
 
@@ -39,7 +39,7 @@ const webApp = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   '@id': `${Astro.site}tools/sentence-splitter#app`,
-  name: 'Sentence Splitter — One Sentence Per Line',
+  name: 'Sentence Splitter - One Sentence Per Line',
   url: `${Astro.site}tools/sentence-splitter`,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
@@ -80,8 +80,8 @@ const breadcrumb = {
 ---
 
 <Base
-  title="Sentence Splitter — One Sentence Per Line (Abbreviation-Aware)"
-  description="Free sentence splitter: paste text and get one sentence per line. Abbreviation-aware, so Dr., e.g. and 3.14 stay intact. Audit your cadence — 100% in your browser, no signup."
+  title="Sentence Splitter - One Sentence Per Line (Abbreviation-Aware)"
+  description="Free sentence splitter: paste text and get one sentence per line. Abbreviation-aware, so Dr., e.g. and 3.14 stay intact. Audit your cadence - 100% in your browser, no signup."
 >
   <main class="halo">
     <!-- Hero -->
@@ -93,10 +93,10 @@ const breadcrumb = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Sentence Splitter — one sentence per line, done right.
+        Sentence Splitter - one sentence per line, done right.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
-        Paste any text and split it into <strong>one sentence per line</strong> —
+        Paste any text and split it into <strong>one sentence per line</strong> -
         abbreviation-aware, so <strong>Dr.</strong>, <strong>e.g.</strong> and
         <strong>3.14</strong> don't break in the wrong place. Then see your
         rhythm at a glance and keep your human voice.
@@ -116,11 +116,11 @@ const breadcrumb = {
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">See your cadence</h2>
-          <p class="mt-1.5 text-sm muted">Each sentence gets a length bar and word count, plus a uniformity meter — so you can spot the 50-word run-on and break up robotic, metronomic rhythm.</p>
+          <p class="mt-1.5 text-sm muted">Each sentence gets a length bar and word count, plus a uniformity meter - so you can spot the 50-word run-on and break up robotic, metronomic rhythm.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Private by design</h2>
-          <p class="mt-1.5 text-sm muted">Pure in-browser segmentation. No upload, no server, no signup. Check the Network tab — zero requests. Safe for confidential drafts, works offline.</p>
+          <p class="mt-1.5 text-sm muted">Pure in-browser segmentation. No upload, no server, no signup. Check the Network tab - zero requests. Safe for confidential drafts, works offline.</p>
         </div>
       </div>
     </section>
@@ -130,7 +130,7 @@ const breadcrumb = {
       <h2 class="text-2xl font-bold">Split your text into sentences</h2>
       <p class="muted">
         Paste a paragraph above and it is rewritten as one sentence per line,
-        live as you type. Each line keeps its original casing and punctuation —
+        live as you type. Each line keeps its original casing and punctuation -
         only leading and trailing whitespace is trimmed. Whether you came from
         ChatGPT, a Word document, an email draft, or a school essay, the goal is
         the same: a clean, reliable list of sentences you can copy, download, or
@@ -148,18 +148,18 @@ const breadcrumb = {
         splitter uses the browser's built-in
         <strong>Intl.Segmenter</strong> with sentence granularity as the base
         tokenizer, then runs a <strong>suppression pass</strong> that re-joins any
-        segment that was split on a known non-boundary period — a curated
+        segment that was split on a known non-boundary period - a curated
         abbreviation list, single-letter initials, decimals and currency, spaced
         ellipses, and URLs/emails. The result is the accuracy a real editor
         expects. You can also add your own domain abbreviations, and they're saved
         in your browser for next time.
       </p>
 
-      <h2 class="text-2xl font-bold">Audit your cadence — see your sentence rhythm</h2>
+      <h2 class="text-2xl font-bold">Audit your cadence - see your sentence rhythm</h2>
       <p class="muted">
         Splitting is only half the value. Once your sentences are stacked one per
         line, the tool renders each as a horizontal <strong>length bar</strong>
-        scaled to its word count and tints it by band — short (≤8 words), medium
+        scaled to its word count and tints it by band - short (≤8 words), medium
         (9–20), long (21–35), or very long (36+). A varied skyline of bar lengths
         reads human; a wall of identical bars reads robotic. The
         <strong>uniformity meter</strong> turns that into a single score from the
@@ -186,10 +186,10 @@ const breadcrumb = {
         or clean AI tells first with the <a href="/">Em Dash Remover</a>.
       </p>
 
-      <h2 class="text-2xl font-bold">Privacy — runs entirely in your browser</h2>
+      <h2 class="text-2xl font-bold">Privacy - runs entirely in your browser</h2>
       <p class="muted">
         Sentence segmentation is just text processing, so there is no reason to
-        send your writing anywhere — and we don't. The <code>Intl.Segmenter</code>
+        send your writing anywhere - and we don't. The <code>Intl.Segmenter</code>
         API is built into your browser and the merge logic is local JavaScript.
         There is no network call, no account, and no storage beyond the
         preferences and custom abbreviations you choose to save in your own

@@ -2,7 +2,7 @@
 
 Clean AI paste inside Obsidian. Paste a draft from ChatGPT, Claude or Gemini and
 the em dashes, curly quotes, ellipses and invisible/zero-width watermark
-characters are gone before a single character lands in your note — using the same
+characters are gone before a single character lands in your note - using the same
 grammar-aware cleaning engine as the [Em Dash Remover](https://emdashremover.com)
 website. 100% local: no network calls, no telemetry.
 
@@ -11,11 +11,11 @@ so it never affects the website build.
 
 ## MVP (implemented in this scaffold)
 
-- **Clean-on-paste interception** — hooks Obsidian's `editor-paste` event, reads
+- **Clean-on-paste interception** - hooks Obsidian's `editor-paste` event, reads
   the clipboard (HTML → Markdown via Obsidian's `htmlToMarkdown`, else plain
   text), cleans it, and only replaces the paste if something actually changed
   (so it never fights the native paste).
-- **"Clean selection" command** — fix text that's already in a note. Surfaces in
+- **"Clean selection" command** - fix text that's already in a note. Surfaces in
   the Command Palette and is hotkey-assignable.
 
 ## Cleaning engine
@@ -31,7 +31,7 @@ so it never affects the website build.
 - Zero-width / invisible / watermark character stripping (ZWSP, ZWNJ, ZWJ, word
   joiner, BOM, soft hyphen, bidi marks, Unicode tag block)
 - Whitespace cleanup (NBSP → space, collapse runs, trim line ends)
-- **Code-fence protection** — fenced and inline code are masked before any
+- **Code-fence protection** - fenced and inline code are masked before any
   character rule runs, so snippets, JSON and shell commands are never altered
 
 > In production this engine should be a shared workspace package imported by both
@@ -68,5 +68,5 @@ Astro project's dependencies.
 ## Privacy
 
 Declares no host permissions, ships no analytics, makes zero `fetch`/`requestUrl`
-calls, and reads only the clipboard payload of the current paste — the same
+calls, and reads only the clipboard payload of the current paste - the same
 provable-privacy promise as the web tool.

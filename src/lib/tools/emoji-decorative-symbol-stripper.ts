@@ -1,11 +1,11 @@
 /**
- * Emoji & Decorative-Symbol Stripper — pure, framework-free engine.
+ * Emoji & Decorative-Symbol Stripper - pure, framework-free engine.
  *
  * Design goals (see docs/tools/emoji-decorative-symbol-stripper.md):
  *  - Remove WHOLE emoji grapheme clusters (skin-tone, ZWJ families, flags,
- *    keycaps) — never leave orphaned ZWJ/VS16 or a bare `1`/`#` behind.
+ *    keycaps) - never leave orphaned ZWJ/VS16 or a bare `1`/`#` behind.
  *  - Remove the ornamental "AI bullet" glyphs LLMs sprinkle into lists/headings
- *    (✦ ▶ ➤ ❖ ● ✅ 🔹) — but be SELECTIVE: meaningful symbols (currency, math,
+ *    (✦ ▶ ➤ ❖ ● ✅ 🔹) - but be SELECTIVE: meaningful symbols (currency, math,
  *    ©/®/™, °) are kept by default so we never over-strip like naive tools do.
  *  - Deterministic string work. 100% in-browser. Nothing here touches the
  *    network, the DOM, or any npm package.
@@ -31,11 +31,11 @@ export interface StripOptions {
   bulletsOnly: boolean;
   /** What a stripped *leading* bullet becomes (only used in bulletsOnly mode). */
   bulletReplacement: BulletReplacement;
-  /** Keep currency symbols ($ € £ ¥ ¢ etc.) — on by default. */
+  /** Keep currency symbols ($ € £ ¥ ¢ etc.) - on by default. */
   keepCurrency: boolean;
-  /** Keep math / sign symbols (° ± × ÷ ≈ ≤ ≥ µ → …) — on by default. */
+  /** Keep math / sign symbols (° ± × ÷ ≈ ≤ ≥ µ → …) - on by default. */
   keepMath: boolean;
-  /** Keep legal symbols (© ® ™ § ¶) — on by default. */
+  /** Keep legal symbols (© ® ™ § ¶) - on by default. */
   keepLegal: boolean;
   /** Collapse double spaces / trim dangling whitespace left behind. */
   tidyWhitespace: boolean;
@@ -100,7 +100,7 @@ const BULLET_GLYPHS = '•‣◦▪▫▶►◄◀★☆✦✧✪✯✱❖➤➔
 
 // Currency / math / legal symbols that the keep-toggles gate. They live OUTSIDE
 // the decorative ranges below, so they must be matched explicitly for isKept()
-// to have anything to gate — otherwise the toggles & "Strip everything" preset
+// to have anything to gate - otherwise the toggles & "Strip everything" preset
 // would be no-ops for them. With the toggles ON (default) isKept() keeps them;
 // with the toggles OFF they are stripped as decoration.
 const GATED_SYMBOLS = '$¢£¤¥₠-₿°±×÷µ−≈≠≤≥∞←-⇒√∑∏©®™§¶℠';
@@ -173,7 +173,7 @@ const KNOWN_NAMES: Record<string, string> = {
 /**
  * Build the best available emoji matcher for this runtime.
  *
- *  1. Prefer native `\p{RGI_Emoji}` with the `v` flag (ES2024) — it matches
+ *  1. Prefer native `\p{RGI_Emoji}` with the `v` flag (ES2024) - it matches
  *     WHOLE RGI emoji sequences (families, skin tones, flags, keycaps), which
  *     is exactly what we need to avoid leaving fragments.
  *  2. If unavailable (older engine), fall back to a hand-built sequence-aware
@@ -341,7 +341,7 @@ export function inventory(input: string, opts: StripOptions = DEFAULT_OPTIONS): 
 
   // Run the SAME ordered passes as strip() against a mutating copy, so a glyph
   // consumed by the emoji pass (e.g. ✅, which is also pictographic) is not then
-  // re-counted by the decorative pass — the inventory mirrors reality exactly.
+  // re-counted by the decorative pass - the inventory mirrors reality exactly.
   let work = input;
   if (opts.emoji) {
     work = work.replace(EMOJI_RE, (g) => {
@@ -368,8 +368,8 @@ export function inventory(input: string, opts: StripOptions = DEFAULT_OPTIONS): 
  */
 export function flavorLabel(counts: StripCounts): string {
   const t = counts.total;
-  if (t === 0) return 'Clean — no emoji or decorative symbols found.';
-  if (t <= 3) return 'Light — a few decorative symbols.';
-  if (t <= 12) return 'Some AI formatting — noticeable emoji & bullets.';
-  return 'Heavy AI formatting — lots of emoji & decorative bullets.';
+  if (t === 0) return 'Clean - no emoji or decorative symbols found.';
+  if (t <= 3) return 'Light - a few decorative symbols.';
+  if (t <= 12) return 'Some AI formatting - noticeable emoji & bullets.';
+  return 'Heavy AI formatting - lots of emoji & decorative bullets.';
 }

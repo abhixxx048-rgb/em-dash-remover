@@ -50,7 +50,7 @@ function sendToTab(tabId, message) {
         })
         .then(() => chrome.tabs.sendMessage(tabId, message))
         .catch(() => {
-          /* Some pages (chrome://, web store) cannot be scripted — no-op. */
+          /* Some pages (chrome://, web store) cannot be scripted - no-op. */
         });
     }
   });

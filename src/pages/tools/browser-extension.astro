@@ -6,11 +6,11 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const features = [
   {
     h: 'One-keystroke clean anywhere',
-    p: 'No more "select → copy → open a website → paste → clean → copy → paste back." Right-click any selected text, or hit a shortcut, and it is cleaned in place — in LinkedIn, Gmail, your CMS, a tweet composer, anywhere you write.',
+    p: 'No more "select → copy → open a website → paste → clean → copy → paste back." Right-click any selected text, or hit a shortcut, and it is cleaned in place - in LinkedIn, Gmail, your CMS, a tweet composer, anywhere you write.',
   },
   {
     h: 'Live before/after toast on every clean',
-    p: 'A small non-blocking toast shows exactly what changed — "4 em dashes → commas, 2 invisible chars removed, 6 curly quotes straightened" — with an Undo link, so you always know the tool did something and can take it back.',
+    p: 'A small non-blocking toast shows exactly what changed - "4 em dashes → commas, 2 invisible chars removed, 6 curly quotes straightened" - with an Undo link, so you always know the tool did something and can take it back.',
   },
   {
     h: 'Native, undo-safe edits',
@@ -22,18 +22,18 @@ const features = [
   },
   {
     h: 'Per-message "Clean this reply" in chat',
-    p: 'A quiet button on each ChatGPT, Claude, and Gemini answer cleans just that reply on demand — meeting you at the exact moment you are reading AI output, without committing to always-on live mode.',
+    p: 'A quiet button on each ChatGPT, Claude, and Gemini answer cleans just that reply on demand - meeting you at the exact moment you are reading AI output, without committing to always-on live mode.',
   },
   {
     h: 'Color-coded badge + per-site memory',
-    p: 'A green/grey toolbar badge shows state at a glance, and the extension remembers which sites you enabled clean-on-paste or live mode on — so paste never surprises you where you did not want it.',
+    p: 'A green/grey toolbar badge shows state at a glance, and the extension remembers which sites you enabled clean-on-paste or live mode on - so paste never surprises you where you did not want it.',
   },
   {
     h: 'Highlight-only "audit this page" mode',
-    p: 'A read-only toggle outlines every em dash, en dash, and invisible/zero-width character on the current page with a count badge — no mutation. Perfect for editors and QA who want to see before they let anything change.',
+    p: 'A read-only toggle outlines every em dash, en dash, and invisible/zero-width character on the current page with a count badge - no mutation. Perfect for editors and QA who want to see before they let anything change.',
   },
   {
-    h: 'Options presets — Smart / Plain / Publish',
+    h: 'Options presets - Smart / Plain / Publish',
     p: 'One-click profiles: Smart (grammar-aware default), Plain (strip everything to bare prose), and Publish (keep curly quotes and proper dashes for polished output). Beats hunting through seven checkboxes every time.',
   },
   {
@@ -46,11 +46,11 @@ const features = [
   },
   {
     h: 'Sync across devices',
-    p: 'Settings and per-site preferences follow you to your other machines via your browser’s built-in sync — no re-setup when you switch computers.',
+    p: 'Settings and per-site preferences follow you to your other machines via your browser’s built-in sync - no re-setup when you switch computers.',
   },
   {
     h: '"Open in full cleaner" escape hatch',
-    p: 'For big or tricky text, one click hands the selection to the full website — diff viewer, AI-tell report and all — so the extension is a fast on-ramp to the richer tools, not a dead end.',
+    p: 'For big or tricky text, one click hands the selection to the full website - diff viewer, AI-tell report and all - so the extension is a fast on-ramp to the richer tools, not a dead end.',
   },
 ];
 
@@ -61,7 +61,7 @@ const faqs = [
   },
   {
     q: 'Does it send my text anywhere?',
-    a: 'No. The extension runs the exact same in-browser cleaning engine as the website. It makes zero network requests and has no telemetry, so your text never leaves your device — all cleaning happens locally on your machine.',
+    a: 'No. The extension runs the exact same in-browser cleaning engine as the website. It makes zero network requests and has no telemetry, so your text never leaves your device - all cleaning happens locally on your machine.',
   },
   {
     q: 'Will it break my undo (Ctrl+Z)?',
@@ -77,15 +77,15 @@ const faqs = [
   },
   {
     q: 'Does it work on mobile?',
-    a: 'No — desktop Chrome and Edge only, because browser extensions do not run on mobile Chrome. On phones, use the website itself, which is the mobile-friendly surface.',
+    a: 'No - desktop Chrome and Edge only, because browser extensions do not run on mobile Chrome. On phones, use the website itself, which is the mobile-friendly surface.',
   },
   {
     q: 'What permissions does it need, and why?',
-    a: 'Minimal ones: context menus, storage, scripting, and activeTab for on-demand right-click and paste actions. Host access for the AI chat live-clean allow-list is optional and only requested when you turn live mode on — there is no scary "read and change all your data on all websites" by default.',
+    a: 'Minimal ones: context menus, storage, scripting, and activeTab for on-demand right-click and paste actions. Host access for the AI chat live-clean allow-list is optional and only requested when you turn live mode on - there is no scary "read and change all your data on all websites" by default.',
   },
   {
     q: 'Is it free?',
-    a: 'Yes — free, no signup, no limits, like the rest of the suite.',
+    a: 'Yes - free, no signup, no limits, like the rest of the suite.',
   },
 ];
 
@@ -104,13 +104,13 @@ const softwareApp = {
   isAccessibleForFree: true,
   featureList: [
     'Right-click "Clean selection" in any input, textarea or contenteditable',
-    'Clean-on-paste — strip em dashes and AI tells the instant you paste',
+    'Clean-on-paste - strip em dashes and AI tells the instant you paste',
     'Per-message "Clean this reply" button in ChatGPT, Claude and Gemini',
     'Live-clean mode for AI chat output via MutationObserver',
     'Grammar-aware em dash replacement (not a blind find-and-replace)',
     'Remove invisible / zero-width / watermark characters',
     'Highlight-only "audit this page" mode for editors',
-    '100% local — zero network requests, no telemetry',
+    '100% local - zero network requests, no telemetry',
   ],
   publisher: { '@id': `${Astro.site}#org` },
 };
@@ -126,11 +126,11 @@ const faqSchema = {
 };
 
 // Breadcrumb structured data is emitted by Base.astro for all /tools/* pages, so
-// no inline BreadcrumbList here — a second one would conflict.
+// no inline BreadcrumbList here - a second one would conflict.
 ---
 
 <Base
-  title="Em Dash Remover Chrome Extension — Clean AI Text in Any Field"
+  title="Em Dash Remover Chrome Extension - Clean AI Text in Any Field"
   description="Em dash remover Chrome & Edge extension: right-click clean selection, clean-on-paste, and live-clean ChatGPT/Claude/Gemini output. Grammar-aware, 100% private, runs entirely in your browser."
 >
   <main class="halo">
@@ -143,17 +143,17 @@ const faqSchema = {
         Chrome &amp; Edge · free · 100% in your browser
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Em Dash Remover for Chrome &amp; Edge — clean AI text in any field, instantly.
+        Em Dash Remover for Chrome &amp; Edge - clean AI text in any field, instantly.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         The same grammar-aware cleaning engine that powers this website, now
         <strong>in your browser</strong>. Right-click to clean a selection,
         clean-on-paste into any field, or live-clean ChatGPT, Claude and Gemini
-        output — without copying your text out to a website and back. Quality, not
+        output - without copying your text out to a website and back. Quality, not
         bypass. Nothing leaves your device.
       </p>
 
-      <!-- Install CTA — Coming soon (no fake store links). -->
+      <!-- Install CTA - Coming soon (no fake store links). -->
       <div class="mx-auto mt-7 flex max-w-md flex-col items-center gap-3">
         <div class="flex flex-wrap items-center justify-center gap-3">
           <span class="inline-flex min-h-11 cursor-not-allowed items-center gap-2 rounded-xl bg-accent px-5 font-semibold text-white opacity-60" aria-disabled="true" title="Coming soon to the Chrome Web Store">
@@ -167,7 +167,7 @@ const faqSchema = {
         </div>
         <p class="text-sm muted">
           Coming soon to the Chrome Web Store and Edge Add-ons. The cleaning engine
-          is already shipping in the <a href="/" class="text-accent hover:underline">web tool</a> —
+          is already shipping in the <a href="/" class="text-accent hover:underline">web tool</a> -
           the extension wraps it in a one-keystroke shell.
         </p>
       </div>
@@ -180,11 +180,11 @@ const faqSchema = {
       <div class="grid gap-6 sm:grid-cols-3">
         <div class="card p-5">
           <h2 class="font-semibold">Right-click "Clean selection"</h2>
-          <p class="mt-1.5 text-sm muted">Select text in any input, textarea or rich editor, right-click, and it is replaced in place with the cleaned version — undo-safe and framework-safe.</p>
+          <p class="mt-1.5 text-sm muted">Select text in any input, textarea or rich editor, right-click, and it is replaced in place with the cleaned version - undo-safe and framework-safe.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Clean-on-paste</h2>
-          <p class="mt-1.5 text-sm muted">Turn it on per site and pasted text is cleaned the instant it lands — em dashes, curly quotes and invisible characters gone before the editor ever sees them.</p>
+          <p class="mt-1.5 text-sm muted">Turn it on per site and pasted text is cleaned the instant it lands - em dashes, curly quotes and invisible characters gone before the editor ever sees them.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Live-clean AI chat</h2>
@@ -201,13 +201,13 @@ const faqSchema = {
           <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent font-semibold text-white">1</span>
           <div>
             <h3 class="font-semibold">Install &amp; pick your defaults</h3>
-            <p class="mt-1 text-sm muted">Add it to Chrome or Edge, then open the popup to choose a preset — Smart, Plain or Publish — and toggle individual rules. Your settings sync across devices.</p>
+            <p class="mt-1 text-sm muted">Add it to Chrome or Edge, then open the popup to choose a preset - Smart, Plain or Publish - and toggle individual rules. Your settings sync across devices.</p>
           </div>
         </li>
         <li class="flex gap-4">
           <span class="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-accent font-semibold text-white">2</span>
           <div>
-            <h3 class="font-semibold">Clean in place — three ways</h3>
+            <h3 class="font-semibold">Clean in place - three ways</h3>
             <p class="mt-1 text-sm muted">Right-click a selection, enable clean-on-paste for a site, or flip on live mode for AI chat. The same in-browser engine runs in every mode, so results are identical to the website.</p>
           </div>
         </li>
@@ -236,10 +236,10 @@ const faqSchema = {
 
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
-      <h2 class="text-2xl font-bold">The same grammar-aware engine as the website — now in your browser</h2>
+      <h2 class="text-2xl font-bold">The same grammar-aware engine as the website - now in your browser</h2>
       <p class="muted">
-        Most em-dash Chrome extensions do a blind global swap — every em dash
-        becomes a space or a comma — which quietly produces comma splices and
+        Most em-dash Chrome extensions do a blind global swap - every em dash
+        becomes a space or a comma - which quietly produces comma splices and
         broken sentences. This extension instead bundles the exact
         <a href="/">grammar-aware cleaning engine</a> that powers the website, so it
         looks at the words on either side of each dash and chooses the right fix.
@@ -263,11 +263,11 @@ const faqSchema = {
         em dashes, you should not have to copy it into a website to clean it. A
         per-message "Clean this reply" button cleans just that answer on demand, and
         an opt-in live mode watches the message container and normalizes assistant
-        text as it streams — debounced and applied only to finished answers, so it
+        text as it streams - debounced and applied only to finished answers, so it
         never fights your own typing.
       </p>
 
-      <h2 class="text-2xl font-bold">100% private — nothing leaves your device</h2>
+      <h2 class="text-2xl font-bold">100% private - nothing leaves your device</h2>
       <p class="muted">
         The content script and service worker make zero network requests and carry
         no telemetry. Host access for the AI-chat live mode is requested

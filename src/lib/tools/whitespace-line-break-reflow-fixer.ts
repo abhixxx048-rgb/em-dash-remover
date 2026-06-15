@@ -1,5 +1,5 @@
 /**
- * Whitespace & Line-Break Reflow Fixer — pure client-side engine.
+ * Whitespace & Line-Break Reflow Fixer - pure client-side engine.
  *
  * Design goals (see docs/tools/whitespace-line-break-reflow-fixer.md):
  *  - Clean up text mangled by copying out of a PDF, email, terminal or code
@@ -8,7 +8,7 @@
  *  - The headline feature is *smart reflow / unwrap*: tell a SOFT line break
  *    (one a PDF/editor inserted just to fit the margin) from a HARD one (a real
  *    paragraph or list boundary) using a weighted heuristic scorer, and remove
- *    only the soft ones — including rejoining hyphen-split words
+ *    only the soft ones - including rejoining hyphen-split words
  *    (`infor-\nmation` → `information`).
  *  - 100% in-browser. Nothing here touches the DOM or the network. Deterministic.
  *
@@ -75,7 +75,7 @@ export const DEFAULT_OPTIONS: ReflowOptions = {
 /** A named bundle of options the UI exposes as a one-click "recipe". */
 export type RecipeId = 'pdf' | 'email' | 'codeSafe' | 'collapse' | 'removeBreaks';
 
-/** Recipe presets — each sets the whole option set at once (§5.5 of the spec). */
+/** Recipe presets - each sets the whole option set at once (§5.5 of the spec). */
 export const RECIPES: Record<RecipeId, { label: string; options: ReflowOptions }> = {
   pdf: {
     label: 'PDF paste cleanup',
@@ -313,7 +313,7 @@ export function fix(input: string, opts: ReflowOptions = DEFAULT_OPTIONS): Reflo
   // Work line-by-line for the per-line transforms.
   let lines = text.split('\n');
 
-  // 3. Strip email quote markers (before reflow — they block joins otherwise).
+  // 3. Strip email quote markers (before reflow - they block joins otherwise).
   if (opts.stripQuoteMarkers) {
     lines = lines.map((line) => {
       if (QUOTE_PREFIX.test(line)) {

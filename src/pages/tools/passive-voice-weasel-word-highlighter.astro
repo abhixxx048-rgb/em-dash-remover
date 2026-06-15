@@ -7,19 +7,19 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'What counts as passive voice?',
-    a: 'Passive voice is a "be" verb (am, is, are, was, were, be, been, being) followed by a past participle — for example "was written", "is reviewed", "has been approved". The actor (who did it) is either missing or pushed to the end after "by". Active voice puts the actor first: "The committee wrote the report." This tool flags every be-verb + participle pattern so you can see them at a glance.',
+    a: 'Passive voice is a "be" verb (am, is, are, was, were, be, been, being) followed by a past participle - for example "was written", "is reviewed", "has been approved". The actor (who did it) is either missing or pushed to the end after "by". Active voice puts the actor first: "The committee wrote the report." This tool flags every be-verb + participle pattern so you can see them at a glance.',
   },
   {
     q: 'How much passive voice is too much?',
-    a: 'A common guideline (used by Rephrasely, Originality and others) is to keep passive sentences under about 5-10% of your total. The meter shows your passive-sentence percentage live. There is no magic number — the point is to notice passive constructions and keep them intentional rather than accidental.',
+    a: 'A common guideline (used by Rephrasely, Originality and others) is to keep passive sentences under about 5-10% of your total. The meter shows your passive-sentence percentage live. There is no magic number - the point is to notice passive constructions and keep them intentional rather than accidental.',
   },
   {
     q: 'Is passive voice always wrong?',
-    a: 'No. Passive voice is legitimate and often preferred in scientific writing ("the samples were collected"), when the actor is unknown or irrelevant, or to keep the focus on the receiver of an action. This tool highlights and explains — it never auto-rewrites — so you stay in control of which passives to keep.',
+    a: 'No. Passive voice is legitimate and often preferred in scientific writing ("the samples were collected"), when the actor is unknown or irrelevant, or to keep the focus on the receiver of an action. This tool highlights and explains - it never auto-rewrites - so you stay in control of which passives to keep.',
   },
   {
     q: 'What are weasel words?',
-    a: 'Weasel words are vague qualifiers and hedges that dodge a concrete claim — like "very", "fairly", "several", "many", "significantly", plus vague attributions such as "studies suggest", "experts say", "it is thought" and "it could be argued". They sound authoritative but commit to nothing. We flag both the single-word qualifiers and the multi-word hedge phrases that AI writing tools especially overuse.',
+    a: 'Weasel words are vague qualifiers and hedges that dodge a concrete claim - like "very", "fairly", "several", "many", "significantly", plus vague attributions such as "studies suggest", "experts say", "it is thought" and "it could be argued". They sound authoritative but commit to nothing. We flag both the single-word qualifiers and the multi-word hedge phrases that AI writing tools especially overuse.',
   },
   {
     q: 'Why are -ly adverbs flagged?',
@@ -27,11 +27,11 @@ const faqs = [
   },
   {
     q: 'Does this fix the text for me?',
-    a: 'No — by design. This is an analysis-and-coaching tool in the Hemingway tradition: it highlights weak spots, explains why each is a tell, and suggests a fix pattern, but you do the rewriting. That keeps your human voice intact and avoids the "rewrite until it fools a detector" game we deliberately do not play.',
+    a: 'No - by design. This is an analysis-and-coaching tool in the Hemingway tradition: it highlights weak spots, explains why each is a tell, and suggests a fix pattern, but you do the rewriting. That keeps your human voice intact and avoids the "rewrite until it fools a detector" game we deliberately do not play.',
   },
   {
     q: 'Does my text get uploaded?',
-    a: 'No. Every highlight and count is computed locally in your browser with plain JavaScript and regular expressions — no server, no upload, no logging, and it works offline. Open your browser DevTools Network tab while you use it and you will see zero requests. That is the whole privacy promise.',
+    a: 'No. Every highlight and count is computed locally in your browser with plain JavaScript and regular expressions - no server, no upload, no logging, and it works offline. Open your browser DevTools Network tab while you use it and you will see zero requests. That is the whole privacy promise.',
   },
   {
     q: 'How is this different from Hemingway or Grammarly?',
@@ -75,8 +75,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Free Passive Voice Checker & Weasel-Word Highlighter — No Signup"
-  description="Free passive voice checker and highlighter. Instantly find passive voice, -ly adverbs and weasel words like 'studies suggest' with live counts and a passive-voice percentage — 100% in your browser, no signup."
+  title="Free Passive Voice Checker & Weasel-Word Highlighter - No Signup"
+  description="Free passive voice checker and highlighter. Instantly find passive voice, -ly adverbs and weasel words like 'studies suggest' with live counts and a passive-voice percentage - 100% in your browser, no signup."
 >
   <main class="halo">
     <!-- Hero -->
@@ -88,12 +88,12 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Passive Voice &amp; Weasel-Word Highlighter — find passive voice, adverbs &amp; vague words.
+        Passive Voice &amp; Weasel-Word Highlighter - find passive voice, adverbs &amp; vague words.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Paste your draft and instantly see every <strong>passive construction</strong>,
         weak <strong>-ly adverb</strong>, and vague <strong>"studies suggest"</strong>
-        hedge highlighted in place — with live counts, a passive-voice percentage, and a
+        hedge highlighted in place - with live counts, a passive-voice percentage, and a
         one-line "why" on each flag. Write with a stronger, more human voice. Nothing is uploaded.
       </p>
     </header>
@@ -107,15 +107,15 @@ const faqSchema = {
       <div class="grid gap-6 sm:grid-cols-3">
         <div class="card p-5">
           <h2 class="font-semibold">Three tells, one pass</h2>
-          <p class="mt-1.5 text-sm muted">Passive voice, weak -ly adverbs and weasel words / vague attributions — flagged together with distinct, colourblind-safe underlines and a live count for each.</p>
+          <p class="mt-1.5 text-sm muted">Passive voice, weak -ly adverbs and weasel words / vague attributions - flagged together with distinct, colourblind-safe underlines and a live count for each.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">It coaches, never rewrites</h2>
-          <p class="mt-1.5 text-sm muted">Every highlight explains why it weakens your writing and shows a fix pattern, so you improve as you edit — and keep your own voice instead of an AI rewrite.</p>
+          <p class="mt-1.5 text-sm muted">Every highlight explains why it weakens your writing and shows a fix pattern, so you improve as you edit - and keep your own voice instead of an AI rewrite.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Private by design</h2>
-          <p class="mt-1.5 text-sm muted">Pure in-browser regex and word lists. No upload, no server, no signup. Check the Network tab — zero requests. Safe for confidential drafts, works offline.</p>
+          <p class="mt-1.5 text-sm muted">Pure in-browser regex and word lists. No upload, no server, no signup. Check the Network tab - zero requests. Safe for confidential drafts, works offline.</p>
         </div>
       </div>
     </section>
@@ -129,14 +129,14 @@ const faqSchema = {
         <strong>-ly adverbs</strong>, and <strong>weasel words</strong>. The counts and the
         passive-voice percentage update within a fraction of a second, and the Directness
         score up top gives you a single finish line to drive toward. It is a read-and-revise
-        tool in the Hemingway tradition — it shows you what to fix, you keep control of the words.
+        tool in the Hemingway tradition - it shows you what to fix, you keep control of the words.
       </p>
 
-      <h2 class="text-2xl font-bold">What is passive voice — and how to spot it</h2>
+      <h2 class="text-2xl font-bold">What is passive voice - and how to spot it</h2>
       <p class="muted">
         Passive voice is a form of "to be" (am, is, are, was, were, be, been, being) followed
         by a past participle: "The report <em>was written</em>", "The bug <em>has been fixed</em>",
-        "Mistakes <em>were made</em>". The giveaway is that the actor — who actually did the thing —
+        "Mistakes <em>were made</em>". The giveaway is that the actor - who actually did the thing -
         is hidden or shoved to the end after "by". A quick test: if you can add "…by zombies" after
         the verb and it still reads, it is passive ("Mistakes were made <em>by zombies</em>"). This
         tool encodes the same be-verb + participle rule used by Hemingway and the
@@ -147,8 +147,8 @@ const faqSchema = {
       <p class="muted">
         Weasel words are qualifiers and hedges that sound confident but commit to nothing:
         <em>very, fairly, several, many, significantly, remarkably, quite</em>. Just as slippery are
-        vague attributions — <em>studies suggest, experts say, it is thought, it could be argued,
-        evidence suggests, many people believe</em> — which imply authority while dodging a real
+        vague attributions - <em>studies suggest, experts say, it is thought, it could be argued,
+        evidence suggests, many people believe</em> - which imply authority while dodging a real
         citation. These are exactly the phrases large language models overuse, so they are also classic
         AI tells. Replace each with something concrete: a number, a name, or a real source. After cleaning
         AI text with the <a href="/">Em Dash Remover</a>, run it here to confirm it no longer hedges.
@@ -160,24 +160,24 @@ const faqSchema = {
         "walked quickly" is weaker than "hurried", "very tired" is weaker than "exhausted". This checker
         matches a curated list of real adverbs rather than a naive "ends in -ly" rule, so legitimate words
         like <em>apply, family, only, reply, supply, ugly</em> and <em>rely</em> are never flagged. Use the
-        category toggles in the toolbar to run a single focused pass — passive only, adverbs only, or
-        weasel only — the way professional editors revise one issue type at a time.
+        category toggles in the toolbar to run a single focused pass - passive only, adverbs only, or
+        weasel only - the way professional editors revise one issue type at a time.
       </p>
 
       <h2 class="text-2xl font-bold">How to rewrite passive into active voice</h2>
       <p class="muted">
         The fix for passive voice is almost always the same: <strong>name the actor</strong>. Ask "who did
         this?" and put them in front of the verb. "The decision was made" → "The board decided." "The data
-        were analyzed" → "We analyzed the data." Passive is not banned — science and objectivity often need
-        it — but accidental passive that hides responsibility is worth flipping. Pair this with the
+        were analyzed" → "We analyzed the data." Passive is not banned - science and objectivity often need
+        it - but accidental passive that hides responsibility is worth flipping. Pair this with the
         <a href="/tools/readability-grade-level-scorer">Readability Scorer</a> to make sure your tightened
         sentences also read at the right grade level.
       </p>
 
-      <h2 class="text-2xl font-bold">Is this private? Yes — it runs in your browser</h2>
+      <h2 class="text-2xl font-bold">Is this private? Yes - it runs in your browser</h2>
       <p class="muted">
         Detecting passive voice, adverbs and weasel words is just regular-expression and word-list matching,
-        so there is no reason to send your text anywhere — and we don't. Everything runs locally in JavaScript:
+        so there is no reason to send your text anywhere - and we don't. Everything runs locally in JavaScript:
         no network call, no account, no storage beyond an optional preference saved in your own browser. That
         makes it safe for drafts under embargo, legal language, patient materials, or anything confidential.
       </p>

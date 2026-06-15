@@ -6,11 +6,11 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const features = [
   {
     title: 'Silent, instant clean-on-paste',
-    body: 'The cleanup happens on the paste event itself — you paste from ChatGPT or Claude and the text is already clean, with no button, modal, or extra keystroke. Frictionless invisibility is the whole point.',
+    body: 'The cleanup happens on the paste event itself - you paste from ChatGPT or Claude and the text is already clean, with no button, modal, or extra keystroke. Frictionless invisibility is the whole point.',
   },
   {
     title: 'Post-paste "cleaned N items" toast',
-    body: 'A brief, dismissible notice like “Cleaned: 3 em dashes, 2 curly quotes, 1 invisible char” after each paste makes the invisible work visible and trustworthy — without interrupting your flow.',
+    body: 'A brief, dismissible notice like “Cleaned: 3 em dashes, 2 curly quotes, 1 invisible char” after each paste makes the invisible work visible and trustworthy - without interrupting your flow.',
   },
   {
     title: 'Status-bar live counter',
@@ -26,19 +26,19 @@ const features = [
   },
   {
     title: 'Per-rule toggles with live examples',
-    body: 'Each toggle shows a tiny before → after (“text—here → text - here”), so you understand exactly what every rule does instead of guessing from a jargon label.',
+    body: 'Each toggle shows a tiny before → after (“text-here → text - here”), so you understand exactly what every rule does instead of guessing from a jargon label.',
   },
   {
     title: '“Why this is a tell” education tooltips',
-    body: 'Info icons explain why em dashes, curly quotes and zero-width chars read as AI — keeping the focus on your human voice and quality, never on detector-bypass.',
+    body: 'Info icons explain why em dashes, curly quotes and zero-width chars read as AI - keeping the focus on your human voice and quality, never on detector-bypass.',
   },
   {
     title: 'AI-tell scan command',
-    body: 'A “Scan note for AI tells” command highlights remaining tells (em-dash density, hedging phrases, invisible chars) in a side panel with counts — turning the plugin from a silent fixer into an active coach.',
+    body: 'A “Scan note for AI tells” command highlights remaining tells (em-dash density, hedging phrases, invisible chars) in a side panel with counts - turning the plugin from a silent fixer into an active coach.',
   },
   {
     title: 'Hotkey-first design',
-    body: 'Every action — clean selection, clean note, scan, toggle clean-on-paste — is a discrete command, so power users bind them to chords and never touch the mouse.',
+    body: 'Every action - clean selection, clean note, scan, toggle clean-on-paste - is a discrete command, so power users bind them to chords and never touch the mouse.',
   },
   {
     title: 'Right-click context menu',
@@ -46,15 +46,15 @@ const features = [
   },
   {
     title: 'Quick-toggle ribbon icon',
-    body: 'A left-ribbon button flips clean-on-paste on and off, with the icon state showing whether it’s armed — one-glance control for the moments you do want a verbatim paste.',
+    body: 'A left-ribbon button flips clean-on-paste on and off, with the icon state showing whether it’s armed - one-glance control for the moments you do want a verbatim paste.',
   },
   {
     title: 'Per-folder rules',
-    body: 'Let a “drafts/” folder use Strict while a “code/” folder is off, via a simple path-glob list — because the same person wants different behavior for prose vs. snippets.',
+    body: 'Let a “drafts/” folder use Strict while a “code/” folder is off, via a simple path-glob list - because the same person wants different behavior for prose vs. snippets.',
   },
   {
     title: 'Dry-run preview-before-replace',
-    body: 'An optional diff modal shows additions and removals before inserting, with an “Insert clean” / “Keep original” choice — converting cautious academics and legal note-takers into permanent users.',
+    body: 'An optional diff modal shows additions and removals before inserting, with an “Insert clean” / “Keep original” choice - converting cautious academics and legal note-takers into permanent users.',
   },
   {
     title: 'Theme-native, dark/light & mobile parity',
@@ -76,14 +76,14 @@ const howItWorks = [
   {
     step: '3',
     title: 'Clean Markdown is inserted',
-    body: 'Only if something actually changed does the plugin replace the paste — so it never fights Obsidian’s native paste, and a toast shows exactly what was cleaned with a one-click undo.',
+    body: 'Only if something actually changed does the plugin replace the paste - so it never fights Obsidian’s native paste, and a toast shows exactly what was cleaned with a one-click undo.',
   },
 ];
 
 const faqs = [
   {
     q: 'Will it send my notes anywhere?',
-    a: 'No. Obsidian runs locally, and the plugin is being built to declare no host permissions, ship no analytics and make zero network calls. It is designed to read only the clipboard payload of the current paste — the same local-only approach as the web tool, so nothing leaves your vault.',
+    a: 'No. Obsidian runs locally, and the plugin is being built to declare no host permissions, ship no analytics and make zero network calls. It is designed to read only the clipboard payload of the current paste - the same local-only approach as the web tool, so nothing leaves your vault.',
   },
   {
     q: 'Will it break my code blocks?',
@@ -99,15 +99,15 @@ const faqs = [
   },
   {
     q: 'How is this different from Smart Typography?',
-    a: 'Smart Typography does the opposite — it adds curly quotes and em dashes as you type. This plugin goes the other direction, un-fancying AI output back to plain punctuation, and it runs on paste rather than on every keystroke.',
+    a: 'Smart Typography does the opposite - it adds curly quotes and em dashes as you type. This plugin goes the other direction, un-fancying AI output back to plain punctuation, and it runs on paste rather than on every keystroke.',
   },
   {
     q: 'Does it remove AI watermarks?',
-    a: 'It strips the zero-width and invisible characters AI text often carries — ZWSP, ZWNJ, ZWJ, word joiner, BOM, soft hyphen and the Unicode tag block — which is where invisible “watermark” characters live.',
+    a: 'It strips the zero-width and invisible characters AI text often carries - ZWSP, ZWNJ, ZWJ, word joiner, BOM, soft hyphen and the Unicode tag block - which is where invisible “watermark” characters live.',
   },
   {
     q: 'How is this different from Clean AI Paste or Paste Reformatter?',
-    a: 'Those focus on Markdown structure, emoji or DIY regex you author yourself. This plugin adds grammar-aware em-dash replacement, built-in invisible-character stripping and an AI-tell scan, with a trusted web companion that shares the exact same cleaning engine — so there’s no rule drift.',
+    a: 'Those focus on Markdown structure, emoji or DIY regex you author yourself. This plugin adds grammar-aware em-dash replacement, built-in invisible-character stripping and an AI-tell scan, with a trusted web companion that shares the exact same cleaning engine - so there’s no rule drift.',
   },
 ];
 
@@ -130,7 +130,7 @@ const softwareApp = {
     'Strip zero-width / invisible watermark characters',
     'Clean selection and clean whole note commands',
     'Code-fence protection so snippets are never altered',
-    '100% local — no network calls, no telemetry',
+    '100% local - no network calls, no telemetry',
   ],
   publisher: { '@id': `${Astro.site}#org` },
 };
@@ -159,8 +159,8 @@ const howToSchema = {
 ---
 
 <Base
-  title="Em Dash Remover for Obsidian — Clean AI Paste, Locally"
-  description="An Obsidian plugin that cleans AI paste the instant you paste it — grammar-aware em dash removal, curly quotes, invisible watermark characters and whitespace, 100% local. Coming soon."
+  title="Em Dash Remover for Obsidian - Clean AI Paste, Locally"
+  description="An Obsidian plugin that cleans AI paste the instant you paste it - grammar-aware em dash removal, curly quotes, invisible watermark characters and whitespace, 100% local. Coming soon."
 >
   <main class="halo">
     <!-- Hero -->
@@ -172,12 +172,12 @@ const howToSchema = {
         Obsidian plugin · 100% local · free · coming soon
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Em Dash Remover for Obsidian — clean AI paste, locally.
+        Em Dash Remover for Obsidian - clean AI paste, locally.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Paste a draft from ChatGPT, Claude or Gemini into a note and the
         <strong>em dashes, curly quotes and invisible watermark characters</strong>
-        are gone before a single character lands — with the same
+        are gone before a single character lands - with the same
         <strong>grammar-aware</strong> cleaning engine as the website, running
         entirely inside Obsidian. Nothing ever leaves your vault.
       </p>
@@ -187,7 +187,7 @@ const howToSchema = {
           style="background: var(--color-accent);"
           aria-disabled="true"
         >
-          Install from Obsidian — coming soon
+          Install from Obsidian - coming soon
         </span>
         <a href="/" class="inline-flex min-h-11 items-center rounded-xl px-5 font-medium text-accent hover:underline">
           Use the web tool now →
@@ -202,20 +202,20 @@ const howToSchema = {
       <div class="card p-6 sm:p-8">
         <h2 class="text-2xl font-bold">What it will do</h2>
         <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
-          In development — features below describe the planned plugin
+          In development - features below describe the planned plugin
         </p>
         <p class="mt-3 muted">
           The plugin is in development. When you paste text copied from an AI chat
           into a note, it will catch Obsidian’s <code>editor-paste</code> event, run
-          the clipboard payload through the same cleaning engine as the website —
+          the clipboard payload through the same cleaning engine as the website -
           grammar-aware em-dash replacement, en-dash handling, curly → straight
           quotes, ellipsis normalization, zero-width / invisible-char stripping and
-          whitespace cleanup — and insert the cleaned Markdown instead of the raw AI
+          whitespace cleanup - and insert the cleaned Markdown instead of the raw AI
           output. It is also planned to add a <strong>Clean selection</strong>
           command to fix text that’s already in a note, and a
           <strong>bypass paste</strong> for the rare time you want the original
           verbatim. Everything is designed to run locally inside Obsidian, with zero
-          network calls — the same local-only story as the web tool, in the place
+          network calls - the same local-only story as the web tool, in the place
           you actually draft.
         </p>
       </div>
@@ -225,7 +225,7 @@ const howToSchema = {
     <section class="mx-auto mt-16 max-w-5xl px-4">
       <h2 class="text-center text-2xl font-bold">Planned features</h2>
       <p class="mx-auto mt-2 max-w-2xl text-center muted">
-        Here’s what we’re building. The goal: the best UX is no UI — you paste,
+        Here’s what we’re building. The goal: the best UX is no UI - you paste,
         it’s clean, and everything else is a confirmation, not a step.
       </p>
       <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -292,7 +292,7 @@ const howToSchema = {
         into your permanent Obsidian vault, your clean notes end up full of em
         dashes, curly quotes and the occasional invisible watermark character. The
         <strong>Em Dash Remover for Obsidian</strong> plugin is being built to fix
-        that at the moment of need — the paste itself — so your vault stays in your
+        that at the moment of need - the paste itself - so your vault stays in your
         voice and your punctuation conventions, not the model’s house style.
       </p>
 
@@ -301,18 +301,18 @@ const howToSchema = {
         An em dash does several jobs. Naive tools swap every one for a comma and
         create comma splices. This plugin is planned to reuse the website’s
         grammar-aware engine to pick a comma, semicolon, colon or spaced hyphen
-        based on the surrounding words — and to protect fenced and inline code so
+        based on the surrounding words - and to protect fenced and inline code so
         nothing inside a snippet, JSON blob or shell command is ever touched.
       </p>
 
-      <h2 class="text-2xl font-bold">100% local — your notes never leave your vault</h2>
+      <h2 class="text-2xl font-bold">100% local - your notes never leave your vault</h2>
       <p class="muted">
         Obsidian is a local-first desktop and mobile app, and the plugin is being
         built to keep it that way: no host permissions, no telemetry, no remote
         config, and zero <code>fetch</code> calls. It is designed to read only the
         clipboard payload of the current paste. That is intended to make it safe for
         confidential research, client work and anything you wouldn’t paste into a
-        random website — the same local-only approach as the web cleaner, with all
+        random website - the same local-only approach as the web cleaner, with all
         processing on your device.
       </p>
     </article>

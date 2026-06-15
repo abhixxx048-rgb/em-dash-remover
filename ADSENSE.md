@@ -1,6 +1,6 @@
 # AdSense Approval Readiness
 
-Goal: make the site **qualify** for AdSense approval. No live ads are served — the
+Goal: make the site **qualify** for AdSense approval. No live ads are served - the
 ad-serving code is dormant and only activates if you set a publisher ID later.
 
 ## ✅ Done in code (approval requirements)
@@ -23,7 +23,7 @@ ad-serving code is dormant and only activates if you set a publisher ID later.
 - Self-built cookie banner wired to Consent Mode (Accept/Decline) + "Cookie
   settings" link to reopen it
 - ⚠️ For EEA/UK/CH personalised ads you must still enable a **Google-certified
-  CMP** — easiest is Google's free CMP in the AdSense dashboard (Privacy &
+  CMP** - easiest is Google's free CMP in the AdSense dashboard (Privacy &
   messaging → European regulations message). The banner here is the baseline.
 
 **Site structure / technical**
@@ -56,4 +56,4 @@ A dormant, CLS-safe `<AdSlot slot="…" />` component exists in
 set. To show an ad, create an ad unit in AdSense, then drop
 `<AdSlot slot="YOUR_SLOT_ID" />` into a page. Nothing is placed right now.
 
-> Legal pages are templates — have them reviewed for your jurisdiction.
+> Legal pages are templates - have them reviewed for your jurisdiction.

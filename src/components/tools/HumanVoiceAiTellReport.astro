@@ -3,7 +3,7 @@
 // Static HTML here; behavior is wired by the client client script, which imports the
 // pure engine. Styling reuses the same utility classes + tokens as Cleaner.astro
 // so it looks native in both light and dark mode. Non-destructive: the report is
-// fully derived from the input — the only mutation path is an explicit word swap.
+// fully derived from the input - the only mutation path is an explicit word swap.
 ---
 
 <section id="tool" aria-label="Human-voice / AI-tell report" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
@@ -42,7 +42,7 @@
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste a draft — or try a sample. We check cadence, structure, hedging &amp; AI vocabulary.</p>
+            <p class="muted text-sm">Paste a draft - or try a sample. We check cadence, structure, hedging &amp; AI vocabulary.</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="heavy" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 Heavy AI</button>
               <button data-sample="subtle" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🌗 Subtle</button>
@@ -74,7 +74,7 @@
                 style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
             </svg>
             <div class="absolute inset-0 flex flex-col items-center justify-center">
-              <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+              <span id="score-num" class="text-xl font-bold leading-none" data-v="0">-</span>
               <span class="text-[9px] muted">/ 100</span>
             </div>
           </div>
@@ -87,7 +87,7 @@
 
         <!-- Plain-language verdict (screen-reader announced) -->
         <p id="verdict" class="mt-3 rounded-lg border border-ink/10 p-3 text-sm" style="background: var(--c-paper);" aria-live="polite">
-          Paste a draft to see why it might read like AI — and how to fix it in your own voice.
+          Paste a draft to see why it might read like AI - and how to fix it in your own voice.
         </p>
 
         <!-- Burstiness chart -->
@@ -132,7 +132,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded. A guide for quality, not a detector.
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded. A guide for quality, not a detector.
   </p>
 </section>
 
@@ -157,7 +157,7 @@
 </div>
 
 <style>
-  /* Category accents — each highlight carries BOTH a tinted background AND a
+  /* Category accents - each highlight carries BOTH a tinted background AND a
      distinct underline style, so the signal never relies on color alone
      (WCAG 1.4.1). The legend dots reuse the same colors. */
   .cat-dot { display: inline-block; height: 0.75rem; width: 1rem; border-radius: 3px; vertical-align: middle; }
@@ -205,9 +205,9 @@
 
   // --- sample drafts for the empty state --------------------------------
   const SAMPLES: Record<string, string> = {
-    heavy: `In today's fast-paced world, effective communication stands as a testament to human ingenuity. It's not just about words — it's about connection. Moreover, it's important to note that clarity is paramount. Furthermore, we must delve into the intricate tapestry of language. Additionally, robust, seamless, and compelling messaging can unlock the full potential of any team. Ultimately, mastering this art will underscore your value, elevate your brand, and foster lasting trust. In conclusion, the future belongs to those who navigate this landscape with meticulous care.`,
+    heavy: `In today's fast-paced world, effective communication stands as a testament to human ingenuity. It's not just about words - it's about connection. Moreover, it's important to note that clarity is paramount. Furthermore, we must delve into the intricate tapestry of language. Additionally, robust, seamless, and compelling messaging can unlock the full potential of any team. Ultimately, mastering this art will underscore your value, elevate your brand, and foster lasting trust. In conclusion, the future belongs to those who navigate this landscape with meticulous care.`,
     subtle: `Good writing takes practice. It's worth noting that most drafts improve on the second pass. You should read your work aloud, cut the filler, and fix the rhythm. A robust edit will sharpen weak sentences. Keep your reader in mind, and the words will follow. The best writers revise relentlessly.`,
-    human: `I rewrote the intro three times last night. The first version felt stiff. The second was better but too long. By the third, I'd cut half of it and finally liked how it read. Funny how that works — you have to write the bad version first to find the good one. Anyway, it's done now. Ship it.`,
+    human: `I rewrote the intro three times last night. The first version felt stiff. The second was better but too long. By the third, I'd cut half of it and finally liked how it read. Funny how that works - you have to write the bad version first to find the good one. Anyway, it's done now. Ship it.`,
   };
 
   // --- toast ------------------------------------------------------------
@@ -271,7 +271,7 @@
       const raw = src.slice(s.start, s.end);
       const f = byId.get(s.findingId);
       const swap = f?.swaps?.length ? ` data-swaps="${escapeHtml(f.swaps.join('|'))}" data-word="${escapeHtml(raw)}"` : '';
-      const title = f ? `${f.label} — ${f.why}` : '';
+      const title = f ? `${f.label} - ${f.why}` : '';
       html += `<span class="hl hl-${s.category}" data-fid="${s.findingId}" data-start="${s.start}"${swap} title="${escapeHtml(title)}">${escapeHtml(raw)}</span>`;
       cursor = s.end;
     }
@@ -298,9 +298,9 @@
       cv.textContent = `· variation ${b.cv} (${b.band})`;
       note.textContent =
         b.band === 'uniform'
-          ? 'Uniform cadence — a flat skyline reads robotic. Mix short and long sentences.'
+          ? 'Uniform cadence - a flat skyline reads robotic. Mix short and long sentences.'
           : b.band === 'bursty'
-          ? 'Varied cadence — this reads human.'
+          ? 'Varied cadence - this reads human.'
           : 'Reasonable cadence variation.';
     }
     const max = Math.max(...b.bars.map((x) => x.words), 1);
@@ -310,7 +310,7 @@
       div.style.height = `${Math.max(8, Math.round((bar.words / max) * 100))}%`;
       div.dataset.start = String(bar.start);
       div.title = `${bar.words} words`;
-      div.setAttribute('aria-label', `Sentence: ${bar.words} words — jump to it`);
+      div.setAttribute('aria-label', `Sentence: ${bar.words} words - jump to it`);
       chart.appendChild(div);
     });
   }
@@ -326,7 +326,7 @@
     const shown = report.findings.filter((f) => on.has(f.category));
     if (shown.length === 0) {
       list.innerHTML = report.findings.length === 0
-        ? '<li class="rounded-lg px-2 py-1.5" style="background: color-mix(in srgb, var(--color-ok) 14%, transparent); color: var(--color-ok);">No strong tells found — reads human ✓</li>'
+        ? '<li class="rounded-lg px-2 py-1.5" style="background: color-mix(in srgb, var(--color-ok) 14%, transparent); color: var(--color-ok);">No strong tells found - reads human ✓</li>'
         : '<li class="muted">No findings in the enabled layers.</li>';
       return;
     }
@@ -345,7 +345,7 @@
           <span class="min-w-0 flex-1"><span class="font-medium">${escapeHtml(f.label)}</span> <span class="muted">${escapeHtml(snip)}</span></span>
           <button data-jump="${f.start}" class="shrink-0 rounded px-1.5 text-xs font-medium text-accent hover:underline" aria-label="Jump to this finding in the text">↧</button>
         </summary>
-        <p class="mt-1.5 pl-6 text-xs muted">${escapeHtml(f.why)} <span class="italic">— ${escapeHtml(f.source)}</span></p>
+        <p class="mt-1.5 pl-6 text-xs muted">${escapeHtml(f.why)} <span class="italic">- ${escapeHtml(f.source)}</span></p>
         ${f.swaps?.length ? `<p class="mt-1 pl-6 text-xs">Try: ${f.swaps.map((s) => `<span class="rounded px-1" style="background: var(--c-accent-soft); color: var(--color-accent);">${escapeHtml(s)}</span>`).join(' ')}</p>` : ''}
       </details>`;
       list.appendChild(li);
@@ -369,11 +369,11 @@
     const copyBar = $<HTMLButtonElement>('copy-bar');
 
     if (!src.trim()) {
-      scoreNum.textContent = '—'; scoreNum.dataset.v = '0';
+      scoreNum.textContent = '-'; scoreNum.dataset.v = '0';
       ring.style.strokeDashoffset = String(RING);
       $<HTMLParagraphElement>('band').textContent = 'Paste text to scan';
       $<HTMLParagraphElement>('delta').textContent = '';
-      $<HTMLParagraphElement>('verdict').textContent = 'Paste a draft to see why it might read like AI — and how to fix it in your own voice.';
+      $<HTMLParagraphElement>('verdict').textContent = 'Paste a draft to see why it might read like AI - and how to fix it in your own voice.';
       copyBtn.disabled = true; copyBar.disabled = true;
     } else {
       animateCount(scoreNum, report.score);
@@ -522,7 +522,7 @@
     if (!lastReport || !input.value.trim()) { toast('Paste a draft first'); return; }
     baseline = { score: lastReport.score, report: lastReport };
     run();
-    toast(`Baseline set at ${baseline.score}/100 — edit to see the delta`);
+    toast(`Baseline set at ${baseline.score}/100 - edit to see the delta`);
   });
 
   // --- download report (.md) --------------------------------------------

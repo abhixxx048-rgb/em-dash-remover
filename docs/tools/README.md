@@ -1,14 +1,14 @@
-# Tool Suite — Detailed Specs
+# Tool Suite - Detailed Specs
 
 > Compiled 2026-06-15. One detailed spec document per planned tool, each produced from dedicated web research (20 tools, ~150 sources total). Strategy lives in [`../../RESEARCH.md`](../../RESEARCH.md); the ranked summary lives in [`../../WANTLIST.md`](../../WANTLIST.md).
 
-Every doc follows the same 10-section structure, with **Section 5 (engagement & helpfulness features)** as the deepest part — the concrete features that make each tool sticky, delightful, and genuinely useful to users. Across the suite that's **340+ documented engagement features**.
+Every doc follows the same 10-section structure, with **Section 5 (engagement & helpfulness features)** as the deepest part - the concrete features that make each tool sticky, delightful, and genuinely useful to users. Across the suite that's **340+ documented engagement features**.
 
-Each tool is designed to stay **100% client-side** (provable privacy) and to reinforce the brand: *clean AI writing for real quality / keep your human voice* — never detector-bypass.
+Each tool is designed to stay **100% client-side** (provable privacy) and to reinforce the brand: *clean AI writing for real quality / keep your human voice* - never detector-bypass.
 
 ---
 
-## Tier 1 — Build next (high demand, low effort, on-brand)
+## Tier 1 - Build next (high demand, low effort, on-brand)
 
 | Tool | Spec | What it does |
 |---|---|---|
@@ -21,7 +21,7 @@ Each tool is designed to stay **100% client-side** (provable privacy) and to rei
 | Whitespace & Line-Break Reflow Fixer | [doc](./whitespace-line-break-reflow-fixer.md) | Collapse spaces, strip trailing whitespace, control blank lines, unwrap hard-wrapped PDF/email text, rejoin hyphen-split words. |
 | Paste-from-Word/Docs Cleaner | [doc](./paste-from-word-docs-cleaner.md) | Intercepts paste, strips Word mso-/span soup + Docs wrappers + PDF artifacts, keeps real paragraphs/lists/links. |
 
-## Tier 2 — Differentiators (medium effort, strong brand fit)
+## Tier 2 - Differentiators (medium effort, strong brand fit)
 
 | Tool | Spec | What it does |
 |---|---|---|
@@ -33,7 +33,7 @@ Each tool is designed to stay **100% client-side** (provable privacy) and to rei
 | Sentence Splitter | [doc](./sentence-splitter.md) | Abbreviation-aware split into one sentence per line + sentence-length cadence visualization. |
 | Bulk / Multi-File Cleaner | [doc](./bulk-multi-file-cleaner.md) | Drag-drop multiple .txt/.md/.docx, clean each in-browser, per-file report, ZIP download. |
 
-## Tier 3 — Bigger bets / moonshots
+## Tier 3 - Bigger bets / moonshots
 
 | Tool | Spec | What it does |
 |---|---|---|
@@ -47,7 +47,7 @@ Each tool is designed to stay **100% client-side** (provable privacy) and to rei
 
 ## How to use these docs
 
-- **Picking what to build:** start at the top of Tier 1. The recommended first ship is the **Invisible / Watermark Character Inspector** — lowest effort, sits on detection logic the product already has, high-volume keyword, purest expression of the privacy brand.
+- **Picking what to build:** start at the top of Tier 1. The recommended first ship is the **Invisible / Watermark Character Inspector** - lowest effort, sits on detection logic the product already has, high-volume keyword, purest expression of the privacy brand.
 - **Each doc's Section 4 (core MVP)** is the buildable v1 scope; **Section 5** is the backlog of engagement features to layer in over time.
 - **Section 7** in each doc has the client-side implementation plan (algorithms, libraries, edge cases) so a tool can go straight to scaffolding.
-- **Section 9** gives the SEO outline and internal-link plan — every tool page should cross-link siblings to build the hub-and-spoke structure described in `RESEARCH.md`.
+- **Section 9** gives the SEO outline and internal-link plan - every tool page should cross-link siblings to build the hub-and-spoke structure described in `RESEARCH.md`.

@@ -1,15 +1,15 @@
 /**
- * WebGPU / WebLLM Rewrite — pure logic module.
+ * WebGPU / WebLLM Rewrite - pure logic module.
  *
  * Design goals (see docs/tools/webgpu-webllm-rewrite.md):
  *  - The flagship vision is an on-device LLM rewrite via WebLLM + WebGPU. That
- *    engine (@mlc-ai/web-llm) is NOT bundled here — it would add ~MBs and a hard
- *    dependency — so this module ships the *always-available* path instead:
+ *    engine (@mlc-ai/web-llm) is NOT bundled here - it would add ~MBs and a hard
+ *    dependency - so this module ships the *always-available* path instead:
  *      1. A WebGPU capability gate (feature-detection only, no network).
  *      2. A deterministic, model-free "rewrite" that applies readable, honest
  *         transforms per mode (Standard / Fluent / Formal / Casual / Shorten /
  *         Expand). It removes AI tells and tightens prose without inventing
- *         content — quality, not detector-bypass, and never a hallucination risk.
+ *         content - quality, not detector-bypass, and never a hallucination risk.
  *      3. Lightweight before/after metrics (word count, reading grade, AI-tell
  *         density) so the rewrite has a measurable, gamified payoff.
  *  - 100% in-browser. Nothing here touches the network. No DOM. Deterministic.
@@ -37,9 +37,9 @@ export interface ModeMeta {
 /** Ordered list used to render the mode chips and to cycle with [ and ]. */
 export const MODES: ModeMeta[] = [
   { id: 'standard', label: 'Standard', hint: 'Clean AI tells, keep your meaning and length.' },
-  { id: 'fluent', label: 'Fluent', hint: 'Smooth readability — simpler words, clearer flow.' },
+  { id: 'fluent', label: 'Fluent', hint: 'Smooth readability - simpler words, clearer flow.' },
   { id: 'formal', label: 'Formal', hint: 'Expand contractions, lift casual phrasing.' },
-  { id: 'casual', label: 'Casual', hint: 'Loosen up — contractions and a friendlier tone.' },
+  { id: 'casual', label: 'Casual', hint: 'Loosen up - contractions and a friendlier tone.' },
   { id: 'shorten', label: 'Shorten', hint: 'Trim filler and hedging for a tighter draft.' },
   { id: 'expand', label: 'Expand', hint: 'Gently space out run-ons into clearer sentences.' },
 ];
@@ -72,7 +72,7 @@ export interface GpuSupport {
 }
 
 // ---------------------------------------------------------------------------
-// AI "tells" — the same family the deterministic cleaner targets. Each entry is
+// AI "tells" - the same family the deterministic cleaner targets. Each entry is
 // a phrase/word pattern that LLM prose overuses. We use these both to *score*
 // text and to *soften* it in the rewrite (replace with a plainer alternative or
 // drop the empty connective entirely).
@@ -85,7 +85,7 @@ interface TellRule {
   to: string;
 }
 
-// Hedging / filler openers that add no information — safe to delete.
+// Hedging / filler openers that add no information - safe to delete.
 const FILLER_OPENERS: TellRule[] = [
   { re: /\bit'?s\s+(?:important|worth)\s+(?:to\s+note|noting|mentioning)\s+that\s+/gi, to: '' },
   { re: /\bit\s+is\s+(?:important|worth)\s+(?:to\s+note|noting|mentioning)\s+that\s+/gi, to: '' },
@@ -182,7 +182,7 @@ const ALL_TELLS: RegExp[] = [
 ].map((r) => r.re);
 
 // ---------------------------------------------------------------------------
-// WebGPU capability gate (feature-detection only — no adapter request here so
+// WebGPU capability gate (feature-detection only - no adapter request here so
 // the function stays synchronous and side-effect-free; the island may follow up
 // with an async requestAdapter() check and a richer message).
 // ---------------------------------------------------------------------------
@@ -193,7 +193,7 @@ export function detectGpu(nav: Navigator | undefined = typeof navigator !== 'und
   return {
     hasApi,
     message: hasApi
-      ? 'WebGPU detected — on-device AI rewrite is possible on this device.'
+      ? 'WebGPU detected - on-device AI rewrite is possible on this device.'
       : 'WebGPU not available here. The instant deterministic rewrite below works everywhere.',
   };
 }
@@ -227,7 +227,7 @@ export function countWords(text: string): number {
   return m ? m.length : 0;
 }
 
-/** Estimate syllables in a word — a deliberately simple, deterministic heuristic. */
+/** Estimate syllables in a word - a deliberately simple, deterministic heuristic. */
 function syllables(word: string): number {
   const w = word.toLowerCase().replace(/[^a-z]/g, '');
   if (!w) return 0;
@@ -307,7 +307,7 @@ function applyRules(text: string, rules: TellRule[]): { text: string; edits: num
 /**
  * Split very long sentences (Expand) on coordinating conjunctions / semicolons
  * so run-ons become readable. Only splits when a clause is long enough to stand
- * on its own — we never fabricate words.
+ * on its own - we never fabricate words.
  */
 function expandRunOns(text: string): { text: string; edits: number } {
   let edits = 0;
@@ -328,7 +328,7 @@ function expandRunOns(text: string): { text: string; edits: number } {
 }
 
 // ---------------------------------------------------------------------------
-// The deterministic rewrite — the always-available engine.
+// The deterministic rewrite - the always-available engine.
 // ---------------------------------------------------------------------------
 
 /**
@@ -342,7 +342,7 @@ export function rewrite(input: string, mode: RewriteMode = DEFAULT_MODE): Rewrit
   let edits = 0;
   let text = input;
 
-  // Step 1 — every mode strips empty filler openers and inflated vocabulary.
+  // Step 1 - every mode strips empty filler openers and inflated vocabulary.
   // This is the "de-AI" core; it is what makes the rewrite read human.
   {
     const a = applyRules(text, FILLER_OPENERS);
@@ -351,7 +351,7 @@ export function rewrite(input: string, mode: RewriteMode = DEFAULT_MODE): Rewrit
     edits += a.edits + b.edits;
   }
 
-  // Step 2 — mode-specific transforms.
+  // Step 2 - mode-specific transforms.
   switch (mode) {
     case 'standard':
       // Nothing extra: keep meaning, length and voice; tells already removed.
@@ -397,7 +397,7 @@ export function rewrite(input: string, mode: RewriteMode = DEFAULT_MODE): Rewrit
     }
   }
 
-  // Step 3 — tidy whitespace/punctuation left behind by deletions.
+  // Step 3 - tidy whitespace/punctuation left behind by deletions.
   text = tidy(text);
 
   return { text, edits };

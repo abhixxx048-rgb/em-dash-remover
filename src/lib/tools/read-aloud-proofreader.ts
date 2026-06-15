@@ -1,5 +1,5 @@
 /**
- * Read-Aloud Proofreader — pure client-side engine.
+ * Read-Aloud Proofreader - pure client-side engine.
  *
  * Design goals (see docs/tools/read-aloud-proofreader.md):
  *  - Deterministic, framework-free text analysis that prepares prose for a
@@ -33,7 +33,7 @@ export interface Chunk {
 
 /** A flagged "listen harder here" spot found by the pre-scan. */
 export interface Flag {
-  /** What kind of issue this is — drives the icon + explanation in the UI. */
+  /** What kind of issue this is - drives the icon + explanation in the UI. */
   kind: 'longSentence' | 'doubledWord' | 'doubleSpace';
   /** Index into the chunk list this flag belongs to (-1 if document-level). */
   chunk: number;
@@ -69,7 +69,7 @@ export interface ProofAnalysis {
   stats: ReadStats;
   /**
    * 0-100 "listen score": 100 = nothing flagged, lower = more spots to hear.
-   * NOT a quality verdict — just "how much to listen for". Honest framing only.
+   * NOT a quality verdict - just "how much to listen for". Honest framing only.
    */
   awkwardScore: number;
 }
@@ -118,7 +118,7 @@ export function splitWords(text: string): string[] {
 export function splitSentences(text: string): { text: string; start: number; end: number }[] {
   const out: { text: string; start: number; end: number }[] = [];
 
-  // Native segmentation when available — most accurate for edge cases.
+  // Native segmentation when available - most accurate for edge cases.
   if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
     try {
       const seg = new (Intl as any).Segmenter('en', { granularity: 'sentence' });
@@ -195,7 +195,7 @@ export const MAX_CHUNK_CHARS = 200;
  * Strategy:
  *  1. Segment into sentences (offsets preserved).
  *  2. Any sentence longer than MAX_CHUNK_CHARS is further split at clause
- *     boundaries (, ; :) — and, if a clause is *still* too long (e.g. a URL or
+ *     boundaries (, ; :) - and, if a clause is *still* too long (e.g. a URL or
  *     run-on with no punctuation), hard-split on whitespace as a last resort.
  *  3. Offsets are kept absolute so highlighting maps back to the full text.
  */
@@ -309,7 +309,7 @@ export const LONG_SENTENCE_WORDS = 30;
  *  - very long sentences (run-on risk),
  *  - adjacent doubled words ("the the", "that that"),
  *  - double spaces (you can hear an odd gap; trivial to fix).
- * No LLM, no network — just string/regex passes over the chunked text.
+ * No LLM, no network - just string/regex passes over the chunked text.
  */
 export function prescan(input: string, chunks: Chunk[]): Flag[] {
   const text = preclean(input);
@@ -470,7 +470,7 @@ export function buildFixList(
   manualFlags: number[] = [],
 ): string {
   const lines: string[] = [
-    '# Read-Aloud proof — things to fix',
+    '# Read-Aloud proof - things to fix',
     '',
     `Heard it through. ${analysis.flags.length} pre-scan flag${analysis.flags.length === 1 ? '' : 's'}` +
       (manualFlags.length ? `, ${manualFlags.length} flagged by ear.` : '.'),
@@ -498,7 +498,7 @@ export function buildFixList(
   }
 
   if (!analysis.flags.length && !manualFlags.length) {
-    lines.push('Nothing flagged — it reads clean. Nice.');
+    lines.push('Nothing flagged - it reads clean. Nice.');
   }
 
   return lines.join('\n');

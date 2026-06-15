@@ -54,7 +54,7 @@ export const TOOLS: Tool[] = [
 export const CORE: Tool = {
   slug: 'core',
   href: '/',
-  icon: '—',
+  icon: '-',
   title: 'Em Dash Remover',
   desc: 'Remove em dashes, smart quotes & AI tells from your text.',
   category: 'clean',

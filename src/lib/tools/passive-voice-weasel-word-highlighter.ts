@@ -1,5 +1,5 @@
 /**
- * Passive-Voice & Weasel-Word Highlighter — pure detection engine.
+ * Passive-Voice & Weasel-Word Highlighter - pure detection engine.
  *
  * Design goals (see docs/tools/passive-voice-weasel-word-highlighter.md):
  *  - Port the proven heuristics from write-good (`passive-voice`,
@@ -9,7 +9,7 @@
  *  - Three distinct categories so the UI can colour + underline + label each
  *    independently (never colour-only).
  *  - 100% in-browser, deterministic, no DOM and no network. Just string math.
- *  - Brand framing is "stronger, more human writing" — analysis only, we never
+ *  - Brand framing is "stronger, more human writing" - analysis only, we never
  *    auto-rewrite. We coach with a "why" + a fix pattern per category.
  */
 
@@ -71,7 +71,7 @@ export interface Analysis {
 
 /* ------------------------------------------------------------------ *
  * Word lists (vendored, English-calibrated).                          *
- * Kept small and inline — no JSON fetch, no dependency.               *
+ * Kept small and inline - no JSON fetch, no dependency.               *
  * ------------------------------------------------------------------ */
 
 // Be-verbs that begin a passive construction (write-good / Hemingway list).
@@ -80,7 +80,7 @@ const BE_VERBS = [
 ];
 
 // Irregular past participles that don't end in "ed". Trimmed-down but
-// representative subset of write-good's ~190-entry `passive-voice` list —
+// representative subset of write-good's ~190-entry `passive-voice` list -
 // the high-frequency ones that actually show up in prose.
 const IRREGULAR_PARTICIPLES = [
   'awoken', 'born', 'beaten', 'become', 'begun', 'bent', 'bound', 'bitten',
@@ -127,7 +127,7 @@ const WEASEL_WORDS = [
   'substantially', 'surprisingly', 'tiny', 'various', 'vast', 'very',
 ];
 
-// Multi-word vague attributions / hedges — the high-value "weasel" phrases
+// Multi-word vague attributions / hedges - the high-value "weasel" phrases
 // users search for and that LLMs overuse. Not in write-good; our extension.
 const WEASEL_PHRASES = [
   'studies suggest', 'studies show', 'research suggests', 'research shows',
@@ -194,7 +194,7 @@ export function countWords(text: string): number {
 /**
  * Split text into sentences, returning each sentence's {start, end, text}.
  * Guards against common abbreviations, decimals, ellipses and URLs so the
- * passive-percentage and sentence count stay sane. Deliberately simple — a
+ * passive-percentage and sentence count stay sane. Deliberately simple - a
  * full parser is overkill for a static page.
  */
 export interface Sentence {
@@ -220,7 +220,7 @@ export function splitSentences(text: string): Sentence[] {
       const next = text[j + 1] ?? '';
       const chunk = text.slice(start, j + 1);
 
-      // Decimal like "3.5": digit on both sides of a single dot — not an end.
+      // Decimal like "3.5": digit on both sides of a single dot - not an end.
       const isDecimal =
         c === '.' && /\d$/.test(text.slice(0, i)) && /^\d/.test(text.slice(i + 1));
       // Known abbreviation immediately before the dot.
@@ -397,11 +397,11 @@ export function analyze(raw: string, toggles: Toggles = DEFAULT_TOGGLES): Analys
 
 /**
  * A compact, shareable one-line summary of an analysis
- * ("3 passive, 8 adverbs, 2 weasel — Directness 78/100").
+ * ("3 passive, 8 adverbs, 2 weasel - Directness 78/100").
  */
 export function summarize(a: Analysis): string {
   const { passive, adverb, weasel, directness } = a.stats;
-  return `${passive} passive, ${adverb} adverb${adverb === 1 ? '' : 's'}, ${weasel} weasel — Directness ${directness}/100`;
+  return `${passive} passive, ${adverb} adverb${adverb === 1 ? '' : 's'}, ${weasel} weasel - Directness ${directness}/100`;
 }
 
 /** Human label for a category (UI legends, aria-labels, the issues list). */

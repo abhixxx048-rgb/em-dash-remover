@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Em Dash Remover — Clean AI Text in Any Field",
+  "name": "Em Dash Remover - Clean AI Text in Any Field",
   "version": "0.1.0",
   "description": "Grammar-aware em dash & AI-tell remover. Right-click clean selection, clean-on-paste, and clean ChatGPT/Claude/Gemini output. 100% local.",
   "icons": {

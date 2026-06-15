@@ -45,7 +45,7 @@
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste a draft — or try an example:</p>
+            <p class="muted text-sm">Paste a draft - or try an example:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="ai" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 Hedge-heavy AI</button>
               <button data-sample="passive" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🏛 Passive bureaucratese</button>
@@ -73,7 +73,7 @@
           style="background: var(--c-paper);">
           <span class="muted">Flagged passive voice, adverbs and weasel words will appear here.</span>
         </div>
-        <!-- Legend — never colour-only, each has a distinct underline. -->
+        <!-- Legend - never colour-only, each has a distinct underline. -->
         <div class="mt-2 flex flex-wrap items-center gap-3 text-xs">
           <span class="inline-flex items-center gap-1"><span class="fl-passive inline-block h-3 w-4 rounded-sm align-middle"></span> passive</span>
           <span class="inline-flex items-center gap-1"><span class="fl-adverb inline-block h-3 w-4 rounded-sm align-middle"></span> -ly adverb</span>
@@ -94,7 +94,7 @@
               style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">-</span>
             <span class="text-[9px] muted">/ 100</span>
           </div>
         </div>
@@ -110,7 +110,7 @@
         <ul id="counts" class="mt-1.5 flex flex-wrap gap-1.5 text-xs" aria-live="polite"></ul>
         <p id="ai-chip" hidden class="mt-2 text-xs">
           <span class="rounded-full px-2 py-0.5 text-accent" style="background: var(--c-accent-soft);">
-            💡 Lots of hedges — these are classic <a href="/" class="font-medium underline">AI tells</a>.
+            💡 Lots of hedges - these are classic <a href="/" class="font-medium underline">AI tells</a>.
           </span>
         </p>
       </div>
@@ -118,7 +118,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded.
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded.
   </p>
 </section>
 
@@ -292,7 +292,7 @@
     const scoreNum = $<HTMLSpanElement>('score-num');
     const ring = document.getElementById('ring') as unknown as SVGCircleElement;
     if (!hasText) {
-      scoreNum.textContent = '—'; scoreNum.dataset.v = '0';
+      scoreNum.textContent = '-'; scoreNum.dataset.v = '0';
       ring.style.strokeDashoffset = String(RING);
       $<HTMLParagraphElement>('band').textContent = 'Paste text to scan';
       $<HTMLParagraphElement>('pct').textContent = '';
@@ -315,7 +315,7 @@
       countsEl.innerHTML = '<li class="muted">Paste text to scan.</li>';
     } else if (stats.passive + stats.adverb + stats.weasel === 0) {
       countsEl.innerHTML =
-        '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">No passive voice or weasel words found — strong, direct writing! ✓</li>';
+        '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">No passive voice or weasel words found - strong, direct writing! ✓</li>';
     } else {
       const pill = (label: string, n: number) => {
         const li = document.createElement('li');
@@ -391,7 +391,7 @@
 
   // --- share the summary
   $<HTMLButtonElement>('share').addEventListener('click', async () => {
-    const msg = `${lastSummary} — checked on ${location.origin}`;
+    const msg = `${lastSummary} - checked on ${location.origin}`;
     try { await navigator.share({ text: msg }); }
     catch { await navigator.clipboard.writeText(msg); toast('Summary copied'); }
   });

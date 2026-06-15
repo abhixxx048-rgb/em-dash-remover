@@ -1,5 +1,5 @@
 /**
- * Homoglyph / Confusables Detector & Normalizer — pure analysis engine.
+ * Homoglyph / Confusables Detector & Normalizer - pure analysis engine.
  *
  * Design goals (see docs/tools/homoglyph-confusables-detector.md):
  *  - Make invisible script-spoofing *visible and removable*. Given text, find
@@ -8,7 +8,7 @@
  *    name it, map it back to its Latin prototype, and compute the UTS #39
  *    "skeleton" so users see what a machine really reads.
  *  - Data-driven, not a hand-rolled regex. A compact confusables table maps each
- *    source code point to { target, name, script } — bundled in the page, so the
+ *    source code point to { target, name, script } - bundled in the page, so the
  *    detection stays honest and the tooltips stay plain-English.
  *  - Dominant-script gating: text that is *legitimately* Cyrillic/Greek/CJK must
  *    NOT be flagged as an attack. We only flag look-alikes that mix into an
@@ -18,7 +18,7 @@
  *    one character, never two surrogate halves.
  *
  * Brand stance: cleanup, never bypass. The job is to turn manipulated text back
- * into legitimate, all-Latin prose — never to "beat a detector," and we ship no
+ * into legitimate, all-Latin prose - never to "beat a detector," and we ship no
  * generator.
  */
 
@@ -28,9 +28,9 @@ export type ScriptClass = 'cyrillic' | 'greek' | 'fullwidth' | 'math' | 'other';
 /**
  * Risk tier for a finding. Paired with an icon + label in the UI, never colour
  * alone (WCAG 1.4.1).
- *  - 'high'   Cyrillic / Greek letters mixed into Latin — the classic spoof.
+ *  - 'high'   Cyrillic / Greek letters mixed into Latin - the classic spoof.
  *  - 'medium' other cross-script look-alikes (Armenian, Cherokee, …).
- *  - 'low'    fullwidth / math-alphanumeric — usually cosmetic compatibility.
+ *  - 'low'    fullwidth / math-alphanumeric - usually cosmetic compatibility.
  */
 export type Severity = 'high' | 'medium' | 'low';
 
@@ -259,7 +259,7 @@ export function lookup(cp: number): Confusable | null {
 }
 
 /* ------------------------------------------------------------------------- *
- * Script detection (native Unicode property escapes — no library).
+ * Script detection (native Unicode property escapes - no library).
  * ------------------------------------------------------------------------- */
 
 export type DominantScript = 'latin' | 'cyrillic' | 'greek' | 'cjk' | 'other' | 'none';
@@ -276,7 +276,7 @@ const RE_LETTER = /\p{L}/u;
 /**
  * Determine the document's dominant *letter* script by counting letters per
  * script. Punctuation/digits/spaces (Common) are ignored. This is what lets us
- * leave legitimately non-Latin text alone — if the dominant script is Cyrillic,
+ * leave legitimately non-Latin text alone - if the dominant script is Cyrillic,
  * we will not flag its Cyrillic letters as look-alikes.
  */
 export function dominantScript(input: string): DominantScript {
@@ -323,7 +323,7 @@ export const SCRIPT_LABEL: Record<ScriptClass, string> = {
   other: 'Other',
 };
 
-/** Compact icon per script class (paired with text — never colour-only). */
+/** Compact icon per script class (paired with text - never colour-only). */
 export const SCRIPT_ICON: Record<ScriptClass, string> = {
   cyrillic: 'Cyr',
   greek: 'Grk',
@@ -347,7 +347,7 @@ export const SEVERITY_LABEL: Record<Severity, string> = {
  * Should this confusable be flagged given the document's dominant script?
  * Gating rules:
  *  - If the dominant script *is* the confusable's source script, it is probably
- *    legitimate (a Cyrillic letter inside Russian prose) — don't flag it.
+ *    legitimate (a Cyrillic letter inside Russian prose) - don't flag it.
  *  - Fullwidth & math compatibility forms are always worth flagging regardless,
  *    since they're never the "real" content in normal prose.
  */
@@ -420,7 +420,7 @@ export function detect(input: string, opts: DetectOptions = DEFAULT_OPTIONS): De
 
 /**
  * Count word-runs that mix the dominant letter-script with a flagged look-alike
- * script — the strongest spoof signal (`pаypаl` where one `а` is Cyrillic). We
+ * script - the strongest spoof signal (`pаypаl` where one `а` is Cyrillic). We
  * tokenise on `\p{L}+` clusters and flag a run that contains at least one
  * dominant-script letter AND at least one flagged confusable.
  */
@@ -448,7 +448,7 @@ export function countMixedRuns(input: string, dominant: DominantScript, opts: De
  * ------------------------------------------------------------------------- */
 
 /**
- * Compute the UTS #39 `skeleton` of the text — the canonical "what a machine
+ * Compute the UTS #39 `skeleton` of the text - the canonical "what a machine
  * sees" form. Simplified to: NFD → map each confusable to its prototype → NFD.
  * (The Default_Ignorable strip step is handled by the sibling invisibles engine;
  * here we focus on the visible look-alike prototypes.) Idempotent:
@@ -547,7 +547,7 @@ export function verdict(result: DetectResult): string {
   if (result.counts.total === 0) {
     return result.scanned === 0
       ? 'Paste text to scan for look-alike characters.'
-      : 'No look-alike characters — your text is genuine Latin.';
+      : 'No look-alike characters - your text is genuine Latin.';
   }
   const parts: string[] = [];
   if (result.counts.cyrillic) parts.push(`${result.counts.cyrillic} Cyrillic`);
@@ -559,7 +559,7 @@ export function verdict(result: DetectResult): string {
   const runNote = result.counts.runs
     ? ` across ${result.counts.runs} mixed-script word${result.counts.runs === 1 ? '' : 's'}`
     : '';
-  return `Found ${list} look-alike${result.counts.total === 1 ? '' : 's'}${runNote} — mixed-script text detected.`;
+  return `Found ${list} look-alike${result.counts.total === 1 ? '' : 's'}${runNote} - mixed-script text detected.`;
 }
 
 /**
@@ -577,7 +577,7 @@ export function confusabilityScore(input: string, result: DetectResult): number 
 /** Build a shareable plaintext report. */
 export function buildReport(result: DetectResult): string {
   if (result.counts.total === 0) {
-    return 'No homoglyph / confusable characters detected — this text is genuine Latin.';
+    return 'No homoglyph / confusable characters detected - this text is genuine Latin.';
   }
   const rows = result.rows.map((row) => `${row.count}× ${formatCp(row.cp)} ${row.info.name} → "${row.info.target}"`);
   return `${verdict(result)}\n${rows.join('\n')}`;

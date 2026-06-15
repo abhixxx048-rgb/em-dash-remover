@@ -25,7 +25,7 @@
         </summary>
         <div class="card mt-2 w-full space-y-1 p-2 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-72 sm:p-3 sm:shadow-lg">
           <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-primes" checked class="h-5 w-5" /> Feet/inch primes (6′2″)</label>
-          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-dashes" checked class="h-5 w-5" /> Dashes (-- → –, --- → —)</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-dashes" checked class="h-5 w-5" /> Dashes (-- → –, --- → -)</label>
           <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-ellipsis" checked class="h-5 w-5" /> Ellipsis (... → …)</label>
           <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-entities" class="h-5 w-5" /> Output HTML entities (&amp;#8220;)</label>
         </div>
@@ -57,7 +57,7 @@
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste text with straight quotes — or try an example:</p>
+            <p class="muted text-sm">Paste text with straight quotes - or try an example:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="demo" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✨ Tricky demo</button>
               <button data-sample="dialogue" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💬 Dialogue</button>
@@ -104,7 +104,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Your text never leaves your browser — open DevTools → Network and you'll see zero requests. Works offline.
+    🔒 Your text never leaves your browser - open DevTools → Network and you'll see zero requests. Works offline.
     <a href="/" class="text-accent hover:underline">↔ Need the reverse? Curly → straight cleaner</a>
   </p>
 </section>
@@ -236,9 +236,9 @@
     const chips = $<HTMLUListElement>('chips');
     chips.innerHTML = '';
     const items: string[] = [];
-    if (flags.decade) items.push(`✓ Decade (’90s) — curled as closing`);
-    if (flags.contraction) items.push(`✓ Leading contraction (’Twas / ’em) — fixed`);
-    if (flags.measurement) items.push(`✓ Foot/inch measurement — using primes ′ ″`);
+    if (flags.decade) items.push(`✓ Decade (’90s) - curled as closing`);
+    if (flags.contraction) items.push(`✓ Leading contraction (’Twas / ’em) - fixed`);
+    if (flags.measurement) items.push(`✓ Foot/inch measurement - using primes ′ ″`);
     if (flags.nested) items.push(`✓ Nested single-in-double quotes`);
     if (!src.trim()) {
       chips.innerHTML = '<li class="muted">Tricky cases we catch will show up here.</li>';

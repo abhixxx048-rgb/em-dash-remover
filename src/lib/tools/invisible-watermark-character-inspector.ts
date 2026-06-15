@@ -1,5 +1,5 @@
 /**
- * Invisible / Watermark Character Inspector — pure detection engine.
+ * Invisible / Watermark Character Inspector - pure detection engine.
  *
  * Design goals (see docs/tools/invisible-watermark-character-inspector.md):
  *  - A "see it before you strip it" diagnostic. Given arbitrary text, classify
@@ -13,7 +13,7 @@
  *    count as one character, never two surrogate halves.
  *
  * Brand stance: invisible characters are *most likely* artifacts (web copy,
- * PDF exports, GPT spacing tells) and trivially removable — not a secret,
+ * PDF exports, GPT spacing tells) and trivially removable - not a secret,
  * unbreakable watermark. We explain rather than alarm.
  */
 
@@ -21,14 +21,14 @@
 export type Category =
   | 'zero-width' // ZWSP / ZWNJ / ZWJ / word joiner / BOM / soft hyphen / invisible math
   | 'space' // look-alike whitespace: NBSP, NNBSP (U+202F), en/em/thin/hair, ideographic
-  | 'bidi' // bidirectional controls — Trojan Source / RTL override risk
-  | 'variation' // variation selectors — emoji presentation OR a smuggling vector
-  | 'tag' // Unicode Tag chars (U+E0000–E007F) — ASCII smuggling / prompt injection
+  | 'bidi' // bidirectional controls - Trojan Source / RTL override risk
+  | 'variation' // variation selectors - emoji presentation OR a smuggling vector
+  | 'tag' // Unicode Tag chars (U+E0000–E007F) - ASCII smuggling / prompt injection
   | 'control' // C0/C1 control chars and other oddities (e.g. U+FFFD)
-  | 'pua'; // Private Use Area — suspicious, app-specific glyphs
+  | 'pua'; // Private Use Area - suspicious, app-specific glyphs
 
 /**
- * Triage severity. Intentionally NOT color-only in the UI — every chip also
+ * Triage severity. Intentionally NOT color-only in the UI - every chip also
  * carries an icon + visible U+XXXX label + text category.
  *  - 'risk'   red:   security relevant (bidi overrides, tag chars).
  *  - 'tell'   amber: likely an AI/web spacing tell or layout-breaker (U+202F, NBSP).
@@ -115,7 +115,7 @@ const TABLE_LIST: CharInfo[] = [
   // --- Zero-width / format -------------------------------------------------
   rec(0x200b, 'ZERO WIDTH SPACE', 'zero-width', 'benign', 'Invisible separator often left by web copy/paste. Safe to remove; it adds no spacing.'),
   rec(0x200c, 'ZERO WIDTH NON-JOINER', 'zero-width', 'benign', 'Controls letter joining in some scripts (e.g. Persian). Usually safe to remove in English text.'),
-  rec(0x200d, 'ZERO WIDTH JOINER', 'zero-width', 'tell', 'Legitimately joins emoji (👨‍👩‍👧). Removing it can break combined emoji — review before stripping.'),
+  rec(0x200d, 'ZERO WIDTH JOINER', 'zero-width', 'tell', 'Legitimately joins emoji (👨‍👩‍👧). Removing it can break combined emoji - review before stripping.'),
   rec(0x2060, 'WORD JOINER', 'zero-width', 'benign', 'A no-break, zero-width joiner. Harmless artifact in most prose; safe to remove.'),
   rec(0xfeff, 'ZERO WIDTH NO-BREAK SPACE (BOM)', 'zero-width', 'benign', 'Byte-order mark. Common at the start of files/exports; usually safe to strip.'),
   rec(0x00ad, 'SOFT HYPHEN', 'zero-width', 'benign', 'Invisible "you may hyphenate here" hint, often from PDFs. Usually safe to remove.'),
@@ -142,8 +142,8 @@ const TABLE_LIST: CharInfo[] = [
   rec(0x2029, 'PARAGRAPH SEPARATOR', 'space', 'tell', 'Invisible paragraph break that is not a normal newline. Usually convert to a newline.'),
 
   // --- Bidirectional controls (security) ----------------------------------
-  rec(0x200e, 'LEFT-TO-RIGHT MARK', 'bidi', 'risk', 'Invisible direction control. Mostly benign in mixed text, but can hide bidi reordering — review.'),
-  rec(0x200f, 'RIGHT-TO-LEFT MARK', 'bidi', 'risk', 'Invisible direction control. Mostly benign, but can mask bidi reordering — review.'),
+  rec(0x200e, 'LEFT-TO-RIGHT MARK', 'bidi', 'risk', 'Invisible direction control. Mostly benign in mixed text, but can hide bidi reordering - review.'),
+  rec(0x200f, 'RIGHT-TO-LEFT MARK', 'bidi', 'risk', 'Invisible direction control. Mostly benign, but can mask bidi reordering - review.'),
   rec(0x202a, 'LEFT-TO-RIGHT EMBEDDING', 'bidi', 'risk', 'Bidi embedding control. Can reorder text deceptively (Trojan Source, CVE-2021-42574).'),
   rec(0x202b, 'RIGHT-TO-LEFT EMBEDDING', 'bidi', 'risk', 'Bidi embedding control. Can reorder text deceptively (Trojan Source, CVE-2021-42574).'),
   rec(0x202c, 'POP DIRECTIONAL FORMATTING', 'bidi', 'risk', 'Ends a bidi override/embedding. Part of Trojan-Source-style reordering tricks.'),
@@ -151,19 +151,19 @@ const TABLE_LIST: CharInfo[] = [
   rec(0x202e, 'RIGHT-TO-LEFT OVERRIDE', 'bidi', 'risk', 'Forces right-to-left rendering; classic spoofing/Trojan-Source vector. Treat as a security risk.'),
   rec(0x2066, 'LEFT-TO-RIGHT ISOLATE', 'bidi', 'risk', 'Bidi isolate control used in reordering attacks. Review before trusting the text.'),
   rec(0x2067, 'RIGHT-TO-LEFT ISOLATE', 'bidi', 'risk', 'Bidi isolate control used in reordering attacks. Review before trusting the text.'),
-  rec(0x2068, 'FIRST STRONG ISOLATE', 'bidi', 'risk', 'Bidi isolate control. Can participate in deceptive reordering — review.'),
-  rec(0x2069, 'POP DIRECTIONAL ISOLATE', 'bidi', 'risk', 'Ends a bidi isolate. Part of bidi reordering tricks — review.'),
+  rec(0x2068, 'FIRST STRONG ISOLATE', 'bidi', 'risk', 'Bidi isolate control. Can participate in deceptive reordering - review.'),
+  rec(0x2069, 'POP DIRECTIONAL ISOLATE', 'bidi', 'risk', 'Ends a bidi isolate. Part of bidi reordering tricks - review.'),
 
   // --- Variation selectors (ambiguous: emoji vs smuggling) ----------------
   rec(0xfe0e, 'VARIATION SELECTOR-15 (text style)', 'variation', 'benign', 'Requests text-style rendering of the preceding glyph. Usually legitimate emoji styling.'),
   rec(0xfe0f, 'VARIATION SELECTOR-16 (emoji style)', 'variation', 'benign', 'Requests emoji-style rendering (e.g. ❤️). Usually legitimate; removing may change how emoji look.'),
-  ...r(0xfe00, 0xfe0d, (cp) => `VARIATION SELECTOR-${cp - 0xfe00 + 1}`, 'variation', 'tell', 'Variation selector. Can be legitimate glyph styling — but a known invisible-smuggling vector. Review.'),
+  ...r(0xfe00, 0xfe0d, (cp) => `VARIATION SELECTOR-${cp - 0xfe00 + 1}`, 'variation', 'tell', 'Variation selector. Can be legitimate glyph styling - but a known invisible-smuggling vector. Review.'),
   ...r(0xe0100, 0xe01ef, (cp) => `VARIATION SELECTOR-${cp - 0xe0100 + 17}`, 'variation', 'tell', 'Supplementary variation selector. Invisible; a known data/instruction smuggling vector. Review.'),
 
   // --- Unicode Tag characters (ASCII smuggling / prompt injection) ---------
   rec(0xe0001, 'LANGUAGE TAG', 'tag', 'risk', 'Deprecated tag char. Invisible; abused to smuggle hidden ASCII into LLM prompts. Treat as a risk.'),
   ...r(0xe0020, 0xe007e, (cp) => `TAG ${String.fromCodePoint(cp - 0xe0000)} (smuggled "${String.fromCodePoint(cp - 0xe0000)}")`, 'tag', 'risk', 'Invisible Tag character that mirrors a printable ASCII byte. Used for hidden ASCII / prompt-injection smuggling.'),
-  rec(0xe007f, 'CANCEL TAG', 'tag', 'risk', 'Terminates a Tag sequence. Part of the invisible ASCII-smuggling vector — treat as a risk.'),
+  rec(0xe007f, 'CANCEL TAG', 'tag', 'risk', 'Terminates a Tag sequence. Part of the invisible ASCII-smuggling vector - treat as a risk.'),
 
   // --- Other controls / replacement ---------------------------------------
   rec(0xfffd, 'REPLACEMENT CHARACTER', 'control', 'benign', 'Marks a decoding error (broken bytes/encoding). Not invisible, but a sign something went wrong.'),
@@ -191,7 +191,7 @@ export function lookup(cp: number, opts?: InspectOptions): CharInfo | null {
     if (cp === 0x0d) return rec(0x0d, 'CARRIAGE RETURN', 'control', 'benign', 'Windows-style line-ending half. Usually safe to normalize to a plain newline.');
   }
 
-  // Private Use Area — app-specific glyphs that often arrive as junk.
+  // Private Use Area - app-specific glyphs that often arrive as junk.
   if (opts?.includePua && ((cp >= 0xe000 && cp <= 0xf8ff) || (cp >= 0xf0000 && cp <= 0xffffd) || (cp >= 0x100000 && cp <= 0x10fffd))) {
     return rec(cp, 'PRIVATE USE AREA CHARACTER', 'pua', 'benign', 'A Private Use Area code point with no standard meaning. Frequently a copy/paste artifact; review before trusting.');
   }
@@ -200,7 +200,7 @@ export function lookup(cp: number, opts?: InspectOptions): CharInfo | null {
   // tab U+0009 and carriage return U+000D are only flagged via the explicit
   // showTabs path above; line feed U+000A is a real newline we leave alone).
   if (opts?.showControls && cp !== 0x0a && cp !== 0x09 && cp !== 0x0d && cp < 0x20) {
-    return rec(cp, 'CONTROL CHARACTER', 'control', 'risk', 'A non-printing C0 control character. Unusual in prose and can confuse parsers — review.');
+    return rec(cp, 'CONTROL CHARACTER', 'control', 'risk', 'A non-printing C0 control character. Unusual in prose and can confuse parsers - review.');
   }
 
   return null;
@@ -276,8 +276,8 @@ export function inspect(input: string, opts: InspectOptions = DEFAULT_OPTIONS): 
 /**
  * Token in a rendered, surrogate-safe breakdown of the text. A `text` token is
  * a run of normal visible characters; a `char` token is a single flagged code
- * point with its metadata. The UI builds DOM from this — NEVER innerHTML with
- * user text — so it is XSS-safe by construction.
+ * point with its metadata. The UI builds DOM from this - NEVER innerHTML with
+ * user text - so it is XSS-safe by construction.
  */
 export type Token =
   | { kind: 'text'; value: string }
@@ -343,7 +343,7 @@ export const DEFAULT_CLEAN: CleanOptions = {
   zeroWidth: true,
   spaces: true,
   bidi: true,
-  variation: false, // ambiguous (emoji styling) — off by default to avoid breakage
+  variation: false, // ambiguous (emoji styling) - off by default to avoid breakage
   tags: true,
   controls: true,
   pua: false,
@@ -421,7 +421,7 @@ export function cleanText(input: string, opts: CleanOptions = DEFAULT_CLEAN): Cl
  */
 export function buildReport(result: InspectResult): string {
   if (result.total === 0) {
-    return 'No hidden or invisible characters detected — this text looks clean.';
+    return 'No hidden or invisible characters detected - this text looks clean.';
   }
   const parts = result.rows.map((row) => `${row.count}× ${formatCp(row.cp)} ${row.info.name}`);
   const noun = result.total === 1 ? 'character' : 'characters';
@@ -443,7 +443,7 @@ export const CATEGORY_LABEL: Record<Category, string> = {
   pua: 'Private use',
 };
 
-/** Compact icon/glyph per category (paired with text — never color-only). */
+/** Compact icon/glyph per category (paired with text - never color-only). */
 export const CATEGORY_ICON: Record<Category, string> = {
   'zero-width': '◦',
   space: '␣',

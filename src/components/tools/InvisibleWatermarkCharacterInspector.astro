@@ -47,7 +47,7 @@
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste any text to reveal hidden Unicode — or try an example:</p>
+            <p class="muted text-sm">Paste any text to reveal hidden Unicode - or try an example:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="gpt" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 GPT spacing (U+202F)</button>
               <button data-sample="zwsp" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">👻 Zero-width watermark</button>
@@ -96,7 +96,7 @@
               style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span id="score-num" class="text-xl font-bold leading-none" data-v="100">—</span>
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="100">-</span>
             <span class="text-[9px] muted">/ 100</span>
           </div>
         </div>
@@ -121,7 +121,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline.
   </p>
 </section>
 
@@ -191,7 +191,7 @@
   const SAMPLES: Record<string, string> = {
     gpt:
       `Here${NNBSP}is a quick summary of the report. The results${NNBSP}were strong, ` +
-      `and the team${NNBSP}delivered ahead of schedule${NNBSP}— a great outcome for everyone.`,
+      `and the team${NNBSP}delivered ahead of schedule${NNBSP}- a great outcome for everyone.`,
     zwsp:
       `This paragraph looks${ZWSP} completely normal,${ZWSP} but it is quietly seeded ` +
       `with${ZWSP} zero-width spaces${ZWSP} between several words.​ You cannot see them, ` +
@@ -201,7 +201,7 @@
       `The right-to-left override above can make text read in a different order than it is stored.`,
     clean:
       `This is a perfectly ordinary paragraph of text. It contains only normal spaces, ` +
-      `letters, and punctuation — nothing hidden, nothing to strip.`,
+      `letters, and punctuation - nothing hidden, nothing to strip.`,
   };
 
   // --- options
@@ -213,7 +213,7 @@
     };
   }
 
-  // --- persistence (preferences only — never the text, for privacy)
+  // --- persistence (preferences only - never the text, for privacy)
   const OPT_IDS = ['opt-tabs', 'opt-controls', 'opt-pua'];
   function saveOpts() {
     const s: Record<string, boolean> = {};
@@ -315,7 +315,7 @@
     const scoreNum = $<HTMLSpanElement>('score-num');
     const ring = document.getElementById('ring') as unknown as SVGCircleElement;
     if (!src.trim()) {
-      scoreNum.textContent = '—';
+      scoreNum.textContent = '-';
       scoreNum.dataset.v = '100';
       ring.style.strokeDashoffset = '0';
       ring.style.stroke = 'var(--color-ok)';
@@ -352,7 +352,7 @@
       li.className = 'count-pill';
       li.style.background = 'color-mix(in srgb, var(--color-ok) 16%, transparent)';
       li.style.color = 'var(--color-ok)';
-      li.textContent = '✓ No hidden characters — your text is clean';
+      li.textContent = '✓ No hidden characters - your text is clean';
       countsEl.appendChild(li);
     } else {
       for (const row of result.rows) {

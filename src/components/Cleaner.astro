@@ -60,7 +60,7 @@
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste AI text — or try an example:</p>
+            <p class="muted text-sm">Paste AI text - or try an example:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="email" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✉️ AI email</button>
               <button data-sample="linkedin" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💼 LinkedIn post</button>
@@ -103,7 +103,7 @@
               style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">-</span>
             <span class="text-[9px] muted">/ 100</span>
           </div>
         </div>
@@ -122,7 +122,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline.
   </p>
 </section>
 
@@ -149,9 +149,9 @@
   const diffEl = $<HTMLDivElement>('diff');
 
   const SAMPLES: Record<string, string> = {
-    email: `Hi team — I wanted to delve into our Q3 results. It's not just about the numbers, it's about the story they tell. We've leveraged a robust, multifaceted strategy to unlock our full potential — and it's a testament to everyone's hard work. Moreover, it's worth noting that our seamless integration paved the way for success.`,
-    linkedin: `🚀 Let's be honest — most people get this wrong. I used to think success was about working harder. It's not. It's about working smarter. Here's the thing: in today's fast-paced world, you need to harness the power of focus. Three things changed everything for me: clarity, consistency, and courage. The future belongs to those who delve deeper. Agree?`,
-    essay: `The Industrial Revolution stands as a testament to human ingenuity. It fundamentally reshaped society — transforming economies, redefining labor, and revolutionizing daily life. In the realm of manufacturing, it underscored the pivotal role of innovation. Ultimately, it's important to note that this transformative era laid the cornerstone for the modern world.`,
+    email: `Hi team - I wanted to delve into our Q3 results. It's not just about the numbers, it's about the story they tell. We've leveraged a robust, multifaceted strategy to unlock our full potential - and it's a testament to everyone's hard work. Moreover, it's worth noting that our seamless integration paved the way for success.`,
+    linkedin: `🚀 Let's be honest - most people get this wrong. I used to think success was about working harder. It's not. It's about working smarter. Here's the thing: in today's fast-paced world, you need to harness the power of focus. Three things changed everything for me: clarity, consistency, and courage. The future belongs to those who delve deeper. Agree?`,
+    essay: `The Industrial Revolution stands as a testament to human ingenuity. It fundamentally reshaped society - transforming economies, redefining labor, and revolutionizing daily life. In the realm of manufacturing, it underscored the pivotal role of innovation. Ultimately, it's important to note that this transformative era laid the cornerstone for the modern world.`,
   };
 
   function readOptions(): CleanOptions {
@@ -248,7 +248,7 @@
     const report = scan(text);
     const scoreNum = $<HTMLSpanElement>('score-num');
     if (!src.trim()) {
-      scoreNum.textContent = '—'; scoreNum.dataset.v = '0';
+      scoreNum.textContent = '-'; scoreNum.dataset.v = '0';
       $<SVGCircleElement>('ring' as any).style.strokeDashoffset = String(RING);
       $<HTMLParagraphElement>('band').textContent = 'Paste text to scan';
     } else {
@@ -267,7 +267,7 @@
     if (!src.trim()) {
       tellsEl.innerHTML = '<li class="muted">Paste text to scan.</li>';
     } else if (report.tells.length === 0) {
-      tellsEl.innerHTML = '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">No tells found — reads human ✓</li>';
+      tellsEl.innerHTML = '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">No tells found - reads human ✓</li>';
     } else {
       for (const t of report.tells) {
         const li = document.createElement('li');

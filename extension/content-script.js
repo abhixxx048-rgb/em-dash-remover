@@ -1,5 +1,5 @@
 /**
- * Content script — the only part that touches the page DOM.
+ * Content script - the only part that touches the page DOM.
  *
  * MVP modes:
  *  1. Right-click "Clean selection" (driven by a message from background.js).

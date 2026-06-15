@@ -2,5 +2,5 @@ name = "em-dash-remover"
 compatibility_date = "2026-06-15"
 
 # Static Astro build output. `npm run build` writes here; Cloudflare Pages
-# serves it directly (no SSR adapter — this is a fully static site).
+# serves it directly (no SSR adapter - this is a fully static site).
 pages_build_output_dir = "dist"

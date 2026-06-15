@@ -7,7 +7,7 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Does this upload my document anywhere?',
-    a: 'No. The tool reads what your clipboard carries and cleans it entirely in your browser with JavaScript. Nothing is uploaded, stored, or logged. Open DevTools → Network while you paste and you will see zero requests — it even works offline.',
+    a: 'No. The tool reads what your clipboard carries and cleans it entirely in your browser with JavaScript. Nothing is uploaded, stored, or logged. Open DevTools → Network while you paste and you will see zero requests - it even works offline.',
   },
   {
     q: 'What is mso- / MsoNormal and why is it in my paste?',
@@ -23,7 +23,7 @@ const faqs = [
   },
   {
     q: 'Can I get clean Markdown instead of HTML?',
-    a: 'Yes. Switch the output to Markdown (or press Ctrl/Cmd+Shift+M) and you get GitHub-flavored Markdown with headings, bold/italic, links and lists — handy for Notion, GitHub or a static site. You can also download the result as .html, .md or .txt.',
+    a: 'Yes. Switch the output to Markdown (or press Ctrl/Cmd+Shift+M) and you get GitHub-flavored Markdown with headings, bold/italic, links and lists - handy for Notion, GitHub or a static site. You can also download the result as .html, .md or .txt.',
   },
   {
     q: 'Does it work on Google Docs paste?',
@@ -31,7 +31,7 @@ const faqs = [
   },
   {
     q: 'Does it remove em dashes and curly quotes too?',
-    a: 'No — on purpose. This tool focuses on formatting cruft (Word/Docs junk and PDF line breaks) and deliberately leaves your punctuation, curly quotes and em dashes alone. If you also want grammar-aware em-dash and quote cleanup, the main Em Dash Remover handles that; we link to it after cleaning when we spot leftover quotes or dashes.',
+    a: 'No - on purpose. This tool focuses on formatting cruft (Word/Docs junk and PDF line breaks) and deliberately leaves your punctuation, curly quotes and em dashes alone. If you also want grammar-aware em-dash and quote cleanup, the main Em Dash Remover handles that; we link to it after cleaning when we spot leftover quotes or dashes.',
   },
 ];
 
@@ -47,12 +47,12 @@ const webApp = {
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
   isAccessibleForFree: true,
   featureList: [
-    'Clean Word HTML — strip mso- styles and MsoNormal classes on paste',
+    'Clean Word HTML - strip mso- styles and MsoNormal classes on paste',
     'Remove Google Docs docs-internal-guid wrapper and inline span soup',
-    'Fix PDF copy text — de-hyphenate split words and reflow line breaks',
+    'Fix PDF copy text - de-hyphenate split words and reflow line breaks',
     'Keep headings, lists, bold and links via a structure allow-list',
     'Output clean HTML, plain text or Markdown',
-    '100% client-side — your text never leaves your browser',
+    '100% client-side - your text never leaves your browser',
   ],
   publisher: { '@id': `${Astro.site}#org` },
 };
@@ -69,7 +69,7 @@ const faqSchema = {
 ---
 
 <Base
-  title="Clean Word, Docs & PDF Paste — Strip Formatting, Keep Text (Free)"
+  title="Clean Word, Docs & PDF Paste - Strip Formatting, Keep Text (Free)"
   description="Paste from Word, Google Docs or a PDF and get clean text instantly. Removes mso- styles, the docs-internal-guid wrapper and PDF line breaks while keeping headings, lists and links. Free, private, 100% in your browser."
 >
   <main class="halo">
@@ -82,12 +82,12 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Clean Word, Google Docs &amp; PDF paste — strip formatting, keep your text.
+        Clean Word, Google Docs &amp; PDF paste - strip formatting, keep your text.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Paste straight from Word, Google Docs, or a PDF and the
         <strong>mso- span soup</strong>, inline styles and broken
-        <strong>PDF line breaks</strong> are stripped the instant you paste —
+        <strong>PDF line breaks</strong> are stripped the instant you paste -
         while your headings, lists, bold and links stay intact. Clean writing for
         real quality, with your human voice kept. Nothing is uploaded.
       </p>
@@ -99,13 +99,13 @@ const faqSchema = {
 
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
-      <h2 class="text-2xl font-bold">Paste from Word, Docs, or a PDF — we clean it instantly</h2>
+      <h2 class="text-2xl font-bold">Paste from Word, Docs, or a PDF - we clean it instantly</h2>
       <p class="muted">
         Most "Word to HTML" cleaners make you find the dirty HTML yourself and
         paste it into a box. This one intercepts the paste itself: it reads the
         hidden rich-HTML payload your clipboard carries (the
         <code>text/html</code> data, not just the plain text) and cleans it the
-        moment you press Ctrl/Cmd+V. There is no "Clean" button to hunt for — you
+        moment you press Ctrl/Cmd+V. There is no "Clean" button to hunt for - you
         paste and the clean result is already there, ready to copy as HTML, plain
         text, or Markdown.
       </p>
@@ -121,29 +121,29 @@ const faqSchema = {
         <code>docs-internal-guid</code> wrapper and converts inline
         <code>font-weight:700</code> and <code>font-style:italic</code> spans back
         into real <code>&lt;strong&gt;</code> and <code>&lt;em&gt;</code>. What it
-        <em>keeps</em> is your actual structure — paragraphs, headings, lists,
-        bold, italic and links — via a curated allow-list, so the cleanup never
+        <em>keeps</em> is your actual structure - paragraphs, headings, lists,
+        bold, italic and links - via a curated allow-list, so the cleanup never
         flattens content you wanted. Curly quotes and em dashes are left untouched
         on purpose; that is the main cleaner's job.
       </p>
 
-      <h2 class="text-2xl font-bold">Fix PDF copy text — de-hyphenate and reflow line breaks</h2>
+      <h2 class="text-2xl font-bold">Fix PDF copy text - de-hyphenate and reflow line breaks</h2>
       <p class="muted">
         Copying out of a PDF is its own kind of mess: text is stored by visual
         position, so you get one line break per row and words split across line
         wraps (<code>com-</code> then <code>pany</code> on the next line). Turn on
         <strong>Repair PDF line breaks</strong> and the cleaner de-hyphenates
         those split words, reflows soft single line breaks back into real
-        paragraphs, and can drop bare page-number lines — while preserving genuine
+        paragraphs, and can drop bare page-number lines - while preserving genuine
         paragraph breaks and list items so it never mangles a list, address or
         poem. Because line-break joining is the one operation that can occasionally
         be wrong, it is a toggle you can switch off.
       </p>
 
-      <h2 class="text-2xl font-bold">100% in your browser — your text never leaves your device</h2>
+      <h2 class="text-2xl font-bold">100% in your browser - your text never leaves your device</h2>
       <p class="muted">
-        Every step — reading the clipboard, parsing the HTML, applying the
-        allow-list, repairing PDF artifacts — runs locally with the browser's own
+        Every step - reading the clipboard, parsing the HTML, applying the
+        allow-list, repairing PDF artifacts - runs locally with the browser's own
         APIs. Nothing is uploaded, there is no account, and there is no logging.
         Open DevTools, switch to the Network tab, and you will see zero requests as
         you paste. That makes it safe for confidential drafts, client work,

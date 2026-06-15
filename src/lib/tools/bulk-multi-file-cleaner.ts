@@ -1,5 +1,5 @@
 /**
- * Bulk / Multi-File Cleaner — pure client-side batch engine.
+ * Bulk / Multi-File Cleaner - pure client-side batch engine.
  *
  * Design goals (see docs/tools/bulk-multi-file-cleaner.md):
  *  - Run the SAME de-AI cleaning engine (src/lib/cleaner.ts) over many files at
@@ -8,7 +8,7 @@
  *  - Produce a legible per-file report (status + counts) plus an aggregate
  *    summary, so the batch outcome is glance-able.
  *  - 100% in-browser, deterministic. Nothing here touches the DOM, the network,
- *    or the FileReader API — the island feeds in already-read text strings and
+ *    or the FileReader API - the island feeds in already-read text strings and
  *    metadata; this module only transforms data structures.
  *
  * MVP scope (Phase 1): plain-text and Markdown. `.docx` / ZIP repacking is a
@@ -171,7 +171,7 @@ export function cleanFile(file: InputFile, opts: BatchOptions = DEFAULT_BATCH_OP
   }
 
   // Recognised-but-deferred binary formats (docx, zip). We never try to parse
-  // these here — that needs a library we have not bundled.
+  // these here - that needs a library we have not bundled.
   if (isComingSoonExtension(ext)) {
     return {
       ...base, status: 'coming-soon', text: '', counts: emptyCounts(),
@@ -254,7 +254,7 @@ export function summarize(reports: FileReport[]): BatchSummary {
 export function statusMeta(status: FileStatus): { icon: string; label: string } {
   switch (status) {
     case 'cleaned': return { icon: '✓', label: 'Cleaned' };       // check
-    case 'unchanged': return { icon: '—', label: 'Already clean' }; // em dash
+    case 'unchanged': return { icon: '-', label: 'Already clean' }; // em dash
     case 'skipped': return { icon: '⊘', label: 'Skipped' };        // circled slash
     case 'coming-soon': return { icon: '⏳', label: 'Coming soon' }; // hourglass
     case 'error': return { icon: '⚠', label: 'Error' };            // warning

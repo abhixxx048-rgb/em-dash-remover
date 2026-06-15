@@ -1,11 +1,11 @@
 /**
- * Paste-from-Word/Docs Cleaner — pure, framework-free engine.
+ * Paste-from-Word/Docs Cleaner - pure, framework-free engine.
  *
  * Design goals (see docs/tools/paste-from-word-docs-cleaner.md):
  *  - Strip the invisible cruft Word and Google Docs hide in the clipboard's
  *    `text/html` payload (`mso-*` styles, `MsoNormal` classes, `<o:p>`/`<w:>`/
  *    `<xml>` namespace junk, conditional comments, StartFragment/EndFragment
- *    markers, the Google Docs `docs-internal-guid` wrapper) — while KEEPING the
+ *    markers, the Google Docs `docs-internal-guid` wrapper) - while KEEPING the
  *    real structure (paragraphs, headings, lists, bold/italic, links).
  *  - Repair the classic PDF-copy artifacts: words hyphenated across a line wrap
  *    (`com-\npany` -> `company`) and one-line-break-per-visual-row paragraphs.
@@ -148,7 +148,7 @@ export function sourceLabel(src: PasteSource): string {
 }
 
 /* ------------------------------------------------------------------ *
- * Stage 1 — pre-sanitize regex pass (junk outside normal elements)   *
+ * Stage 1 - pre-sanitize regex pass (junk outside normal elements)   *
  * ------------------------------------------------------------------ */
 
 /**
@@ -189,7 +189,7 @@ export function preSanitizeHtml(html: string): { html: string; msoBlocks: number
 }
 
 /* ------------------------------------------------------------------ *
- * Stage 2 — Google Docs normalization (string-level, pre-allow-list) *
+ * Stage 2 - Google Docs normalization (string-level, pre-allow-list) *
  * ------------------------------------------------------------------ */
 
 /**
@@ -231,7 +231,7 @@ export function normalizeGoogleDocs(html: string): { html: string; docsWrapper: 
 }
 
 /* ------------------------------------------------------------------ *
- * Stage 3 — post-allow-list cleanup (runs on already-sanitized HTML) *
+ * Stage 3 - post-allow-list cleanup (runs on already-sanitized HTML) *
  * ------------------------------------------------------------------ */
 
 /**
@@ -274,7 +274,7 @@ export function countInlineStyles(html: string): number {
 }
 
 /* ------------------------------------------------------------------ *
- * Stage 4 — PDF-artifact repair (plain-text level)                   *
+ * Stage 4 - PDF-artifact repair (plain-text level)                   *
  * ------------------------------------------------------------------ */
 
 export interface PdfRepairResult {
@@ -348,7 +348,7 @@ export function repairPdfText(input: string, dropPageNumbers: boolean): PdfRepai
 }
 
 /* ------------------------------------------------------------------ *
- * Stage 5 — HTML -> plain text, HTML -> Markdown (no DOM, no deps)    *
+ * Stage 5 - HTML -> plain text, HTML -> Markdown (no DOM, no deps)    *
  * ------------------------------------------------------------------ */
 
 /** Decode the handful of HTML entities our outputs can contain. */
@@ -360,7 +360,7 @@ export function decodeEntities(s: string): string {
     .replace(/&gt;/g, '>')
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;/g, "'")
-    .replace(/&mdash;/g, '—')
+    .replace(/&mdash;/g, '-')
     .replace(/&ndash;/g, '–')
     .replace(/&hellip;/g, '…')
     .replace(/&rsquo;/g, '’')
@@ -371,7 +371,7 @@ export function decodeEntities(s: string): string {
 
 /**
  * Convert clean (already allow-listed) HTML to readable PLAIN text, preserving
- * paragraph and list-item boundaries. A tiny, dependency-free serializer — we
+ * paragraph and list-item boundaries. A tiny, dependency-free serializer - we
  * map block tags to newlines and list items to `- ` so the text reads naturally
  * (spec §4.8 / §7.5).
  */
@@ -392,7 +392,7 @@ export function htmlToText(html: string): string {
 
 /**
  * Convert clean (already allow-listed) HTML to GitHub-flavored Markdown. A
- * small, local HTML->Markdown step (spec §5.5 / §10) — no Turndown dependency.
+ * small, local HTML->Markdown step (spec §5.5 / §10) - no Turndown dependency.
  * Handles headings, bold/italic, links, lists, blockquotes, code, and
  * paragraphs, which covers what the allow-list can emit.
  */
@@ -438,7 +438,7 @@ export function htmlToMarkdown(html: string): string {
 
 /**
  * When there is no `text/html` (PDF reader, Safari quirks, plain copy), there's
- * nothing to sanitize — we only run the PDF/whitespace passes. This convenience
+ * nothing to sanitize - we only run the PDF/whitespace passes. This convenience
  * wrapper returns text plus a counts object shaped like the HTML path so the UI
  * can render one inventory.
  */
@@ -507,7 +507,7 @@ export function textStats(text: string): { words: number; chars: number; paragra
  * handoff strip (spec §5.18). Returns 0 when the text is clean of them.
  */
 export function residualTypography(text: string): { emDashes: number; curlyQuotes: number } {
-  const emDashes = (text.match(/[—–]/g) || []).length;
+  const emDashes = (text.match(/[-–]/g) || []).length;
   const curlyQuotes = (text.match(/[‘’“”]/g) || []).length;
   return { emDashes, curlyQuotes };
 }

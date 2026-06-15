@@ -1,5 +1,5 @@
 /**
- * On-Device AI Rewrite — pure, framework-free helpers.
+ * On-Device AI Rewrite - pure, framework-free helpers.
  *
  * Design goals (see docs/tools/on-device-ai-rewrite.md):
  *  - The ACTUAL rewrite happens in the browser via Chrome's built-in Rewriter
@@ -40,7 +40,7 @@ export const DEFAULT_OPTIONS: RewriteOptions = {
 };
 
 /** Plain-English labels + tooltips for each control value (used by the UI so
- *  the underlying API enum is demystified — Section 5, feature 16). */
+ *  the underlying API enum is demystified - Section 5, feature 16). */
 export const TONE_LABELS: Record<Tone, { label: string; hint: string }> = {
   'more-formal': { label: 'Formal', hint: 'Tightens contractions and slang; same meaning, more professional.' },
   'as-is': { label: 'As-is', hint: 'Keep the current tone; just rephrase for clarity.' },
@@ -60,7 +60,7 @@ export const FORMAT_LABELS: Record<Format, { label: string; hint: string }> = {
 };
 
 // ---------------------------------------------------------------------------
-// Presets — Section 5, feature 2. Named goals that set both selectors at once,
+// Presets - Section 5, feature 2. Named goals that set both selectors at once,
 // because users think in goals ("tighten this"), not API enum values.
 // ---------------------------------------------------------------------------
 
@@ -77,25 +77,25 @@ export const PRESETS: Preset[] = [
   {
     id: 'polish',
     label: 'Polish',
-    hint: 'Formal, same length — tidy it up.',
+    hint: 'Formal, same length - tidy it up.',
     options: { tone: 'more-formal', length: 'as-is', format: 'plain-text' },
   },
   {
     id: 'tighten',
     label: 'Tighten',
-    hint: 'Formal and shorter — cut the fat.',
+    hint: 'Formal and shorter - cut the fat.',
     options: { tone: 'more-formal', length: 'shorter', format: 'plain-text' },
   },
   {
     id: 'soften',
     label: 'Soften',
-    hint: 'Casual, same length — warmer voice.',
+    hint: 'Casual, same length - warmer voice.',
     options: { tone: 'more-casual', length: 'as-is', format: 'plain-text' },
   },
   {
     id: 'expand',
     label: 'Expand',
-    hint: 'Same tone, longer — add detail.',
+    hint: 'Same tone, longer - add detail.',
     options: { tone: 'as-is', length: 'longer', format: 'plain-text' },
   },
   {
@@ -108,7 +108,7 @@ export const PRESETS: Preset[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Capability model — Section 4 feature 4 + Section 5 feature 1.
+// Capability model - Section 4 feature 4 + Section 5 feature 1.
 // The island resolves real availability via `await Rewriter.availability()`;
 // these helpers turn that raw status into honest, color-and-text UI copy.
 // ---------------------------------------------------------------------------
@@ -138,12 +138,12 @@ export function capabilityBadge(cap: Capability): CapabilityBadge {
       return { text: 'Model downloads on first use (one-time)', icon: '◐', tone: 'warn', canRewrite: true };
     case 'unavailable':
     default:
-      return { text: 'AI unavailable — using deterministic cleanup', icon: '◯', tone: 'muted', canRewrite: false };
+      return { text: 'AI unavailable - using deterministic cleanup', icon: '◯', tone: 'muted', canRewrite: false };
   }
 }
 
 // ---------------------------------------------------------------------------
-// Deterministic fallback "rewrite" — Section 4 feature 9.
+// Deterministic fallback "rewrite" - Section 4 feature 9.
 // When the on-device model is unavailable (non-Chrome, unsupported hardware,
 // origin-trial not active) we still give the user a useful result: a 100% local,
 // rule-based clean-up. This is NOT an AI rewrite and the UI labels it as such.
@@ -173,12 +173,12 @@ export function deterministicRewrite(input: string): FallbackResult {
   const note = (n: string) => { if (!notes.includes(n)) notes.push(n); };
 
   // Normalize typed "--"/"---" to a real em dash so the next step catches it.
-  if (/-{2,}/.test(text)) text = text.replace(/-{2,}/g, '—');
+  if (/-{2,}/.test(text)) text = text.replace(/-{2,}/g, '-');
 
   // Em / en dashes → a context-light comma (the full grammar-aware engine lives
   // in lib/cleaner.ts; the fallback here keeps a light touch).
-  if (/[—–]/.test(text)) {
-    text = text.replace(/\s*[—–]\s*/g, ', ');
+  if (/[-–]/.test(text)) {
+    text = text.replace(/\s*[-–]\s*/g, ', ');
     note('replaced em/en dash with a comma');
   }
 
@@ -218,7 +218,7 @@ export function deterministicRewrite(input: string): FallbackResult {
 }
 
 // ---------------------------------------------------------------------------
-// Local counters — Section 5 feature 5. No model needed.
+// Local counters - Section 5 feature 5. No model needed.
 // ---------------------------------------------------------------------------
 
 export interface TextStats {
@@ -250,7 +250,7 @@ function sentences(text: string): string[] {
 }
 
 // ---------------------------------------------------------------------------
-// Voice-match meter — Section 5 feature 6. A 0–100 score estimating how much of
+// Voice-match meter - Section 5 feature 6. A 0–100 score estimating how much of
 // the author's original voice survived the rewrite, so users can avoid
 // over-rewriting (brand promise: "keep your human voice"). Pure JS, <1ms.
 // ---------------------------------------------------------------------------
@@ -296,15 +296,15 @@ export function voiceMatch(original: string, rewrite: string): VoiceMatch {
   const score = Math.round(blended * 100);
 
   const label =
-    score >= 75 ? 'Strong voice match — barely touched your style'
-    : score >= 45 ? 'Moderate change — recognizably yours'
-    : 'Heavy rewrite — quite different from the original';
+    score >= 75 ? 'Strong voice match - barely touched your style'
+    : score >= 45 ? 'Moderate change - recognizably yours'
+    : 'Heavy rewrite - quite different from the original';
 
   return { score, label };
 }
 
 // ---------------------------------------------------------------------------
-// Shared context — Section 4 feature 7. A small, stable instruction handed to
+// Shared context - Section 4 feature 7. A small, stable instruction handed to
 // the Rewriter API on `create()` so the model stays on-brand (preserve voice,
 // clean AI tells) without us ever positioning the tool as a detector bypass.
 // ---------------------------------------------------------------------------
@@ -315,24 +315,24 @@ export const SHARED_CONTEXT =
   'Do not invent facts.';
 
 // ---------------------------------------------------------------------------
-// A deliberately AI-sounding sample — Section 5 feature 11 empty-state demo.
+// A deliberately AI-sounding sample - Section 5 feature 11 empty-state demo.
 // ---------------------------------------------------------------------------
 
 export const SAMPLES: Record<string, string> = {
   email:
-    "Hi team — I wanted to delve into our Q3 results. It's not just about the " +
+    "Hi team - I wanted to delve into our Q3 results. It's not just about the " +
     "numbers, it's about the story they tell. We've leveraged a robust, " +
-    'multifaceted strategy to unlock our full potential — and it’s a testament ' +
+    'multifaceted strategy to unlock our full potential - and it’s a testament ' +
     "to everyone's hard work. Moreover, it's worth noting that our seamless " +
     'integration paved the way for success.',
   essay:
     'The Industrial Revolution stands as a testament to human ingenuity. It ' +
-    'fundamentally reshaped society — transforming economies, redefining labor, ' +
+    'fundamentally reshaped society - transforming economies, redefining labor, ' +
     'and revolutionizing daily life. In the realm of manufacturing, it ' +
     'underscored the pivotal role of innovation. Ultimately, it is worth noting ' +
     'that this transformative era laid the cornerstone for the modern world.',
   cover:
-    'Dear Hiring Manager — I am writing to express my profound enthusiasm for ' +
+    'Dear Hiring Manager - I am writing to express my profound enthusiasm for ' +
     'this role. Throughout my career, I have consistently leveraged a diverse ' +
     'skill set to drive impactful outcomes. It is important to note that I am a ' +
     'highly motivated individual who thrives in dynamic, fast-paced environments.',

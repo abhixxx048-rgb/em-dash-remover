@@ -7,19 +7,19 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'What reading level should my content be?',
-    a: 'For most general web content, aim for around a 7th-to-9th grade reading level — readable enough that busy people skim it easily without feeling talked down to. Plain-language and healthcare materials often target grade 6-8. Academic and technical audiences can handle grade 13+. Pick a target audience above and the meter will tell you how far off you are.',
+    a: 'For most general web content, aim for around a 7th-to-9th grade reading level - readable enough that busy people skim it easily without feeling talked down to. Plain-language and healthcare materials often target grade 6-8. Academic and technical audiences can handle grade 13+. Pick a target audience above and the meter will tell you how far off you are.',
   },
   {
     q: "What's a good Flesch Reading Ease score?",
     a: 'A Flesch Reading Ease score of 60-70 ("standard / plain English") is a solid target for general audiences. Scores of 70-80 are fairly easy and good for the widest reach; below 50 reads as fairly difficult, and below 30 is very difficult (academic or legal). Higher is easier.',
   },
   {
-    q: 'Flesch-Kincaid vs Gunning Fog — which should I trust?',
-    a: 'They measure the same thing (US grade level) with slightly different inputs: Flesch-Kincaid weighs syllables per word, while Gunning Fog focuses on the percentage of complex (3+ syllable) words. Rather than trust one, use the consensus grade — the average of all the grade-level formulas — which smooths out each formula\'s quirks.',
+    q: 'Flesch-Kincaid vs Gunning Fog - which should I trust?',
+    a: 'They measure the same thing (US grade level) with slightly different inputs: Flesch-Kincaid weighs syllables per word, while Gunning Fog focuses on the percentage of complex (3+ syllable) words. Rather than trust one, use the consensus grade - the average of all the grade-level formulas - which smooths out each formula\'s quirks.',
   },
   {
     q: 'Why do the formulas disagree?',
-    a: 'Each formula was calibrated on different text and weighs different signals — sentence length, syllables, letters per word, or share of long words. Character-based formulas (Coleman-Liau, ARI) ignore syllables entirely, so they react differently to long-but-simple words. A spread of one or two grades between formulas is normal; that is exactly why we show a consensus.',
+    a: 'Each formula was calibrated on different text and weighs different signals - sentence length, syllables, letters per word, or share of long words. Character-based formulas (Coleman-Liau, ARI) ignore syllables entirely, so they react differently to long-but-simple words. A spread of one or two grades between formulas is normal; that is exactly why we show a consensus.',
   },
   {
     q: 'How accurate is the syllable counting?',
@@ -27,11 +27,11 @@ const faqs = [
   },
   {
     q: 'Does this send my text anywhere?',
-    a: 'No. Every score is computed locally in your browser with plain JavaScript math — there is no server, no upload, no logging, and it works offline. Open your browser DevTools Network tab while you use it and you will see zero requests. That is the whole point: it is private by design.',
+    a: 'No. Every score is computed locally in your browser with plain JavaScript math - there is no server, no upload, no logging, and it works offline. Open your browser DevTools Network tab while you use it and you will see zero requests. That is the whole point: it is private by design.',
   },
   {
     q: 'How is this different from Hemingway?',
-    a: 'Hemingway gives a single grade and highlights hard sentences, but hides the math and pushes a paid app. We show all six standard formulas with their numbers plus a consensus, highlight the hardest sentences with a jump-to list, and keep everything free, private, and in your browser — no signup.',
+    a: 'Hemingway gives a single grade and highlights hard sentences, but hides the math and pushes a paid app. We show all six standard formulas with their numbers plus a consensus, highlight the hardest sentences with a jump-to list, and keep everything free, private, and in your browser - no signup.',
   },
 ];
 
@@ -71,8 +71,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Free Readability Checker — Flesch-Kincaid Grade & Hard-Sentence Highlighter"
-  description="Free readability checker and reading grade level calculator. Get Flesch Reading Ease, Flesch-Kincaid, Gunning Fog, SMOG, Coleman-Liau & ARI plus a hard-sentence highlighter — 100% in your browser, no signup."
+  title="Free Readability Checker - Flesch-Kincaid Grade & Hard-Sentence Highlighter"
+  description="Free readability checker and reading grade level calculator. Get Flesch Reading Ease, Flesch-Kincaid, Gunning Fog, SMOG, Coleman-Liau & ARI plus a hard-sentence highlighter - 100% in your browser, no signup."
 >
   <main class="halo">
     <!-- Hero -->
@@ -84,11 +84,11 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Free Readability Checker — Flesch-Kincaid, Gunning Fog &amp; hard-sentence highlighter.
+        Free Readability Checker - Flesch-Kincaid, Gunning Fog &amp; hard-sentence highlighter.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Paste any text and instantly see its <strong>reading ease</strong>, U.S.
-        <strong>grade level</strong>, and the exact sentences dragging it down —
+        <strong>grade level</strong>, and the exact sentences dragging it down -
         with every formula's math shown. Write so a real human reads it easily.
         Nothing is uploaded.
       </p>
@@ -103,15 +103,15 @@ const faqSchema = {
       <div class="grid gap-6 sm:grid-cols-3">
         <div class="card p-5">
           <h2 class="font-semibold">Every formula, one consensus</h2>
-          <p class="mt-1.5 text-sm muted">Flesch Reading Ease, Flesch-Kincaid, Gunning Fog, SMOG, Coleman-Liau and ARI — averaged into one clear grade so you don't have to pick a side.</p>
+          <p class="mt-1.5 text-sm muted">Flesch Reading Ease, Flesch-Kincaid, Gunning Fog, SMOG, Coleman-Liau and ARI - averaged into one clear grade so you don't have to pick a side.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">See the hardest sentences</h2>
-          <p class="mt-1.5 text-sm muted">Dense sentences are flagged and ranked, with jump-to-and-pulse so you fix the exact lines that hurt readability — not the whole draft.</p>
+          <p class="mt-1.5 text-sm muted">Dense sentences are flagged and ranked, with jump-to-and-pulse so you fix the exact lines that hurt readability - not the whole draft.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Private by design</h2>
-          <p class="mt-1.5 text-sm muted">Pure in-browser math. No upload, no server, no signup. Check the Network tab — zero requests. Safe for confidential work, works offline.</p>
+          <p class="mt-1.5 text-sm muted">Pure in-browser math. No upload, no server, no signup. Check the Network tab - zero requests. Safe for confidential work, works offline.</p>
         </div>
       </div>
     </section>
@@ -123,7 +123,7 @@ const faqSchema = {
         A readability checker estimates how hard your writing is to read and turns
         that into a U.S. school grade level. Paste your text above and the scores
         update live as you type. The single number to watch is the
-        <strong>consensus grade</strong> — the average of every grade-level formula —
+        <strong>consensus grade</strong> - the average of every grade-level formula -
         because no individual formula is perfect on its own. Lower means easier;
         for most web writing, a grade of 7-9 hits the sweet spot of broad reach
         without sounding simplistic.
@@ -136,13 +136,13 @@ const faqSchema = {
         (lower is easier, in school years). Here is the quick guide:
       </p>
       <ul class="list-disc space-y-1 pl-6 muted">
-        <li><strong>Flesch Reading Ease 90-100:</strong> very easy — about a 5th-grade reader.</li>
-        <li><strong>60-70:</strong> standard / plain English — ideal for a general audience.</li>
-        <li><strong>30-50:</strong> fairly difficult — college level.</li>
-        <li><strong>Below 30:</strong> very difficult — academic, technical, or legal.</li>
+        <li><strong>Flesch Reading Ease 90-100:</strong> very easy - about a 5th-grade reader.</li>
+        <li><strong>60-70:</strong> standard / plain English - ideal for a general audience.</li>
+        <li><strong>30-50:</strong> fairly difficult - college level.</li>
+        <li><strong>Below 30:</strong> very difficult - academic, technical, or legal.</li>
       </ul>
 
-      <h2 class="text-2xl font-bold">Flesch Reading Ease — formula &amp; how to use it</h2>
+      <h2 class="text-2xl font-bold">Flesch Reading Ease - formula &amp; how to use it</h2>
       <p class="muted">
         Flesch Reading Ease is computed as
         <code>206.835 − 1.015 × (words ÷ sentences) − 84.6 × (syllables ÷ words)</code>.
@@ -166,11 +166,11 @@ const faqSchema = {
         <strong>Gunning Fog</strong> (<code>0.4 × [words/sentences + 100 × complex/words]</code>)
         emphasizes the share of complex (3+ syllable) words. The
         <strong>SMOG index</strong> (<code>3 + √(polysyllable count)</code>) is favored
-        in healthcare and is most stable on 30+ sentences — below that we flag it as
+        in healthcare and is most stable on 30+ sentences - below that we flag it as
         low confidence. <strong>Coleman-Liau</strong> and <strong>ARI</strong> are
         character-based: they count letters instead of estimating syllables, which
         makes them a useful cross-check for technical writing and proper nouns. When
-        the formulas disagree by a grade or two, that is normal — trust the consensus.
+        the formulas disagree by a grade or two, that is normal - trust the consensus.
       </p>
 
       <h2 class="text-2xl font-bold">Why the hardest sentences matter (and how to fix them)</h2>
@@ -185,10 +185,10 @@ const faqSchema = {
         reads naturally.
       </p>
 
-      <h2 class="text-2xl font-bold">Is this private? Yes — it runs in your browser</h2>
+      <h2 class="text-2xl font-bold">Is this private? Yes - it runs in your browser</h2>
       <p class="muted">
         Readability scoring is pure arithmetic, so there is no reason to send your
-        text anywhere — and we don't. Every count and formula runs locally in
+        text anywhere - and we don't. Every count and formula runs locally in
         JavaScript. There is no network call, no account, and no storage beyond an
         optional draft saved in your own browser. That makes it safe for drafts under
         embargo, patient materials, legal language, or anything confidential.

@@ -1,5 +1,5 @@
 ---
-// Privacy-safe analytics layer. Sends COUNTS/metadata only — never user text.
+// Privacy-safe analytics layer. Sends COUNTS/metadata only - never user text.
 // All providers are gated: each script is injected only when its config const
 // in src/consts.ts is set (empty string = disabled).
 import { UMAMI_WEBSITE_ID, UMAMI_SRC, CF_WA_TOKEN } from '../consts';
@@ -13,7 +13,7 @@ import { UMAMI_WEBSITE_ID, UMAMI_SRC, CF_WA_TOKEN } from '../consts';
   <script is:inline defer src={UMAMI_SRC} data-website-id={UMAMI_WEBSITE_ID}></script>
 )}
 
-{/* Cloudflare Web Analytics — cookieless beacon, injected only when token set. */}
+{/* Cloudflare Web Analytics - cookieless beacon, injected only when token set. */}
 {CF_WA_TOKEN && (
   <script
     is:inline
@@ -25,7 +25,7 @@ import { UMAMI_WEBSITE_ID, UMAMI_SRC, CF_WA_TOKEN } from '../consts';
 
 {/*
   Central auto-tracking funnel. ALWAYS injected (no per-page code needed). It
-  cannot import ../lib/analytics — inline scripts have no module scope — so the
+  cannot import ../lib/analytics - inline scripts have no module scope - so the
   allowlist + text-stripping guard are duplicated inline. Everything is
   defensive (optional chaining + try/catch) and sends nothing unless
   window.umami is present. Element text values are NEVER read into props.

@@ -1,5 +1,5 @@
 /**
- * Case Converter — pure, framework-free transform engine.
+ * Case Converter - pure, framework-free transform engine.
  *
  * Design goals (see docs/tools/case-converter.md):
  *  - Correctness over a naive `.toUpperCase()` clone: real sentence-boundary
@@ -76,10 +76,10 @@ export const TITLE_STYLE_LABELS: Record<TitleStyle, string> = {
 // Small-word lists for title casing.
 // ---------------------------------------------------------------------------
 
-/** Articles — lowercased mid-title in every style. */
+/** Articles - lowercased mid-title in every style. */
 const ARTICLES = new Set(['a', 'an', 'the']);
 
-/** Coordinating conjunctions — lowercased mid-title in every style. */
+/** Coordinating conjunctions - lowercased mid-title in every style. */
 const COORD_CONJUNCTIONS = new Set(['and', 'but', 'for', 'nor', 'or']);
 
 /**

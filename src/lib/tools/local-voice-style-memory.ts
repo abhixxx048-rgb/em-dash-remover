@@ -1,5 +1,5 @@
 /**
- * Local Voice / Style Memory — pure client-side stylometry engine.
+ * Local Voice / Style Memory - pure client-side stylometry engine.
  *
  * Design goals (see docs/tools/local-voice-style-memory.md):
  *  - Build a private "style fingerprint" from samples of a user's own writing:
@@ -17,7 +17,7 @@
  */
 
 // ---------------------------------------------------------------------------
-// Versioning — persisted profiles carry these so future metric changes can
+// Versioning - persisted profiles carry these so future metric changes can
 // re-derive or invalidate old fingerprints cleanly.
 // ---------------------------------------------------------------------------
 
@@ -36,13 +36,13 @@ export interface Features {
   sentLenMean: number;
   /** Standard deviation of sentence length in words. */
   sentLenSd: number;
-  /** Coefficient of variation of sentence length (SD/mean) — "burstiness". */
+  /** Coefficient of variation of sentence length (SD/mean) - "burstiness". */
   sentLenCv: number;
   /** Contractions ÷ expansion opportunities, 0..1. */
   contractionRate: number;
   /** Type-token ratio (unique words ÷ total words), 0..1. */
   ttr: number;
-  /** Moving-average TTR over a fixed window — length-robust diversity, 0..1. */
+  /** Moving-average TTR over a fixed window - length-robust diversity, 0..1. */
   mattr: number;
   /** Yule's K richness (lower = richer vocabulary). */
   yuleK: number;
@@ -137,7 +137,7 @@ export interface FeatureDelta {
   draft: string;
   /** Signed z-score (how many of YOUR SDs the draft is away). */
   z: number;
-  /** Absolute z, capped — drives "how off" sorting and the bar width. */
+  /** Absolute z, capped - drives "how off" sorting and the bar width. */
   severity: number;
 }
 
@@ -284,7 +284,7 @@ export function countSyllables(word: string): number {
 }
 
 // ---------------------------------------------------------------------------
-// Function-word list — the stylometric workhorse. These are unconscious and
+// Function-word list - the stylometric workhorse. These are unconscious and
 // topic-independent, so they characterize an author far better than content
 // words. (A pragmatic ~120-word English set.)
 // ---------------------------------------------------------------------------
@@ -415,7 +415,7 @@ function mattr(words: string[], window = 50): number {
 }
 
 /**
- * Yule's K — a length-stable richness measure based on the frequency spectrum.
+ * Yule's K - a length-stable richness measure based on the frequency spectrum.
  * K = 10000 * (Σ_i i² V_i − N) / N², where V_i is the number of word types that
  * occur i times and N is the token count. Lower K = richer vocabulary.
  */
@@ -439,7 +439,7 @@ function punctProfile(text: string, words: number): PunctProfile {
     comma: per1000((text.match(/,/g) || []).length),
     semicolon: per1000((text.match(/;/g) || []).length),
     colon: per1000((text.match(/:/g) || []).length),
-    emDash: per1000((text.match(/—/g) || []).length),
+    emDash: per1000((text.match(/-/g) || []).length),
     enDash: per1000((text.match(/–/g) || []).length),
     ellipsis: per1000((text.match(/…|\.\.\./g) || []).length),
     parenthesis: per1000((text.match(/[()]/g) || []).length),
@@ -607,11 +607,11 @@ export function profileStrength(samples: string[]): { pct: number; words: number
   if (words === 0) {
     message = 'Paste a few things you actually wrote to start your fingerprint.';
   } else if (words < MIN_WORDS_RELIABLE) {
-    message = `Good start — ${clean.length} sample${clean.length === 1 ? '' : 's'}, ${words} words. Add more of your writing for a sharper fingerprint.`;
+    message = `Good start - ${clean.length} sample${clean.length === 1 ? '' : 's'}, ${words} words. Add more of your writing for a sharper fingerprint.`;
   } else if (clean.length < 3) {
-    message = `Solid — ${clean.length} sample${clean.length === 1 ? '' : 's'}, ${words} words. One more sample sharpens it further.`;
+    message = `Solid - ${clean.length} sample${clean.length === 1 ? '' : 's'}, ${words} words. One more sample sharpens it further.`;
   } else {
-    message = `Strong fingerprint — ${clean.length} samples, ${words} words.`;
+    message = `Strong fingerprint - ${clean.length} samples, ${words} words.`;
   }
   return { pct, words, samples: clean.length, message };
 }
@@ -720,7 +720,7 @@ export function scanDraft(draft: string, profile: Profile): ScanResult {
   // Weighted total distance → 0-100 (higher = more like you).
   const distance = zPenalty * 0.6 + funcDist * 6 + punctDist * 4;
   let score = Math.round(100 * Math.exp(-distance / 4));
-  // Soften the score for low-confidence profiles — never present a shaky number
+  // Soften the score for low-confidence profiles - never present a shaky number
   // as fact. Pull it toward a neutral 60.
   if (profile.lowConfidence) score = Math.round(score * 0.7 + 60 * 0.3);
   score = clamp(score, 0, 100);
@@ -753,10 +753,10 @@ function punctDistance(a: PunctProfile, b: PunctProfile): number {
 }
 
 function buildVerdict(score: number, band: ScanResult['band'], p: Profile): string {
-  const conf = p.lowConfidence ? ' (low-confidence profile — add more of your writing for a firmer read)' : '';
-  if (band === 'you') return `This sounds like you — nice. Match ${score}/100.${conf}`;
-  if (band === 'drifting') return `Drifting from your voice in a few places. Match ${score}/100 — the breakdown below shows where.${conf}`;
-  return `This reads more like the model than like you. Match ${score}/100 — see the off-voice spots below.${conf}`;
+  const conf = p.lowConfidence ? ' (low-confidence profile - add more of your writing for a firmer read)' : '';
+  if (band === 'you') return `This sounds like you - nice. Match ${score}/100.${conf}`;
+  if (band === 'drifting') return `Drifting from your voice in a few places. Match ${score}/100 - the breakdown below shows where.${conf}`;
+  return `This reads more like the model than like you. Match ${score}/100 - see the off-voice spots below.${conf}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -791,7 +791,7 @@ export function findFlags(draft: string, profile: Profile): Flag[] {
         start: s.start,
         end: s.end,
         text: s.text,
-        reason: `Your sentences average ${Math.round(p.sentLenMean)} words; this one is ${wc} — well above your range.`,
+        reason: `Your sentences average ${Math.round(p.sentLenMean)} words; this one is ${wc} - well above your range.`,
       });
     } else if (z <= -2 && p.sentLenMean - wc >= 6) {
       flags.push({
@@ -805,7 +805,7 @@ export function findFlags(draft: string, profile: Profile): Flag[] {
     if (flags.length >= MAX_FLAGS) return flags;
   }
 
-  // 2) Expanded contractions — only when the writer clearly contracts a lot.
+  // 2) Expanded contractions - only when the writer clearly contracts a lot.
   if (p.contractionRate >= 0.4) {
     for (const c of CONTRACTIONS) {
       c.full.lastIndex = 0;
@@ -816,7 +816,7 @@ export function findFlags(draft: string, profile: Profile): Flag[] {
           start: m.index,
           end: m.index + m[0].length,
           text: m[0],
-          reason: `You'd usually contract this — try "${c.short}".`,
+          reason: `You'd usually contract this - try "${c.short}".`,
           suggestion: { replace: m[0], with: matchCase(m[0], c.short) },
         });
         if (m[0].length === 0) c.full.lastIndex++;
@@ -828,15 +828,15 @@ export function findFlags(draft: string, profile: Profile): Flag[] {
   // 3) Punctuation the profile essentially never uses (em dash is the headline,
   //    and ties straight into the main Em Dash Remover tool).
   if (p.punct.emDash < 0.5) {
-    const re = /—/g;
+    const re = /-/g;
     let m: RegExpExecArray | null;
     while ((m = re.exec(text)) !== null) {
       flags.push({
         kind: 'off-punct',
         start: m.index,
         end: m.index + 1,
-        text: '—',
-        reason: 'Your writing essentially never uses em dashes — this one stands out. Clean it on the main Em Dash Remover.',
+        text: '-',
+        reason: 'Your writing essentially never uses em dashes - this one stands out. Clean it on the main Em Dash Remover.',
       });
       if (flags.length >= MAX_FLAGS) return flags;
     }
@@ -855,7 +855,7 @@ export function findFlags(draft: string, profile: Profile): Flag[] {
           start: m.index,
           end: m.index + m[0].length,
           text: m[0],
-          reason: `You favor plain words — "${m[0]}" → "${plain}".`,
+          reason: `You favor plain words - "${m[0]}" → "${plain}".`,
           suggestion: { replace: m[0], with: matchCase(m[0], plain) },
         });
         if (flags.length >= MAX_FLAGS) return flags;
@@ -878,7 +878,7 @@ function matchCase(original: string, replacement: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Profile export / import (manual portability — the only "sync", no server)
+// Profile export / import (manual portability - the only "sync", no server)
 // ---------------------------------------------------------------------------
 
 /** Serialize a profile to a pretty JSON string for download. */
@@ -915,18 +915,18 @@ export function importProfile(json: string): Profile {
 
 /** A pre-baked "punchy casual voice" sample used to seed the demo profile. */
 export const DEMO_SAMPLES: string[] = [
-  `Okay, here's the deal. I don't do long, winding sentences. I write the way I talk — short, fast, to the point. If something's boring, I cut it. You won't catch me using fancy words when a plain one does the job.`,
+  `Okay, here's the deal. I don't do long, winding sentences. I write the way I talk - short, fast, to the point. If something's boring, I cut it. You won't catch me using fancy words when a plain one does the job.`,
   `Honestly? Most advice online is fluff. I'd rather give you one thing that works than ten things that sound smart. So that's what I do. I test it, I keep what works, and I tell you the rest is noise.`,
   `Weekends are for the dog and bad coffee. I'm not precious about routines. I show up, I do the work, and then I'm done. That's it. No big secret.`,
 ];
 
 /** An obviously off-voice, AI-flavored draft to demo the deviation scan. */
 export const DEMO_DRAFT =
-  `In today's rapidly evolving landscape, it is important to note that one must endeavor to utilize a multifaceted approach in order to facilitate optimal outcomes — a testament to the transformative power of strategic thinking. Furthermore, it is worth noting that by leveraging robust methodologies, individuals are able to ascertain numerous additional benefits that subsequently demonstrate sufficient value across a wide variety of contexts.`;
+  `In today's rapidly evolving landscape, it is important to note that one must endeavor to utilize a multifaceted approach in order to facilitate optimal outcomes - a testament to the transformative power of strategic thinking. Furthermore, it is worth noting that by leveraging robust methodologies, individuals are able to ascertain numerous additional benefits that subsequently demonstrate sufficient value across a wide variety of contexts.`;
 
 /** Build the demo profile on demand (named so the UI can greet by name). */
 export function buildDemoProfile(): Profile {
-  const p = buildProfile('Demo — punchy casual voice', DEMO_SAMPLES);
+  const p = buildProfile('Demo - punchy casual voice', DEMO_SAMPLES);
   p.id = 'demo';
   return p;
 }

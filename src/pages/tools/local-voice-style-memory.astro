@@ -7,11 +7,11 @@ import RelatedTools from '../../components/RelatedTools.astro';
 const faqs = [
   {
     q: 'Does my writing get uploaded anywhere?',
-    a: 'No. Your samples, your style profile, and any draft you check are processed entirely in your browser. The fingerprint is saved in your browser\'s IndexedDB on this device — there is no server, no account, and no upload. Open your DevTools Network tab while you use it and you will see zero requests. It even works offline after the page loads.',
+    a: 'No. Your samples, your style profile, and any draft you check are processed entirely in your browser. The fingerprint is saved in your browser\'s IndexedDB on this device - there is no server, no account, and no upload. Open your DevTools Network tab while you use it and you will see zero requests. It even works offline after the page loads.',
   },
   {
     q: 'How many writing samples do I need to match my style?',
-    a: 'For a reliable fingerprint, aim for at least three paragraphs or roughly 300+ words of writing you actually wrote unaided — emails, notes, a blog post. More real sample means a sharper match. With less than that, the profile is marked "low confidence" and the match score is softened so we never present a shaky number as fact.',
+    a: 'For a reliable fingerprint, aim for at least three paragraphs or roughly 300+ words of writing you actually wrote unaided - emails, notes, a blog post. More real sample means a sharper match. With less than that, the profile is marked "low confidence" and the match score is softened so we never present a shaky number as fact.',
   },
   {
     q: 'What does it actually measure?',
@@ -23,15 +23,15 @@ const faqs = [
   },
   {
     q: 'Can I use it for a client\'s or a brand\'s voice?',
-    a: 'Yes. Create multiple named profiles — "My voice", "Newsletter", "Client A", "Brand" — each stored independently in your browser. Switch the active voice from the dropdown and watch the same draft\'s match score and flags change. That multi-profile workflow is exactly what paid brand-voice SaaS charges for, free and local here.',
+    a: 'Yes. Create multiple named profiles - "My voice", "Newsletter", "Client A", "Brand" - each stored independently in your browser. Switch the active voice from the dropdown and watch the same draft\'s match score and flags change. That multi-profile workflow is exactly what paid brand-voice SaaS charges for, free and local here.',
   },
   {
     q: 'How do I delete or back up my data?',
-    a: 'Open Manage → "Delete all my data" to truly wipe every profile from this browser\'s IndexedDB, or delete a single profile from the list. Because the data is local, deletion is real and instant. Want a backup or to move a profile to another of your devices? Export it as a JSON file and import it on the other browser — that manual export is the only "sync", with no server involved.',
+    a: 'Open Manage → "Delete all my data" to truly wipe every profile from this browser\'s IndexedDB, or delete a single profile from the list. Because the data is local, deletion is real and instant. Want a backup or to move a profile to another of your devices? Export it as a JSON file and import it on the other browser - that manual export is the only "sync", with no server involved.',
   },
   {
     q: 'Will it write for me?',
-    a: 'Version 1 is non-destructive: it suggests concrete, profile-derived nudges (contract this, split that long sentence, swap a stiff word for the plain one you actually use), and only changes your draft when you click Apply. If we ever add true voice-matched rewriting, it would run on an on-device model with the same zero-upload promise — never a server.',
+    a: 'Version 1 is non-destructive: it suggests concrete, profile-derived nudges (contract this, split that long sentence, swap a stiff word for the plain one you actually use), and only changes your draft when you click Apply. If we ever add true voice-matched rewriting, it would run on an on-device model with the same zero-upload promise - never a server.',
   },
 ];
 
@@ -39,7 +39,7 @@ const webApp = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   '@id': `${Astro.site}tools/local-voice-style-memory#app`,
-  name: 'Local Voice / Style Memory — Match My Writing Style',
+  name: 'Local Voice / Style Memory - Match My Writing Style',
   url: `${Astro.site}tools/local-voice-style-memory`,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
@@ -48,7 +48,7 @@ const webApp = {
   isAccessibleForFree: true,
   featureList: [
     'Build a private writing style fingerprint',
-    'Match my writing style — 100% on your device',
+    'Match my writing style - 100% on your device',
     'Sounds-like-you match score for any draft',
     'Sentence length, contraction rate and vocabulary diversity analysis',
     'Function-word and punctuation stylometry',
@@ -71,8 +71,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Match My Writing Style — Private On-Device Voice Profile (Nothing Uploaded)"
-  description="Build a private writing-style fingerprint and check if a draft still sounds like you. 100% on your device — sentence length, contractions, vocabulary & punctuation. Make AI sound like you, nothing uploaded, no signup."
+  title="Match My Writing Style - Private On-Device Voice Profile (Nothing Uploaded)"
+  description="Build a private writing-style fingerprint and check if a draft still sounds like you. 100% on your device - sentence length, contractions, vocabulary & punctuation. Make AI sound like you, nothing uploaded, no signup."
 >
   <main class="halo">
     <!-- Hero -->
@@ -84,12 +84,12 @@ const faqSchema = {
         100% on your device · free · no signup · nothing uploaded
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Match My Writing Style — build a private voice profile and check if a draft still sounds like you.
+        Match My Writing Style - build a private voice profile and check if a draft still sounds like you.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Paste a few things you actually wrote and the tool builds a private
-        <strong>style fingerprint</strong> — sentence length, contractions,
-        vocabulary, punctuation — stored only in your browser. Then it flags
+        <strong>style fingerprint</strong> - sentence length, contractions,
+        vocabulary, punctuation - stored only in your browser. Then it flags
         where a new draft drifts from how <em>you</em> really write. Keep your
         human voice, not a detector-bypass.
       </p>
@@ -104,15 +104,15 @@ const faqSchema = {
       <div class="grid gap-6 sm:grid-cols-3">
         <div class="card p-5">
           <h2 class="font-semibold">Provably private</h2>
-          <p class="mt-1.5 text-sm muted">Your samples and drafts never leave your browser. The fingerprint lives in IndexedDB on your device — check the Network tab, zero requests. Cloud rivals upload your writing; we can't.</p>
+          <p class="mt-1.5 text-sm muted">Your samples and drafts never leave your browser. The fingerprint lives in IndexedDB on your device - check the Network tab, zero requests. Cloud rivals upload your writing; we can't.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Learns how you write</h2>
-          <p class="mt-1.5 text-sm muted">Real stylometry — sentence rhythm, contraction rate, vocabulary richness, function-word mix, punctuation habits — turned into a plain-English portrait of your voice.</p>
+          <p class="mt-1.5 text-sm muted">Real stylometry - sentence rhythm, contraction rate, vocabulary richness, function-word mix, punctuation habits - turned into a plain-English portrait of your voice.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">You keep authorship</h2>
-          <p class="mt-1.5 text-sm muted">It shows where a draft stops sounding like you and suggests profile-derived nudges — but nothing changes until you click. No auto-rewrite, no detector games.</p>
+          <p class="mt-1.5 text-sm muted">It shows where a draft stops sounding like you and suggests profile-derived nudges - but nothing changes until you click. No auto-rewrite, no detector games.</p>
         </div>
       </div>
     </section>
@@ -121,8 +121,8 @@ const faqSchema = {
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
       <h2 class="text-2xl font-bold">What is a writing-style fingerprint?</h2>
       <p class="muted">
-        A writing-style fingerprint — sometimes called a linguistic fingerprint or
-        <em>stylometry</em> — is a compact summary of the unconscious habits that make
+        A writing-style fingerprint - sometimes called a linguistic fingerprint or
+        <em>stylometry</em> - is a compact summary of the unconscious habits that make
         your writing recognizably yours. It is not about <em>what</em> you write but
         <em>how</em>: the length and rhythm of your sentences, whether you contract
         ("it's" vs "it is"), how varied your vocabulary is, which little function
@@ -139,18 +139,18 @@ const faqSchema = {
         extract:
       </p>
       <ul class="list-disc space-y-1 pl-6 muted">
-        <li><strong>Sentence length</strong> — the mean, the spread, and the variation (burstiness). Human writing tends to mix long and short; uniform sentences are a classic AI tell.</li>
-        <li><strong>Contraction rate</strong> — contractions divided by the chances you had to contract. AI "polishing" often expands "don't" back to "do not", which instantly reads less like you.</li>
-        <li><strong>Vocabulary diversity</strong> — type-token ratio plus MATTR and Yule's K richness, so long samples are not unfairly flattened.</li>
-        <li><strong>Function-word mix</strong> — the frequency of small words like "the", "of", "and", "to". This is the stylometric gold standard because it is unconscious and topic-independent.</li>
-        <li><strong>Punctuation habits</strong> — commas, semicolons, colons, parentheses, exclamation and question marks, and especially em dashes and ellipses, all per 1000 words.</li>
-        <li><strong>Structure</strong> — paragraph length, word and syllable length, and a Flesch reading-ease baseline.</li>
+        <li><strong>Sentence length</strong> - the mean, the spread, and the variation (burstiness). Human writing tends to mix long and short; uniform sentences are a classic AI tell.</li>
+        <li><strong>Contraction rate</strong> - contractions divided by the chances you had to contract. AI "polishing" often expands "don't" back to "do not", which instantly reads less like you.</li>
+        <li><strong>Vocabulary diversity</strong> - type-token ratio plus MATTR and Yule's K richness, so long samples are not unfairly flattened.</li>
+        <li><strong>Function-word mix</strong> - the frequency of small words like "the", "of", "and", "to". This is the stylometric gold standard because it is unconscious and topic-independent.</li>
+        <li><strong>Punctuation habits</strong> - commas, semicolons, colons, parentheses, exclamation and question marks, and especially em dashes and ellipses, all per 1000 words.</li>
+        <li><strong>Structure</strong> - paragraph length, word and syllable length, and a Flesch reading-ease baseline.</li>
       </ul>
 
       <h2 class="text-2xl font-bold">Build your profile (stored only in your browser)</h2>
       <p class="muted">
         In <strong>Build</strong> mode, paste two or three things you genuinely wrote
-        — an email, a couple of notes, a blog post — and name the voice. Aim for
+        - an email, a couple of notes, a blog post - and name the voice. Aim for
         about 300+ words; the strength meter tells you when you have enough for a
         sharp fingerprint. Click <strong>Save profile</strong> and it is written to
         your browser's IndexedDB. You can keep several named voices ("My voice",
@@ -163,8 +163,8 @@ const faqSchema = {
       <p class="muted">
         Switch to <strong>Check</strong> mode, paste a draft (often one an AI helped
         write), and watch the <strong>sounds-like-you</strong> meter. It compares the
-        draft's features to your fingerprint — measuring each one in
-        <em>your own</em> standard deviations — and lands on a 0-100 match with a
+        draft's features to your fingerprint - measuring each one in
+        <em>your own</em> standard deviations - and lands on a 0-100 match with a
         plain verdict. The "you vs. this draft" panel shows exactly which dials are
         off ("your sentences: 16 words; this draft: 27"), and the findings list pins
         the concrete spots: an over-long sentence, an expanded contraction you would
@@ -173,16 +173,16 @@ const faqSchema = {
         authorship.
       </p>
 
-      <h2 class="text-2xl font-bold">100% on your device — why nothing is uploaded</h2>
+      <h2 class="text-2xl font-bold">100% on your device - why nothing is uploaded</h2>
       <p class="muted">
         Cloud tools that "write in your style" all upload your samples and drafts to
         a server to do it. That is the exact thing we refuse to do. Stylometry is
-        just arithmetic over your text, so there is no reason to send it anywhere —
+        just arithmetic over your text, so there is no reason to send it anywhere -
         and we don't. Your fingerprint stays in this browser's IndexedDB; deletion is
         real and instant; and if you want a backup or to move a profile to another of
         your own devices, you export it as a JSON file and import it manually. That
         manual export is the only "sync", because a server would break the entire
-        promise. This is a quality and ownership tool — it helps you keep your human
+        promise. This is a quality and ownership tool - it helps you keep your human
         voice, and it is never a detector-bypass. If a draft is full of em dashes your
         profile never uses, clean them on the <a href="/">Em Dash Remover</a>, then
         re-check here to confirm it sounds like you again.

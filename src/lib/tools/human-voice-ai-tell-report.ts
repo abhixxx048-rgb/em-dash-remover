@@ -1,5 +1,5 @@
 /**
- * Human-Voice / AI-Tell Report — pure client-side analysis engine.
+ * Human-Voice / AI-Tell Report - pure client-side analysis engine.
  *
  * Design goals (see docs/tools/human-voice-ai-tell-report.md):
  *  - Non-destructive: the input text is NEVER mutated. Everything here is a
@@ -23,7 +23,7 @@
 // Types
 // ---------------------------------------------------------------------------
 
-/** Category buckets — also drive highlight color + legend (never color-only). */
+/** Category buckets - also drive highlight color + legend (never color-only). */
 export type FindingCategory = 'cadence' | 'structure' | 'hedging' | 'vocabulary';
 
 /** One concrete, offset-aware finding the UI can highlight + list. */
@@ -101,7 +101,7 @@ export interface Report {
 // Zero-width & invisible characters frequently left in AI / web-copied text.
 // Mirrors cleaner.ts INVISIBLES so pasted AI text does not skew offsets/counts.
 // NOTE: we do NOT strip these from the source (offsets must stay aligned); the
-// inspector tool handles those — here we only avoid counting them as words.
+// inspector tool handles those - here we only avoid counting them as words.
 const INVISIBLES = /[​-‏⁠﻿­‪-‮⁡-⁤]/g;
 
 // Abbreviations whose trailing period must NOT end a sentence.
@@ -360,7 +360,7 @@ export const WORD_SWAPS: Record<string, string[]> = {
   vibrant: ['lively', 'bright'],
 };
 
-// Signature words — rare in human prose, flagged at any count.
+// Signature words - rare in human prose, flagged at any count.
 const AI_WORDS_STRONG = [
   'delve', 'delves', 'delving', 'underscore', 'underscores', 'underscoring',
   'showcase', 'showcases', 'tapestry', 'testament', 'realm',
@@ -369,7 +369,7 @@ const AI_WORDS_STRONG = [
   'bolster',
 ];
 
-// Common "AI accent" words — density-gated (flag only above a per-1k threshold).
+// Common "AI accent" words - density-gated (flag only above a per-1k threshold).
 const AI_WORDS_SOFT = [
   'leverage', 'leveraging', 'harness', 'navigate', 'navigating', 'enhance',
   'foster', 'fostering', 'utilize', 'utilizing', 'facilitate', 'optimize',
@@ -378,7 +378,7 @@ const AI_WORDS_SOFT = [
   'vibrant',
 ];
 
-// Metronomic transition words — counted for opener-density, never per word.
+// Metronomic transition words - counted for opener-density, never per word.
 const AI_TRANSITIONS = [
   'moreover', 'furthermore', 'additionally', 'consequently', 'nevertheless',
   'nonetheless', 'subsequently', 'accordingly', 'notably', 'importantly',
@@ -497,7 +497,7 @@ function detectOpeners(
       text: capitalize(word),
       start: first.start,
       end: first.end,
-      why: `${hits.length} sentences open with "${capitalize(word)}". Humans vary or drop their openers — try starting some of these differently.`,
+      why: `${hits.length} sentences open with "${capitalize(word)}". Humans vary or drop their openers - try starting some of these differently.`,
       source: 'GPTZero · Wikipedia: Signs of AI writing',
     });
   }
@@ -528,7 +528,7 @@ function detectRuleOfThree(text: string): Finding[] {
     text: h.text,
     start: h.start,
     end: h.end,
-    why: 'Three-item lists are a model favorite. One is fine; several in a row flatten the rhythm — vary the count or recast one as a sentence.',
+    why: 'Three-item lists are a model favorite. One is fine; several in a row flatten the rhythm - vary the count or recast one as a sentence.',
     source: 'GPTZero: rule-of-three',
   }));
 }
@@ -667,7 +667,7 @@ export function analyze(input: string): Report {
       // jump-to (data-start) still lands on the first sentence.
       start: first.start,
       end: first.start,
-      why: `Your sentences barely vary in length (variation ${burst.cv.toFixed(2)}). A flat skyline reads robotic — mix short punchy lines with longer ones.`,
+      why: `Your sentences barely vary in length (variation ${burst.cv.toFixed(2)}). A flat skyline reads robotic - mix short punchy lines with longer ones.`,
       source: 'GPTZero · QuillBot: burstiness',
     });
     // re-sort so the uniform finding lands in position
@@ -716,10 +716,10 @@ function buildVerdict(
   words: number,
 ): string {
   if (words < 25) {
-    return 'Add more text (about 25+ words) for a reliable human-voice read — no single tell is conclusive.';
+    return 'Add more text (about 25+ words) for a reliable human-voice read - no single tell is conclusive.';
   }
   if (findings.length === 0) {
-    return 'Reads human — no strong tells found. Nothing here screams "model". Nice.';
+    return 'Reads human - no strong tells found. Nothing here screams "model". Nice.';
   }
 
   // Pick the two most-common finding labels as the "fix these first" hooks.
@@ -736,8 +736,8 @@ function buildVerdict(
     band === 'human' ? 'This mostly reads like you' :
     band === 'some' ? 'This reads somewhat AI' :
     'This reads heavily AI';
-  const fix = fixHints.length ? ` — ${fixHints.slice(0, 2).join(' and ')} and it\'ll sound more human.` : '.';
-  return `${lead}${fix} Remember: no single tell is conclusive — use this as a guide, not a verdict.`;
+  const fix = fixHints.length ? ` - ${fixHints.slice(0, 2).join(' and ')} and it\'ll sound more human.` : '.';
+  return `${lead}${fix} Remember: no single tell is conclusive - use this as a guide, not a verdict.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -799,7 +799,7 @@ export function buildReport(report: Report): string {
   lines.push(`- Words: ${report.words} · Sentences: ${report.sentences}`);
   if (!report.burstiness.lowConfidence) {
     lines.push(
-      `- Sentence cadence (burstiness): CV ${report.burstiness.cv} — ${report.burstiness.band}` +
+      `- Sentence cadence (burstiness): CV ${report.burstiness.cv} - ${report.burstiness.band}` +
       ` (mean ${report.burstiness.mean} words/sentence)`,
     );
   } else {
@@ -825,11 +825,11 @@ export function buildReport(report: Report): string {
   }
   if (report.findings.length === 0) {
     lines.push('');
-    lines.push('No strong tells found — reads human.');
+    lines.push('No strong tells found - reads human.');
   }
   lines.push('');
   lines.push('---');
-  lines.push('Generated locally in your browser. No text was uploaded. A guide for quality — no single tell is conclusive.');
+  lines.push('Generated locally in your browser. No text was uploaded. A guide for quality - no single tell is conclusive.');
   return lines.join('\n');
 }
 

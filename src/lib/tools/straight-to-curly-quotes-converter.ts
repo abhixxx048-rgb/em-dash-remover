@@ -1,5 +1,5 @@
 /**
- * Straight-to-Curly Smart Quotes Converter — pure client-side engine.
+ * Straight-to-Curly Smart Quotes Converter - pure client-side engine.
  *
  * The deliberate inverse of the site's curly→straight cleaner: it "educates"
  * typewriter punctuation (straight quotes ", apostrophes ', `--`, `...`) into
@@ -27,7 +27,7 @@ const RDQUO = '”'; // ” closing double
 const LSQUO = '‘'; // ‘ opening single
 const RSQUO = '’'; // ’ closing single + apostrophe
 // Dashes (mirrors the EM/EN constants in src/lib/cleaner.ts).
-const EM = '—'; // — em dash
+const EM = '-'; // - em dash
 const EN = '–'; // – en dash
 // Ellipsis + primes.
 const HELLIP = '…'; // … ellipsis
@@ -104,7 +104,7 @@ export interface EducateCounts {
   total: number;
 }
 
-/** Which "tricky case" patterns were detected — drives the spotlight chips in the UI. */
+/** Which "tricky case" patterns were detected - drives the spotlight chips in the UI. */
 export interface EdgeCaseFlags {
   decade: boolean; // ’90s
   contraction: boolean; // ’Twas / ’em
@@ -162,7 +162,7 @@ function entity(ch: string): string {
 }
 
 /**
- * Educate a single PROSE chunk. The passes run in a fixed order — primes and
+ * Educate a single PROSE chunk. The passes run in a fixed order - primes and
  * the decade/contraction guards MUST run before the generic quote logic so a
  * measurement (6'2") or a decade (’90s) is not mis-curled into quotes.
  */
@@ -215,7 +215,7 @@ function educateProse(
   }
 
   // --- 2) Decade / leading-contraction guard: force CLOSING apostrophe ’.
-  // Decades: '90s, '08 — apostrophe + two digits + optional s.
+  // Decades: '90s, '08 - apostrophe + two digits + optional s.
   text = text.replace(/'(?=\d\d)/g, () => {
     counts.singleQuotes++; counts.decades++; flags.decade = true;
     return P_CLOSE_S;
@@ -232,11 +232,11 @@ function educateProse(
 
   // --- 3) Opening quotes: a " or ' is OPENING when it follows start-of-string,
   // whitespace, an opening bracket, or an em/en dash.
-  text = text.replace(/(^|[\s([{–—])"/g, (_m, pre) => {
+  text = text.replace(/(^|[\s([{–-])"/g, (_m, pre) => {
     counts.doubleQuotes++;
     return pre + P_OPEN_D;
   });
-  text = text.replace(/(^|[\s([{–—])'/g, (_m, pre) => {
+  text = text.replace(/(^|[\s([{–-])'/g, (_m, pre) => {
     counts.singleQuotes++;
     return pre + P_OPEN_S;
   });
@@ -271,7 +271,7 @@ function educateProse(
   // When emitting entities, also encode the dash/ellipsis glyphs we inserted.
   if (opts.htmlEntities) {
     text = text
-      .replace(/—/g, entity(EM))
+      .replace(/-/g, entity(EM))
       .replace(/–/g, entity(EN))
       .replace(/…/g, entity(HELLIP));
   }

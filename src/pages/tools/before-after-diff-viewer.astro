@@ -7,11 +7,11 @@ import RelatedTools from '../../components/RelatedTools.astro';
 const faqs = [
   {
     q: 'Does this upload my text anywhere?',
-    a: 'No. The diff is computed entirely in your browser with JavaScript — your original and changed text never leave your device. Open your browser DevTools Network tab while you use it and you will see zero requests with your text. It even works offline. That makes it safe for confidential legal, medical, or financial copy.',
+    a: 'No. The diff is computed entirely in your browser with JavaScript - your original and changed text never leave your device. Open your browser DevTools Network tab while you use it and you will see zero requests with your text. It even works offline. That makes it safe for confidential legal, medical, or financial copy.',
   },
   {
     q: "What's the difference between word-level and character-level diff?",
-    a: 'Word-level diff highlights whole words that changed, which reads cleanly for prose — ideal for checking that a cleanup did not alter your meaning. Character-level diff highlights the exact characters that changed, which is best for inspecting fine punctuation like a single em dash turning into a comma. Switch between them with the Word / Character toggle.',
+    a: 'Word-level diff highlights whole words that changed, which reads cleanly for prose - ideal for checking that a cleanup did not alter your meaning. Character-level diff highlights the exact characters that changed, which is best for inspecting fine punctuation like a single em dash turning into a comma. Switch between them with the Word / Character toggle.',
   },
   {
     q: 'Can I undo a change after I accept it?',
@@ -19,7 +19,7 @@ const faqs = [
   },
   {
     q: "Can I compare two texts that didn't come from the cleaner?",
-    a: 'Absolutely. Paste any two pieces of text into the Original and Changed boxes — release-note versions, microcopy variants, prompt revisions, or two drafts of an essay. The viewer works as a standalone before-and-after text compare tool, not only for cleaner output.',
+    a: 'Absolutely. Paste any two pieces of text into the Original and Changed boxes - release-note versions, microcopy variants, prompt revisions, or two drafts of an essay. The viewer works as a standalone before-and-after text compare tool, not only for cleaner output.',
   },
   {
     q: "Why are some 'invisible' changes shown as chips?",
@@ -46,9 +46,9 @@ const webApp = {
     'Compare before and after text instantly',
     'Inline and side-by-side diff views',
     'Word-level and character-level diffing',
-    'Per-change accept and reject — keep your voice',
+    'Per-change accept and reject - keep your voice',
     'Highlight invisible / zero-width characters',
-    '100% private — no upload, runs in your browser',
+    '100% private - no upload, runs in your browser',
   ],
   publisher: { '@id': `${Astro.site}#org` },
 };
@@ -65,8 +65,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Before/After Diff Viewer — Compare Text & See What Changed (No Upload)"
-  description="Compare your before and after text instantly. Inline or side-by-side, word or character diff, accept or reject every change. 100% private — runs in your browser, no upload."
+  title="Before/After Diff Viewer - Compare Text & See What Changed (No Upload)"
+  description="Compare your before and after text instantly. Inline or side-by-side, word or character diff, accept or reject every change. 100% private - runs in your browser, no upload."
 >
   <main class="halo">
     <!-- Hero -->
@@ -82,7 +82,7 @@ const faqSchema = {
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Compare your original and cleaned text side by side or inline. Every em
-        dash, quote, and invisible character is highlighted — and you decide,
+        dash, quote, and invisible character is highlighted - and you decide,
         change by change, whether to <strong>keep the original or use the
         cleaned version</strong>. Clean for quality, keep your human voice.
       </p>
@@ -99,7 +99,7 @@ const faqSchema = {
         Bulk find-and-replace tools are scary because they change your prose
         silently. A before-and-after diff viewer removes that fear: it shows
         every edit before you commit it. Paste your original on the left and the
-        cleaned or edited version on the right, and the diff appears instantly —
+        cleaned or edited version on the right, and the diff appears instantly -
         recomputing as you type. Deletions are shown struck through in red,
         insertions underlined in green, and unchanged text stays neutral, so you
         can read the change at a glance.
@@ -107,7 +107,7 @@ const faqSchema = {
 
       <h2 class="text-2xl font-bold">Inline vs side-by-side: pick your view</h2>
       <p class="muted">
-        <strong>Inline</strong> view merges both versions into one column — the
+        <strong>Inline</strong> view merges both versions into one column - the
         lowest-effort way to read a change in context, and the default on mobile.
         <strong>Side-by-side</strong> view aligns the original and the result in
         two gutter-numbered columns, the way editors and developers expect to
@@ -116,16 +116,16 @@ const faqSchema = {
         nothing hides from you.
       </p>
 
-      <h2 class="text-2xl font-bold">Accept or reject every change — keep your voice</h2>
+      <h2 class="text-2xl font-bold">Accept or reject every change - keep your voice</h2>
       <p class="muted">
         This is track-changes without Microsoft Word and without uploading a
         thing. Each change is its own reviewable unit: click ↩ to keep your
-        original wording or ✓ to use the cleaned version. Filter by change type —
-        dashes, quotes, ellipses, invisibles, whitespace, markdown — to scrutinise
+        original wording or ✓ to use the cleaned version. Filter by change type -
+        dashes, quotes, ellipses, invisibles, whitespace, markdown - to scrutinise
         one category while accepting the rest. Power users can navigate with
         <code>j</code> / <code>k</code> and accept or reject with <code>a</code> /
         <code>r</code>. When you are done, copy or download the merged result.
-        Reject everything and you get your exact original back — nothing is ever
+        Reject everything and you get your exact original back - nothing is ever
         forced on you.
       </p>
 
@@ -134,7 +134,7 @@ const faqSchema = {
         <strong>Word-level</strong> diffing groups changes by whole words, which
         reads naturally for prose and is the right default for verifying meaning.
         <strong>Character-level</strong> diffing pinpoints the exact characters
-        that changed — perfect for inspecting a lone em dash becoming a comma or a
+        that changed - perfect for inspecting a lone em dash becoming a comma or a
         curly quote turning straight. Toggle between them live; the diff recomputes
         without leaving the page.
       </p>
@@ -144,7 +144,7 @@ const faqSchema = {
         Several popular compare tools offer "save online and share a URL," which
         quietly sends your text to a server. This viewer never does. All diffing,
         classification, accept/reject merging, and export run in your browser with
-        zero network calls — a direct answer to searches for a private, no-upload,
+        zero network calls - a direct answer to searches for a private, no-upload,
         offline text diff checker. It is safe for sensitive documents and works
         with no internet connection at all.
       </p>

@@ -63,7 +63,7 @@
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste text to split it one sentence per line — Dr. and 3.14 stay intact. Or try:</p>
+            <p class="muted text-sm">Paste text to split it one sentence per line - Dr. and 3.14 stay intact. Or try:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="tricky" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🧪 Tricky (Dr., e.g., 3.14)</button>
               <button data-sample="uniform" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 Uniform (AI-like)</button>
@@ -114,7 +114,7 @@
               style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span id="mono-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span id="mono-num" class="text-xl font-bold leading-none" data-v="0">-</span>
             <span class="text-[9px] muted">uniformity</span>
           </div>
         </div>
@@ -135,7 +135,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded.
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded.
   </p>
 </section>
 
@@ -152,7 +152,7 @@
 </div>
 
 <style>
-  /* Length-band tints for cadence bars. Never color-only — every row also shows
+  /* Length-band tints for cadence bars. Never color-only - every row also shows
      a numeric word badge and an aria-label naming the band. */
   .cad-row { display: grid; grid-template-columns: 1fr auto; gap: 0.5rem; align-items: center; }
   .cad-bar-wrap { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
@@ -190,7 +190,7 @@
   const SAMPLES: Record<string, string> = {
     tricky: `Dr. Smith met with the team at 9 a.m. on Tuesday. The budget is about $1,000.50, give or take. He said, "Is the report ready?" and waited. We use tools like Slack, Notion, etc. for this. Pi is roughly 3.14, which surprised no one. J. R. R. Tolkien wrote it. Visit https://example.com/docs for more, e.g. the setup guide.`,
     uniform: `The new feature is ready for review. It improves the loading speed by a lot. Users have asked for this change often. The team worked hard on the update. We tested it across many devices. The results look very promising so far. It should ship by the end of the week. We are excited to share it with you.`,
-    varied: `Stop. You are overthinking this. The truth is that good writing, the kind that actually holds a reader's attention from the first line to the last, rarely comes from a single tidy formula — it comes from rhythm, from the way a long, winding sentence gives way to something short. Like this. Read your draft aloud. If every line sounds the same length, you have a problem, and now you can see it.`,
+    varied: `Stop. You are overthinking this. The truth is that good writing, the kind that actually holds a reader's attention from the first line to the last, rarely comes from a single tidy formula - it comes from rhythm, from the way a long, winding sentence gives way to something short. Like this. Read your draft aloud. If every line sounds the same length, you have a problem, and now you can see it.`,
   };
 
   // --- toast
@@ -318,7 +318,7 @@
       output.value = '';
       copyBtn.disabled = true;
       copyBar.disabled = true;
-      monoNum.textContent = '—';
+      monoNum.textContent = '-';
       monoNum.dataset.v = '0';
       ring.style.strokeDashoffset = String(RING);
       ring.style.stroke = 'var(--color-ok)';
@@ -341,7 +341,7 @@
     ring.style.stroke = color;
     $<HTMLParagraphElement>('mono-label').textContent = stats.monotonyLabel;
 
-    // Stats strip — numeric, with click-to-jump for longest/shortest.
+    // Stats strip - numeric, with click-to-jump for longest/shortest.
     const chips: string[] = [];
     chips.push(statChip(`${stats.words} words`));
     chips.push(statChip(`avg ${stats.avgWords} words/sentence`));
@@ -353,7 +353,7 @@
     // No-boundaries gentle note
     const note = $<HTMLParagraphElement>('note');
     if (result.noBoundaries) {
-      note.textContent = 'No sentence endings detected — treated as one sentence.';
+      note.textContent = 'No sentence endings detected - treated as one sentence.';
       note.hidden = false;
     } else {
       note.hidden = true;

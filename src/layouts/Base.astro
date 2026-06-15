@@ -21,8 +21,8 @@ interface Props {
 const adsenseEnabled = ADSENSE_PUB_ID.length > 0;
 
 const {
-  title = 'Em Dash Remover — Free AI Text Cleaner',
-  description = 'Free, grammar-aware em dash remover. Strip em dashes, smart quotes, invisible characters and AI tells from your text — 100% in your browser. Your text never leaves your device.',
+  title = 'Em Dash Remover - Free AI Text Cleaner',
+  description = 'Free, grammar-aware em dash remover. Strip em dashes, smart quotes, invisible characters and AI tells from your text - 100% in your browser. Your text never leaves your device.',
   noindex = false,
 } = Astro.props;
 
@@ -41,7 +41,7 @@ const ogId = seg === 'tools' || seg.startsWith('tools/')
     : 'index';
 const ogImage = new URL(`/open-graph/${ogId}.png`, Astro.site).href;
 
-// Breadcrumb trail for tool pages (Home › Tools › This tool) — helps Google show
+// Breadcrumb trail for tool pages (Home › Tools › This tool) - helps Google show
 // a breadcrumb in results and reinforces the hub-and-spoke structure.
 const isToolPage = seg.startsWith('tools/');
 const breadcrumb = isToolPage
@@ -51,7 +51,7 @@ const breadcrumb = isToolPage
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
         { '@type': 'ListItem', position: 2, name: 'Tools', item: new URL('/tools', Astro.site).href },
-        { '@type': 'ListItem', position: 3, name: (title || '').split('—')[0].split('|')[0].trim(), item: canonical },
+        { '@type': 'ListItem', position: 3, name: (title || '').split('-')[0].split('|')[0].trim(), item: canonical },
       ],
     }
   : null;
@@ -92,7 +92,7 @@ const orgGraph = {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-    <!-- Google Consent Mode v2 — default DENIED, must load before any ad/analytics tag. -->
+    <!-- Google Consent Mode v2 - default DENIED, must load before any ad/analytics tag. -->
     <script is:inline>
       window.dataLayer = window.dataLayer || [];
       function gtag() { dataLayer.push(arguments); }
@@ -154,7 +154,7 @@ const orgGraph = {
     <header class="sticky top-0 z-40 border-b border-ink/8 backdrop-blur-md" style="background: color-mix(in srgb, var(--c-paper) 80%, transparent);">
       <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-2">
         <a href="/" class="flex min-h-11 items-center gap-2 font-bold">
-          <span class="grid h-7 w-7 place-items-center rounded-lg bg-accent text-white">—</span>
+          <span class="grid h-7 w-7 place-items-center rounded-lg bg-accent text-white">-</span>
           <span>Em Dash Remover</span>
         </a>
         <div class="flex items-center gap-1">
@@ -219,7 +219,7 @@ const orgGraph = {
           ))}
         </div>
         <div class="mt-10 flex flex-col gap-4 border-t border-ink/8 pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p>🔒 100% client-side — your text never leaves your browser.</p>
+          <p>🔒 100% client-side - your text never leaves your browser.</p>
           <nav class="flex flex-wrap gap-x-5 gap-y-2">
             <a href="/tools" class="inline-flex min-h-11 items-center hover:text-accent">Tools</a>
             <a href="/blog" class="inline-flex min-h-11 items-center hover:text-accent">Blog</a>

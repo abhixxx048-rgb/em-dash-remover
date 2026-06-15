@@ -7,7 +7,7 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Does my text get uploaded anywhere?',
-    a: 'No. The rewrite runs entirely in your browser with plain JavaScript — nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. It even works with your connection turned off.',
+    a: 'No. The rewrite runs entirely in your browser with plain JavaScript - nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. It even works with your connection turned off.',
   },
   {
     q: 'Does it work offline?',
@@ -15,11 +15,11 @@ const faqs = [
   },
   {
     q: 'Which browsers and devices does it support?',
-    a: 'The instant rewrite works in every modern browser, on any device, including older phones. The experimental on-device AI model path additionally requires WebGPU — available in current Chrome, Edge, Safari 26+, and Firefox where enabled. If WebGPU is missing, the tool detects this and falls back to the instant rewrite instead of showing an error.',
+    a: 'The instant rewrite works in every modern browser, on any device, including older phones. The experimental on-device AI model path additionally requires WebGPU - available in current Chrome, Edge, Safari 26+, and Firefox where enabled. If WebGPU is missing, the tool detects this and falls back to the instant rewrite instead of showing an error.',
   },
   {
     q: 'Will this beat an AI detector?',
-    a: 'That is not the goal. We optimize for human-readable quality — removing filler, inflated vocabulary, and AI tells so your writing keeps your voice. We never market or build for detector evasion.',
+    a: 'That is not the goal. We optimize for human-readable quality - removing filler, inflated vocabulary, and AI tells so your writing keeps your voice. We never market or build for detector evasion.',
   },
   {
     q: 'Is it free? Do I need an account?',
@@ -39,7 +39,7 @@ const webApp = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   '@id': `${Astro.site}tools/webgpu-webllm-rewrite#app`,
-  name: 'Private On-Device AI Rewriter — No Upload',
+  name: 'Private On-Device AI Rewriter - No Upload',
   url: `${Astro.site}tools/webgpu-webllm-rewrite`,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
@@ -53,7 +53,7 @@ const webApp = {
     'Before / after readability grade and AI-tell density meters',
     'Word-level before/after diff view',
     'WebGPU feature-detection with graceful fallback',
-    'Works offline — copy and download the result',
+    'Works offline - copy and download the result',
   ],
   publisher: { '@id': `${Astro.site}#org` },
 };
@@ -70,8 +70,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Private On-Device AI Rewriter — Runs in Your Browser, No Upload"
-  description="Free private AI rewriter that runs 100% in your browser — no upload, no signup, works offline. Rewrite and de-AI text with Fluent, Formal, Casual, Shorten and Expand modes. WebGPU-ready, with an instant fallback everywhere."
+  title="Private On-Device AI Rewriter - Runs in Your Browser, No Upload"
+  description="Free private AI rewriter that runs 100% in your browser - no upload, no signup, works offline. Rewrite and de-AI text with Fluent, Formal, Casual, Shorten and Expand modes. WebGPU-ready, with an instant fallback everywhere."
 >
   <main class="halo">
     <!-- Hero -->
@@ -81,14 +81,14 @@ const faqSchema = {
         100% in your browser · free · no signup · works offline
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Private AI Rewriter — runs 100% in your browser, no upload.
+        Private AI Rewriter - runs 100% in your browser, no upload.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Rewrite and de-AI your text without it ever leaving your device. Pick a
-        mode — <strong>Fluent, Formal, Casual, Shorten</strong> or
-        <strong>Expand</strong> — and the rewrite happens instantly, offline, with
+        mode - <strong>Fluent, Formal, Casual, Shorten</strong> or
+        <strong>Expand</strong> - and the rewrite happens instantly, offline, with
         nothing uploaded. On WebGPU devices, an on-device AI model is coming next.
-        Clean AI writing for real quality — keep your human voice.
+        Clean AI writing for real quality - keep your human voice.
       </p>
     </header>
 
@@ -102,11 +102,11 @@ const faqSchema = {
       <p class="muted">
         This tool is built around a simple, load-bearing promise: your text never
         leaves your device. The rewrite you get today runs as plain JavaScript in
-        your browser — it strips the empty openers ("it's important to note
+        your browser - it strips the empty openers ("it's important to note
         that"), swaps inflated vocabulary ("delve", "leverage", "robust") for plain
         words, and adjusts tone by mode, all without sending a single byte to a
         server. You can prove it: open your browser's DevTools, switch to the
-        Network tab, and rewrite — you'll see zero requests. Turn off your Wi-Fi and
+        Network tab, and rewrite - you'll see zero requests. Turn off your Wi-Fi and
         it still works.
       </p>
       <p class="muted">
@@ -114,7 +114,7 @@ const faqSchema = {
         path: a small, 4-bit quantized language model that downloads once, caches
         in your browser, and then paraphrases on your own GPU with no further
         network calls. The page already feature-detects WebGPU and shows whether
-        your device could run it — but the privacy guarantee is identical either
+        your device could run it - but the privacy guarantee is identical either
         way, because both paths run locally.
       </p>
 
@@ -124,12 +124,12 @@ const faqSchema = {
         can tap between them with no reload:
       </p>
       <ul class="list-disc space-y-2 pl-6 muted">
-        <li><strong>Standard</strong> — removes AI tells while keeping your meaning, length, and voice.</li>
-        <li><strong>Fluent</strong> — drops empty connectives ("Moreover", "Furthermore") for smoother flow.</li>
-        <li><strong>Formal</strong> — lifts the register by expanding contractions and casual phrasing.</li>
-        <li><strong>Casual</strong> — warms the tone with contractions and a friendlier rhythm.</li>
-        <li><strong>Shorten</strong> — trims filler, hedging, and redundant intensifiers for a tighter draft.</li>
-        <li><strong>Expand</strong> — breaks long run-on sentences into clearer, separate ones.</li>
+        <li><strong>Standard</strong> - removes AI tells while keeping your meaning, length, and voice.</li>
+        <li><strong>Fluent</strong> - drops empty connectives ("Moreover", "Furthermore") for smoother flow.</li>
+        <li><strong>Formal</strong> - lifts the register by expanding contractions and casual phrasing.</li>
+        <li><strong>Casual</strong> - warms the tone with contractions and a friendlier rhythm.</li>
+        <li><strong>Shorten</strong> - trims filler, hedging, and redundant intensifiers for a tighter draft.</li>
+        <li><strong>Expand</strong> - breaks long run-on sentences into clearer, separate ones.</li>
       </ul>
       <p class="muted">
         Every mode is deterministic and content-preserving: it never invents facts
@@ -140,20 +140,20 @@ const faqSchema = {
 
       <h2 class="text-2xl font-bold">Why on-device? Your text never leaves your device</h2>
       <p class="muted">
-        Cloud paraphrasers — QuillBot, Scribbr, and the rest — are polished, but
+        Cloud paraphrasers - QuillBot, Scribbr, and the rest - are polished, but
         every one of them uploads your text to a server, and several store it. That
         is a non-starter for privacy-sensitive writing: a patient-note summary, a
         termination email, an unpublished manuscript, or anything covered by a
         company's data-loss-prevention policy. Because this rewriter runs entirely
         in your browser, it makes a claim those tools structurally cannot: the text
-        physically never leaves your machine. That is the whole point — provable
+        physically never leaves your machine. That is the whole point - provable
         privacy you can verify yourself, not a privacy policy you have to trust.
       </p>
 
       <h2 class="text-2xl font-bold">Works in Chrome, Edge, Safari and Firefox</h2>
       <p class="muted">
-        The instant rewrite works everywhere — any modern browser, any device, even
-        an older phone — because it needs no GPU and no model. The experimental
+        The instant rewrite works everywhere - any modern browser, any device, even
+        an older phone - because it needs no GPU and no model. The experimental
         on-device AI model path additionally needs WebGPU, which now ships across
         Chrome, Edge, Safari 26+, and Firefox where enabled. Crucially, when WebGPU
         is missing or blocked, the tool detects it and falls back to the instant

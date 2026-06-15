@@ -1,5 +1,5 @@
 ---
-// Paste-from-Word/Docs Cleaner — the interactive island.
+// Paste-from-Word/Docs Cleaner - the interactive island.
 // Static HTML below; behavior wired up by the client client script, which imports
 // the pure engine and runs the browser-only DOMParser allow-list locally.
 ---
@@ -44,7 +44,7 @@
       <!-- Input: a real paste-target so we can read the rich text/html payload -->
       <div class="p-4" data-pane="input" style="background: var(--c-surface);">
         <div class="mb-2 flex items-center justify-between">
-          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste here — Ctrl/Cmd+V</h2>
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste here - Ctrl/Cmd+V</h2>
           <span id="source-badge" class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium text-accent" style="background: var(--c-accent-soft);" hidden></span>
         </div>
         <div class="relative">
@@ -58,7 +58,7 @@
           ></div>
           <!-- Empty state with three "Try an example" loaders -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste straight from Word, Docs, or a PDF — we strip the junk and keep your real paragraphs. Or try an example:</p>
+            <p class="muted text-sm">Paste straight from Word, Docs, or a PDF - we strip the junk and keep your real paragraphs. Or try an example:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="word" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📄 Word paste</button>
               <button data-sample="docs" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📝 Google Docs</button>
@@ -98,7 +98,7 @@
     <div class="border-t border-ink/8 px-4 py-4">
       <div class="flex items-center justify-between gap-2">
         <span class="text-xs font-semibold uppercase tracking-wide muted">What we removed</span>
-        <span id="removed-total" class="text-sm font-semibold" data-v="0">—</span>
+        <span id="removed-total" class="text-sm font-semibold" data-v="0">-</span>
       </div>
       <ul id="inventory" class="mt-2 flex flex-wrap gap-1.5 text-xs" aria-live="polite">
         <li class="muted">Paste something to see what gets cleaned.</li>
@@ -112,7 +112,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Nothing is uploaded.
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Nothing is uploaded.
   </p>
 </section>
 
@@ -166,8 +166,8 @@
       text: 'Our Q3 strategy is on track.\n· Revenue grew 12%.\nSee the full report.',
     },
     docs: {
-      html: `<meta charset="utf-8"><b style="font-weight:normal" id="docs-internal-guid-1a2b3c"><p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt"><span style="font-size:11pt;font-family:Arial;color:#000000;font-weight:400">Welcome to the </span><span style="font-size:11pt;font-family:Arial;font-weight:700">new docs</span><span style="font-size:11pt;font-family:Arial;font-weight:400"> — please </span><span style="font-size:11pt;font-family:Arial;font-style:italic;font-weight:400">read carefully</span><span style="font-size:11pt;font-family:Arial;font-weight:400">.</span></p></b>`,
-      text: 'Welcome to the new docs — please read carefully.',
+      html: `<meta charset="utf-8"><b style="font-weight:normal" id="docs-internal-guid-1a2b3c"><p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt"><span style="font-size:11pt;font-family:Arial;color:#000000;font-weight:400">Welcome to the </span><span style="font-size:11pt;font-family:Arial;font-weight:700">new docs</span><span style="font-size:11pt;font-family:Arial;font-weight:400"> - please </span><span style="font-size:11pt;font-family:Arial;font-style:italic;font-weight:400">read carefully</span><span style="font-size:11pt;font-family:Arial;font-weight:400">.</span></p></b>`,
+      text: 'Welcome to the new docs - please read carefully.',
     },
     pdf: {
       html: '',
@@ -232,7 +232,7 @@
   }
 
   /* ----------------------------------------------------------------- *
-   * The DOM allow-list sanitizer (browser-only — lives here, not in   *
+   * The DOM allow-list sanitizer (browser-only - lives here, not in   *
    * the pure lib). Walks a DETACHED, inert parsed document and:       *
    *  - drops disallowed tags but KEEPS their text (unwrap),           *
    *  - removes every attribute except the allow-listed ones,          *
@@ -401,12 +401,12 @@
     list.innerHTML = '';
     if (!hasContent) {
       list.innerHTML = '<li class="muted">Paste something to see what gets cleaned.</li>';
-      totalEl.textContent = '—'; totalEl.dataset.v = '0';
+      totalEl.textContent = '-'; totalEl.dataset.v = '0';
     } else {
       const rows = inventoryRows(counts);
       animateCount(totalEl, counts.total);
       if (rows.length === 0) {
-        list.innerHTML = '<li class="rounded-full px-2 py-0.5" style="background: color-mix(in srgb, var(--color-ok) 18%, transparent); color: var(--color-ok);">✓ Looks clean already — no Word/Docs junk found</li>';
+        list.innerHTML = '<li class="rounded-full px-2 py-0.5" style="background: color-mix(in srgb, var(--color-ok) 18%, transparent); color: var(--color-ok);">✓ Looks clean already - no Word/Docs junk found</li>';
       } else {
         for (const r of rows) {
           const li = document.createElement('li');
@@ -435,7 +435,7 @@
   }
 
   /* ----------------------------------------------------------------- *
-   * Paste interception — the headline feature (spec §4.1 / §5.1).     *
+   * Paste interception - the headline feature (spec §4.1 / §5.1).     *
    * Read the RICH text/html payload, not just the plain text.         *
    * ----------------------------------------------------------------- */
   input.addEventListener('paste', (e: ClipboardEvent) => {
@@ -553,7 +553,7 @@
       b.textContent = '✓ Copied'; toast('Copied to clipboard');
       setTimeout(() => (b.textContent = prev), 1300);
     } catch {
-      toast('Copy failed — select and press Ctrl/Cmd+C');
+      toast('Copy failed - select and press Ctrl/Cmd+C');
     }
   }
 

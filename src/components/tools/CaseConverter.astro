@@ -65,7 +65,7 @@
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Type or paste text — or try an example:</p>
+            <p class="muted text-sm">Type or paste text - or try an example:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="headline" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📰 Headline</button>
               <button data-sample="allcaps" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🔠 ALL CAPS</button>
@@ -80,7 +80,7 @@
       <div class="p-4" data-pane="output" style="background: var(--c-surface);">
         <div class="mb-2 flex items-center justify-between">
           <h2 class="text-xs font-semibold uppercase tracking-wide muted">
-            Result <span id="active-label" class="text-accent normal-case">— Title Case</span>
+            Result <span id="active-label" class="text-accent normal-case">- Title Case</span>
           </h2>
           <div class="flex items-center gap-1.5">
             <button id="download" aria-label="Download result as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
@@ -117,7 +117,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline.
   </p>
 </section>
 
@@ -221,7 +221,7 @@
       b.style.color = active ? 'var(--color-accent)' : '';
       b.style.fontWeight = active ? '600' : '';
     });
-    $<HTMLSpanElement>('active-label').textContent = '— ' + MODE_LABELS[mode].label;
+    $<HTMLSpanElement>('active-label').textContent = '- ' + MODE_LABELS[mode].label;
     // Title-only controls.
     const isTitle = mode === 'title';
     $<HTMLDivElement>('title-opts').style.display = isTitle ? '' : 'none';
@@ -231,7 +231,7 @@
   // --- build the "why this casing?" explainer text
   function explain(style: TitleStyle): string {
     const s = TITLE_STYLE_LABELS[style];
-    const common = 'Articles (a, an, the) and short coordinating conjunctions (and, but, or, nor, for) are lowercased mid-title; the first and last word — and the first word after a colon — are always capitalized.';
+    const common = 'Articles (a, an, the) and short coordinating conjunctions (and, but, or, nor, for) are lowercased mid-title; the first and last word - and the first word after a colon - are always capitalized.';
     const prep =
       style === 'chicago' ? 'Chicago lowercases all prepositions regardless of length, and capitalizes only the first part of a hyphenated word.'
       : style === 'mla' ? 'MLA lowercases prepositions of any length.'

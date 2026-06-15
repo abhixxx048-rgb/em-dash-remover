@@ -1,10 +1,10 @@
 /**
- * Readability / Grade-Level Scorer — pure client-side engine.
+ * Readability / Grade-Level Scorer - pure client-side engine.
  *
  * Design goals (see docs/tools/readability-grade-level-scorer.md):
  *  - Deterministic, framework-free analysis of English prose using the standard
  *    peer-reviewed formulas: Flesch Reading Ease, Flesch-Kincaid Grade,
- *    Gunning Fog, SMOG, Coleman-Liau and ARI — plus a consensus grade.
+ *    Gunning Fog, SMOG, Coleman-Liau and ARI - plus a consensus grade.
  *  - Per-sentence difficulty so the UI can highlight the hardest sentences.
  *  - 100% in-browser math. NO DOM, NO network, NO new dependencies.
  *
@@ -42,7 +42,7 @@ export interface DocStats {
   syllables: number;
   characters: number; // letters + digits only (for Coleman-Liau / ARI)
   complexWords: number; // 3+ syllables (Gunning Fog)
-  polysyllables: number; // 3+ syllables (SMOG) — same rule, named for clarity
+  polysyllables: number; // 3+ syllables (SMOG) - same rule, named for clarity
   avgWordsPerSentence: number;
   avgSyllablesPerWord: number;
   /** Estimated silent reading time in minutes (~238 wpm). */
@@ -98,12 +98,12 @@ export function readingEaseBand(score: number): string {
 export function gradeLabel(grade: number): string {
   const g = Math.round(grade);
   if (g <= 0) return 'Pre-school';
-  if (g <= 5) return `${ordinal(g)} grade — very easy`;
-  if (g <= 8) return `${ordinal(g)} grade — easy to read`;
-  if (g <= 10) return `${ordinal(g)} grade — fairly easy`;
-  if (g <= 12) return `${ordinal(g)} grade — fairly hard`;
-  if (g <= 15) return 'College level — hard';
-  return 'Graduate level — very hard';
+  if (g <= 5) return `${ordinal(g)} grade - very easy`;
+  if (g <= 8) return `${ordinal(g)} grade - easy to read`;
+  if (g <= 10) return `${ordinal(g)} grade - fairly easy`;
+  if (g <= 12) return `${ordinal(g)} grade - fairly hard`;
+  if (g <= 15) return 'College level - hard';
+  return 'Graduate level - very hard';
 }
 
 /** 1 -> "1st", 2 -> "2nd", 11 -> "11th", etc. */
@@ -150,7 +150,7 @@ export function preclean(input: string): string {
 export function splitSentences(text: string): { text: string; start: number; end: number }[] {
   const out: { text: string; start: number; end: number }[] = [];
 
-  // Native segmentation when available — most accurate for edge cases.
+  // Native segmentation when available - most accurate for edge cases.
   if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
     try {
       const seg = new (Intl as any).Segmenter('en', { granularity: 'sentence' });
@@ -231,7 +231,7 @@ function countCharacters(text: string): number {
 // Syllable counting (no-dependency heuristic + memoization)
 // ---------------------------------------------------------------------------
 
-// Words whose heuristic syllable count is commonly wrong — hand-tuned.
+// Words whose heuristic syllable count is commonly wrong - hand-tuned.
 const SYLLABLE_EXCEPTIONS: Record<string, number> = {
   every: 2, business: 2, people: 2, fire: 1, hour: 1, our: 1, area: 3,
   february: 4, idea: 3, real: 1, being: 2, create: 2, science: 2,
@@ -265,7 +265,7 @@ export function countSyllables(word: string): number {
     let s = w;
     // Keep "consonant + le" as a syllable (table, little), else drop silent e.
     if (/[^aeiouy]le$/.test(s)) {
-      // leave it — the "le" cluster counts
+      // leave it - the "le" cluster counts
     } else {
       s = s.replace(/e$/, '');
     }
@@ -468,12 +468,12 @@ function buildVerdict(scores: Scores, lowConfidence: boolean): string {
   const ease = scores.fleschReadingEase;
   const grade = gradeLabel(g);
   if (g <= 8) {
-    return `This reads at about a ${ordinal(Math.round(g))}-grade level (${grade.split('—')[1]?.trim() || 'easy'}) — great for a broad, general audience.`;
+    return `This reads at about a ${ordinal(Math.round(g))}-grade level (${grade.split('-')[1]?.trim() || 'easy'}) - great for a broad, general audience.`;
   }
   if (g <= 12) {
-    return `This reads at about a ${ordinal(Math.round(g))}-grade level — fine for an adult audience, but a couple of grades above the grade 7-9 sweet spot for general web content.`;
+    return `This reads at about a ${ordinal(Math.round(g))}-grade level - fine for an adult audience, but a couple of grades above the grade 7-9 sweet spot for general web content.`;
   }
-  return `This reads at roughly a ${grade.toLowerCase()} (grade ${Math.round(g)}, ease ${Math.round(ease)}/100) — likely too dense for a general audience. Shorten the hardest sentences to bring it down.`;
+  return `This reads at roughly a ${grade.toLowerCase()} (grade ${Math.round(g)}, ease ${Math.round(ease)}/100) - likely too dense for a general audience. Shorten the hardest sentences to bring it down.`;
 }
 
 /**
@@ -503,7 +503,7 @@ export function buildReport(analysis: Analysis): string {
     `  Consensus grade:         ${scores.consensusGrade}`,
     `  Flesch-Kincaid grade:    ${scores.fleschKincaidGrade}`,
     `  Gunning Fog:             ${scores.gunningFog}`,
-    `  SMOG:                    ${scores.smog}${analysis.smogLowConfidence ? ' (low confidence — needs 30+ sentences)' : ''}`,
+    `  SMOG:                    ${scores.smog}${analysis.smogLowConfidence ? ' (low confidence - needs 30+ sentences)' : ''}`,
     `  Coleman-Liau:            ${scores.colemanLiau}`,
     `  Automated Readability:   ${scores.automatedReadabilityIndex}`,
     '',

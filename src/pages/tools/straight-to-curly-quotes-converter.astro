@@ -7,7 +7,7 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Why did Word curl my ’90s the wrong way?',
-    a: 'Word (and most auto-correct) sees an apostrophe at the start of "90s" and assumes it is an opening single quote, so it curls it as ‘90s. But the apostrophe stands in for the missing "19", so it should face the other way — a closing apostrophe, ’90s. This converter detects the apostrophe-then-digits pattern and curls it correctly as ’90s by default.',
+    a: 'Word (and most auto-correct) sees an apostrophe at the start of "90s" and assumes it is an opening single quote, so it curls it as ‘90s. But the apostrophe stands in for the missing "19", so it should face the other way - a closing apostrophe, ’90s. This converter detects the apostrophe-then-digits pattern and curls it correctly as ’90s by default.',
   },
   {
     q: 'Which quote is opening and which is closing?',
@@ -19,19 +19,19 @@ const faqs = [
   },
   {
     q: 'What is the difference between curly and straight quotes?',
-    a: 'Straight quotes (" and \') are typewriter marks — the same glyph is used to open and close. Curly, or "smart", quotes are directional (“ ” and ‘ ’) and are what professional typesetting uses. Straight quotes in published copy are the number-one "looks amateur" tell.',
+    a: 'Straight quotes (" and \') are typewriter marks - the same glyph is used to open and close. Curly, or "smart", quotes are directional (“ ” and ‘ ’) and are what professional typesetting uses. Straight quotes in published copy are the number-one "looks amateur" tell.',
   },
   {
     q: 'Are smart quotes safe to use in code or URLs?',
-    a: 'No — code and URLs need straight quotes, and curly ones will break them. This converter leaves anything inside backticks, fenced code blocks, and URLs or file paths untouched, so the straight quotes that must stay straight are preserved automatically.',
+    a: 'No - code and URLs need straight quotes, and curly ones will break them. This converter leaves anything inside backticks, fenced code blocks, and URLs or file paths untouched, so the straight quotes that must stay straight are preserved automatically.',
   },
   {
     q: 'Does this upload my text?',
-    a: 'No. All conversion runs in your browser with plain JavaScript. Nothing is uploaded, stored, or logged — open your DevTools Network tab while you use it and you will see zero requests. It also works offline, which makes it safe for confidential manuscripts.',
+    a: 'No. All conversion runs in your browser with plain JavaScript. Nothing is uploaded, stored, or logged - open your DevTools Network tab while you use it and you will see zero requests. It also works offline, which makes it safe for confidential manuscripts.',
   },
   {
     q: 'How do I convert curly quotes back to straight?',
-    a: 'Use the reverse tool — the site\'s curly→straight cleaner turns smart quotes, em dashes and ellipses back into plain typewriter punctuation. The two tools are a matched pair: smarten or dumb-down your quotes either direction.',
+    a: 'Use the reverse tool - the site\'s curly→straight cleaner turns smart quotes, em dashes and ellipses back into plain typewriter punctuation. The two tools are a matched pair: smarten or dumb-down your quotes either direction.',
   },
   {
     q: 'What does SmartyPants do?',
@@ -43,7 +43,7 @@ const webApp = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   '@id': `${Astro.site}tools/straight-to-curly-quotes-converter#app`,
-  name: 'Smart Quotes Converter — Straight to Curly Quotes',
+  name: 'Smart Quotes Converter - Straight to Curly Quotes',
   url: `${Astro.site}tools/straight-to-curly-quotes-converter`,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
@@ -74,8 +74,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Smart Quotes Converter — Straight to Curly Quotes (Done Right)"
-  description="Free smart quotes converter: turn straight quotes into correctly-directional curly quotes, true apostrophes, en/em dashes and primes. Fixes ’90s, ’Twas and 6′2″ — 100% in your browser."
+  title="Smart Quotes Converter - Straight to Curly Quotes (Done Right)"
+  description="Free smart quotes converter: turn straight quotes into correctly-directional curly quotes, true apostrophes, en/em dashes and primes. Fixes ’90s, ’Twas and 6′2″ - 100% in your browser."
 >
   <main class="halo">
     <!-- Hero -->
@@ -85,12 +85,12 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Smart Quotes Converter — Straight Quotes to Curly Quotes
+        Smart Quotes Converter - Straight Quotes to Curly Quotes
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Turn typewriter quotes, apostrophes, <code>--</code> and <code>...</code>
         into correctly-directional curly quotes, true apostrophes, proper en/em
-        dashes and a real ellipsis — with the tricky cases (<strong>’90s</strong>,
+        dashes and a real ellipsis - with the tricky cases (<strong>’90s</strong>,
         <strong>’Twas</strong>, <strong>6′2″</strong>) actually handled right.
         Done in your browser, instantly.
       </p>
@@ -105,12 +105,12 @@ const faqSchema = {
       <h2 class="text-2xl font-bold">How to use the smart quotes converter</h2>
       <ol class="list-decimal space-y-2 pl-6 muted">
         <li>Paste or type text with straight quotes into the box above (or tap an example).</li>
-        <li>Pick your quote <strong>style</strong> — US/UK English, German „ “ or French « » — and toggle primes, dashes and the ellipsis to taste.</li>
+        <li>Pick your quote <strong>style</strong> - US/UK English, German „ “ or French « » - and toggle primes, dashes and the ellipsis to taste.</li>
         <li>Watch the curly result update live; switch to <strong>Diff</strong> to verify exactly which marks changed.</li>
         <li>Hit <strong>Copy</strong> (or Ctrl/Cmd + Enter) and paste the typeset text wherever you publish.</li>
       </ol>
 
-      <h2 class="text-2xl font-bold">Straight vs curly quotes — which way does each mark face?</h2>
+      <h2 class="text-2xl font-bold">Straight vs curly quotes - which way does each mark face?</h2>
       <p class="muted">
         Straight quotes (<code>"</code> and <code>'</code>) are typewriter
         leftovers: the same glyph opens and closes. Professional typesetting uses
@@ -119,14 +119,14 @@ const faqSchema = {
         <strong>”</strong> and <strong>’</strong>. The rule of thumb: a quote that
         follows a space, a bracket, or the start of a line <em>opens</em>, and a
         quote that follows a letter <em>closes</em>. An apostrophe inside or at the
-        end of a word — <em>don’t</em>, <em>Hastings’</em> — is always the closing
+        end of a word - <em>don’t</em>, <em>Hastings’</em> - is always the closing
         form ’.
       </p>
 
       <h2 class="text-2xl font-bold">The tricky cases we get right: ’90s, ’Twas, and foot/inch marks (6'2")</h2>
       <p class="muted">
         This is where Word, Google Docs and most thin converter clones fail. When
-        an apostrophe leads a decade — <strong>’90s</strong>, <strong>’08</strong> —
+        an apostrophe leads a decade - <strong>’90s</strong>, <strong>’08</strong> -
         it stands in for the dropped "19", so it must curl as a <em>closing</em>
         apostrophe ’, not an opening ‘. Auto-correct almost always gets this
         backwards. The same is true for leading contractions like
@@ -142,14 +142,14 @@ const faqSchema = {
       <p class="muted">
         Three different marks do three different jobs: the hyphen (-) joins words
         (well-known), the en dash (–) spans ranges (10–20, May–September), and the
-        em dash (—) marks a strong break in a sentence. The classic typewriter
+        em dash (-) marks a strong break in a sentence. The classic typewriter
         shortcut is <code>--</code> for an en dash and <code>---</code> for an em
         dash, and this tool expands both automatically. It also turns three dots
         (<code>...</code>) into a single ellipsis character (…) so your line breaks
         and spacing behave the way a typesetter expects.
       </p>
 
-      <h2 class="text-2xl font-bold">For developers — Unicode vs HTML entities, code and URLs</h2>
+      <h2 class="text-2xl font-bold">For developers - Unicode vs HTML entities, code and URLs</h2>
       <p class="muted">
         Curly quotes are great in prose and terrible in code. This converter runs a
         preserve guard that skips anything inside backticks, fenced code blocks, and
@@ -157,14 +157,14 @@ const faqSchema = {
         alone. If your CMS stores SmartyPants-style entities, switch on
         <strong>Output HTML entities</strong> to emit <code>&amp;#8220;</code> /
         <code>&amp;#8217;</code> instead of literal Unicode. Everything is plain,
-        deterministic JavaScript — no SmartyPants build step required.
+        deterministic JavaScript - no SmartyPants build step required.
       </p>
 
-      <h2 class="text-2xl font-bold">Privacy — everything runs in your browser</h2>
+      <h2 class="text-2xl font-bold">Privacy - everything runs in your browser</h2>
       <p class="muted">
         There is no server and no upload. All conversion happens on your device, so
         you can safely typeset confidential or unpublished manuscripts. Open your
-        browser's DevTools Network tab while you work and you'll see zero requests —
+        browser's DevTools Network tab while you work and you'll see zero requests -
         and the tool keeps working with your connection turned off.
       </p>
     </article>

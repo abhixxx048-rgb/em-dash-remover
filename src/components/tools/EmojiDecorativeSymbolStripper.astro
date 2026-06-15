@@ -62,12 +62,12 @@
             id="input"
             rows="14"
             aria-label="Text to strip emoji and symbols from"
-            placeholder="Paste your AI draft — we'll pull the emoji and ornamental bullets, and keep your real symbols (©, °, $)."
+            placeholder="Paste your AI draft - we'll pull the emoji and ornamental bullets, and keep your real symbols (©, °, $)."
             class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste AI text — or try an example:</p>
+            <p class="muted text-sm">Paste AI text - or try an example:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="chatgpt" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 ChatGPT answer</button>
               <button data-sample="linkedin" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💼 LinkedIn post</button>
@@ -127,7 +127,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline.
   </p>
 
   <!-- Education panel: why this is a tell (on-brand, quality not bypass). -->
@@ -138,7 +138,7 @@
     <p class="mt-2 text-sm muted">
       Emoji-as-bullets (✅ 🔹 🚀) and checkmark headers are among the most visible
       signs of pasted ChatGPT or Claude output. Removing them makes your writing
-      read as your own — and, as a bonus, makes it cleaner for screen readers,
+      read as your own - and, as a bonus, makes it cleaner for screen readers,
       which otherwise announce "white heavy check mark" before every line. This is
       about keeping a professional, human voice, not about beating a detector.
     </p>
@@ -260,7 +260,7 @@
     // Flavor / "how AI-flavored" label.
     const flavor = $<HTMLParagraphElement>('flavor');
     if (!src.trim()) flavor.textContent = 'Paste text to scan.';
-    else if (counts.total === 0) flavor.textContent = 'No emoji or decorative symbols found — your text is already clean.';
+    else if (counts.total === 0) flavor.textContent = 'No emoji or decorative symbols found - your text is already clean.';
     else flavor.textContent = flavorLabel(counts);
 
     // Inventory table.
@@ -354,7 +354,7 @@
       const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
       b.textContent = '✓ Copied'; toast('Copied to clipboard');
       setTimeout(() => (b.textContent = prev), 1300);
-    } catch { toast('Copy failed — select and copy manually'); }
+    } catch { toast('Copy failed - select and copy manually'); }
   }
   function doReset() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
 

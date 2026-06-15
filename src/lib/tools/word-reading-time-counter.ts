@@ -1,9 +1,9 @@
 /**
- * Word & Reading-Time Counter — pure client-side analysis engine.
+ * Word & Reading-Time Counter - pure client-side analysis engine.
  *
  * Design goals (see docs/tools/word-reading-time-counter.md):
  *  - Unicode-aware counting (Intl.Segmenter where available, regex fallback) so
- *    CJK / emoji / accented text and contractions count correctly — NOT a naive
+ *    CJK / emoji / accented text and contractions count correctly - NOT a naive
  *    `split(' ')`.
  *  - Grapheme-correct character counts (👨‍👩‍👧 = 1, é = 1) plus raw UTF-16 length
  *    for field-limit use cases.
@@ -107,7 +107,7 @@ export function countSentences(text: string): number {
     if (!chunk || !chunk.trim()) continue;
     // No terminator (final fragment) still counts as one sentence.
     if (punct === undefined) { n++; continue; }
-    // Decimal like "3.14" — the next chunk starts with a digit: not a break.
+    // Decimal like "3.14" - the next chunk starts with a digit: not a break.
     const next = parts[i + 2];
     const isDecimal = punct === '.' && /\d$/.test(chunk) && next && /^\d/.test(next);
     if (isDecimal || ABBREV_GUARD.test(chunk.trimEnd())) {
@@ -166,7 +166,7 @@ export function readingTime(words: number, wpm: number): TimeEstimate {
   const totalSeconds = wpm > 0 ? (words / wpm) * 60 : 0;
   const minutes = Math.floor(totalSeconds / 60);
   const secs = Math.round(totalSeconds % 60);
-  // Rounding can push secs to 60 — carry it into minutes.
+  // Rounding can push secs to 60 - carry it into minutes.
   const carry = secs === 60 ? 1 : 0;
   const m = minutes + carry;
   const s = secs === 60 ? 0 : secs;

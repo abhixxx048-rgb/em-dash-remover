@@ -5,11 +5,11 @@ import Cleaner from '../components/Cleaner.astro';
 const faqs = [
   {
     q: 'Why do people remove em dashes from AI text?',
-    a: 'Heavy em-dash use (—) is one of the most recognizable "tells" of AI-generated writing. Models like ChatGPT and Claude lean on em dashes far more than most human writers, so cleaning them up helps your text read naturally.',
+    a: 'Heavy em-dash use (-) is one of the most recognizable "tells" of AI-generated writing. Models like ChatGPT and Claude lean on em dashes far more than most human writers, so cleaning them up helps your text read naturally.',
   },
   {
     q: 'How is this different from other em dash removers?',
-    a: 'Most tools do a blind find-and-replace (every em dash becomes a comma), which creates comma splices and broken sentences. Our Smart mode looks at the surrounding words and picks the right fix — a comma, semicolon, colon, period, or parentheses — so the grammar stays correct.',
+    a: 'Most tools do a blind find-and-replace (every em dash becomes a comma), which creates comma splices and broken sentences. Our Smart mode looks at the surrounding words and picks the right fix - a comma, semicolon, colon, period, or parentheses - so the grammar stays correct.',
   },
   {
     q: 'Does my text get sent to a server?',
@@ -21,15 +21,15 @@ const faqs = [
   },
   {
     q: 'How do I remove em dashes in Word or Google Docs?',
-    a: 'The fastest way is to paste your text into this tool, copy the cleaned result, and paste it back. You can also use Find & Replace in Word or Google Docs and search for the em dash character (—), but that does a blind replace and will not fix the grammar around it.',
+    a: 'The fastest way is to paste your text into this tool, copy the cleaned result, and paste it back. You can also use Find & Replace in Word or Google Docs and search for the em dash character (-), but that does a blind replace and will not fix the grammar around it.',
   },
   {
     q: 'Does removing em dashes bypass AI detectors?',
-    a: 'No — and it is not meant to. AI detectors look at statistical patterns like perplexity and burstiness, not punctuation, so stripping em dashes or invisible characters will not fool them. This is a quality tool: it keeps your real writing from being mistaken for a robot\'s, it is not a "humanizer" for hiding AI. See our guide for the full explanation.',
+    a: 'No - and it is not meant to. AI detectors look at statistical patterns like perplexity and burstiness, not punctuation, so stripping em dashes or invisible characters will not fool them. This is a quality tool: it keeps your real writing from being mistaken for a robot\'s, it is not a "humanizer" for hiding AI. See our guide for the full explanation.',
   },
   {
     q: 'Is it free?',
-    a: 'Yes — completely free, no signup, no limits.',
+    a: 'Yes - completely free, no signup, no limits.',
   },
 ];
 
@@ -67,7 +67,7 @@ const faqSchema = {
 
 <Base
   title="Em Dash Remover – Free AI Text Cleaner (No Signup)"
-  description="Instantly remove em dashes, smart quotes and invisible characters from ChatGPT and AI text. Grammar-aware, free, no signup — runs 100% in your browser."
+  description="Instantly remove em dashes, smart quotes and invisible characters from ChatGPT and AI text. Grammar-aware, free, no signup - runs 100% in your browser."
 >
   <main class="halo">
     <!-- Hero -->
@@ -76,11 +76,11 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Em Dash Remover — clean AI text the smart way.
+        Em Dash Remover - clean AI text the smart way.
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Strip em dashes, smart quotes, invisible characters and other AI tells
-        from your text — with <strong>grammar-aware</strong> replacements, not a
+        from your text - with <strong>grammar-aware</strong> replacements, not a
         blind find-and-replace. Clean AI writing for real quality, keep your
         human voice.
       </p>
@@ -93,27 +93,27 @@ const faqSchema = {
       <div class="grid gap-6 sm:grid-cols-3">
         <div class="card p-5">
           <h2 class="font-semibold">Grammar-correct, not just deleted</h2>
-          <p class="mt-1.5 text-sm muted">An em dash does many jobs. Smart mode picks a comma, colon, semicolon or parentheses based on the sentence — so you never get a comma splice.</p>
+          <p class="mt-1.5 text-sm muted">An em dash does many jobs. Smart mode picks a comma, colon, semicolon or parentheses based on the sentence - so you never get a comma splice.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">Your text never leaves your browser</h2>
-          <p class="mt-1.5 text-sm muted">No upload, no server, no logging. Provable privacy — check the Network tab. Safe for confidential work.</p>
+          <p class="mt-1.5 text-sm muted">No upload, no server, no logging. Provable privacy - check the Network tab. Safe for confidential work.</p>
         </div>
         <div class="card p-5">
           <h2 class="font-semibold">More than dashes</h2>
-          <p class="mt-1.5 text-sm muted">Invisible watermark characters, smart quotes, AI cliché phrases and overused words — all caught in one pass, with a live AI-tell score.</p>
+          <p class="mt-1.5 text-sm muted">Invisible watermark characters, smart quotes, AI cliché phrases and overused words - all caught in one pass, with a live AI-tell score.</p>
         </div>
       </div>
     </section>
 
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
-      <h2 class="text-2xl font-bold">What is an em dash (—) and why remove it?</h2>
+      <h2 class="text-2xl font-bold">What is an em dash (-) and why remove it?</h2>
       <p class="muted">
-        An em dash (—) is the longest dash in typography, wider than a hyphen (-)
+        An em dash (-) is the longest dash in typography, wider than a hyphen (-)
         and an en dash (–). Writers use it to add a dramatic pause, insert an aside,
         or join related ideas. Used sparingly, it is excellent punctuation. The
-        problem is that AI writing tools <em>overuse</em> it dramatically — studies of
+        problem is that AI writing tools <em>overuse</em> it dramatically - studies of
         AI-generated text find em dashes appearing several times more often than in
         typical human writing. That makes the em dash one of the clearest signs that
         a piece was drafted by ChatGPT, Claude or Gemini.
@@ -124,28 +124,28 @@ const faqSchema = {
         Large language models learn punctuation patterns from huge amounts of web
         and book text, and they gravitate to the em dash because it is a flexible,
         always-grammatical connector. Combined with markdown formatting leaking into
-        prose, the result is text peppered with dashes. Removing them — and the other
-        tells like curly quotes and invisible characters — instantly makes writing
+        prose, the result is text peppered with dashes. Removing them - and the other
+        tells like curly quotes and invisible characters - instantly makes writing
         read more naturally and personally.
       </p>
 
       <h2 class="text-2xl font-bold">How to remove em dashes from text</h2>
       <ol class="list-decimal space-y-2 pl-6 muted">
         <li>Paste your text into the cleaner box above (or click an example).</li>
-        <li>Choose how em dashes should be replaced — <strong>Smart</strong> mode picks the grammatically correct fix automatically.</li>
+        <li>Choose how em dashes should be replaced - <strong>Smart</strong> mode picks the grammatically correct fix automatically.</li>
         <li>Review the cleaned result, or switch to <strong>Diff</strong> view to see exactly what changed.</li>
         <li>Click <strong>Copy</strong> and paste the clean text wherever you need it.</li>
       </ol>
       <p class="muted">
         It works the same whether your text came from ChatGPT, an email draft, a
         LinkedIn post, or a school essay. Because everything runs in your browser,
-        you can clean confidential text safely — nothing is uploaded.
+        you can clean confidential text safely - nothing is uploaded.
       </p>
 
       <h3 class="text-lg font-semibold">Removing em dashes in Word or Google Docs</h3>
       <p class="muted">
         Microsoft Word and Google Docs both have Find &amp; Replace, but searching for
-        "—" and replacing it with a comma is a blind swap that often breaks your
+        "-" and replacing it with a comma is a blind swap that often breaks your
         sentences. For correct results, paste your text here first, let Smart mode fix
         the grammar, then copy it back into your document.
       </p>
@@ -157,7 +157,7 @@ const faqSchema = {
         ellipsis character (…) to three dots, strips non-breaking spaces and
         invisible zero-width "watermark" characters, and can remove leftover markdown.
         It also scores your text for clichéd phrases and overused AI vocabulary so you
-        can see — and fix — what makes writing sound robotic.
+        can see - and fix - what makes writing sound robotic.
       </p>
     </article>
 

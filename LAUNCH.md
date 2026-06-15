@@ -1,15 +1,15 @@
-# LAUNCH.md — Em Dash Remover Launch Playbook
+# LAUNCH.md - Em Dash Remover Launch Playbook
 
-> Synthesized from 6 research lenses (SEO, launch/distribution, analytics, engagement/UX, content marketing, competitive). Decisive, sequenced, tailored to **emdashremover.app** — a free, 100% client-side text-cleaning suite of ~20 tools + Chrome/Edge extension + Obsidian plugin. Goal priority: **SEO > tool-usage analytics > engagement > marketing.**
+> Synthesized from 6 research lenses (SEO, launch/distribution, analytics, engagement/UX, content marketing, competitive). Decisive, sequenced, tailored to **emdashremover.app** - a free, 100% client-side text-cleaning suite of ~20 tools + Chrome/Edge extension + Obsidian plugin. Goal priority: **SEO > tool-usage analytics > engagement > marketing.**
 
 ---
 
-## Completeness Critic — gaps & contradictions across lenses (read first)
+## Completeness Critic - gaps & contradictions across lenses (read first)
 
 These are the things no single lens fully resolved. They are folded into the plan below; flagging them so nothing slips.
 
 1. **"Privacy is the wedge" vs "privacy is table stakes."** The launch/UX/content lenses lean on provable privacy as *the* differentiator; the competitive lens proves Originality.AI and CopyCleanse already say the identical "text never leaves your device" line. **Resolution:** privacy is the *credibility floor*; the actual wedge is **breadth + provable transparency + one engine across web/extension/Obsidian + "defend the human voice."** Privacy is *how* you earn trust, not *why* you win.
-2. **Reddit account aging is a hard gate, but the timeline conflicts with "launch this week."** Aging needs 2–4 weeks; you cannot retroactively age an account. **Resolution:** start aging TODAY; the coordinated PH/HN/Reddit week fires ~3 weeks out. Don't compress this — a shadowban on r/ChatGPT (4.2M) is unrecoverable.
+2. **Reddit account aging is a hard gate, but the timeline conflicts with "launch this week."** Aging needs 2–4 weeks; you cannot retroactively age an account. **Resolution:** start aging TODAY; the coordinated PH/HN/Reddit week fires ~3 weeks out. Don't compress this - a shadowban on r/ChatGPT (4.2M) is unrecoverable.
 3. **Analytics "no consent banner" vs existing AdSense banner.** Umami/Cloudflare are cookieless (no banner needed); AdSense requires Consent Mode v2 (banner needed). **Resolution:** keep the existing ConsentBanner gating *only* the AdSense tag; fire Umami unconditionally. Documented in §6.
 4. **The em-dash meme is a tailwind AND a decay risk.** OpenAI "fixed" it Nov 2025, so the trend will cool. **Resolution:** newsjack hard NOW, but build the durable evergreen clusters (invisible chars, paste-from-Word, smart quotes) that survive the meme. Don't bet the whole content engine on a meme with a half-life.
 5. **AdSense brand-safety risk is under-weighted by most lenses.** The category is full of "bypass/undetectable" sites Google pattern-matches as spam. **Resolution:** zero "bypass/evade/undetectable/cheat" language anywhere; ship an explicit "Why we're not a humanizer" FAQ. This is a launch-blocker for both AdSense approval and SEO.
@@ -25,31 +25,31 @@ These are the things no single lens fully resolved. They are folded into the pla
 1. **Start aging Reddit + Indie Hackers accounts TODAY** with genuine, link-free help in r/ChatGPT, r/writing, r/ObsidianMD, r/SEO. This gates your entire launch week and cannot be rushed.
 2. **Ship privacy-safe analytics (Umami + Cloudflare WA) with a per-tool event taxonomy BEFORE go-live.** You get exactly one week-one; if you can't see which of the 20 tools convert, the launch spike is wasted data.
 3. **Fix the one-way-spoke problem: `<RelatedTools>` module + footer tool-grid on all 20 pages.** One PR that simultaneously lifts pages/session, drives extension installs, and builds the internal-link web SEO needs.
-4. **Newsjack the "OpenAI fixed the em dash" moment** with a how-to + "every doc you already pasted still has them, and so does Claude/Gemini" angle — across the homepage H1, Show HN, PH, and the invisible-character pillar post.
-5. **Run launch week as a backlink campaign, not a traffic spike:** Show HN (open-sourced engine) + self-hunted PH + value-first Reddit + directories (BetaList, TAAFT, AlternativeTo vs undash/DashAway). These are do-follow links ChatGPT/Claude cite for tool recs — they serve goal #1 (SEO) directly.
+4. **Newsjack the "OpenAI fixed the em dash" moment** with a how-to + "every doc you already pasted still has them, and so does Claude/Gemini" angle - across the homepage H1, Show HN, PH, and the invisible-character pillar post.
+5. **Run launch week as a backlink campaign, not a traffic spike:** Show HN (open-sourced engine) + self-hunted PH + value-first Reddit + directories (BetaList, TAAFT, AlternativeTo vs undash/DashAway). These are do-follow links ChatGPT/Claude cite for tool recs - they serve goal #1 (SEO) directly.
 
-**The single positioning wedge:** *The honest, all-in-one, provably-private AI-text toolkit — one engine across web, extension, and Obsidian — that helps your real writing stop getting mistaken for a robot's. (Not a detection-bypass humanizer.)*
+**The single positioning wedge:** *The honest, all-in-one, provably-private AI-text toolkit - one engine across web, extension, and Obsidian - that helps your real writing stop getting mistaken for a robot's. (Not a detection-bypass humanizer.)*
 
 **The one tagline to lead with:**
-> **Remove em dashes & AI tells — free, no signup, nothing leaves your browser. Check the Network tab.**
+> **Remove em dashes & AI tells - free, no signup, nothing leaves your browser. Check the Network tab.**
 
 ---
 
 ## 2. Positioning & Messaging
 
 **The wedge (3 pillars competitors can't combine):**
-- **Breadth:** ~20 tools on one trusted brand. No competitor has a suite — they fight over a single character (undash, DashAway) or a single page (convertcase).
-- **Provable transparency:** not just "we don't upload" — *verify it yourself* (live "Network requests: 0" counter, airplane-mode demo, open-source engine on GitHub).
+- **Breadth:** ~20 tools on one trusted brand. No competitor has a suite - they fight over a single character (undash, DashAway) or a single page (convertcase).
+- **Provable transparency:** not just "we don't upload" - *verify it yourself* (live "Network requests: 0" counter, airplane-mode demo, open-source engine on GitHub).
 - **Same engine everywhere:** web + Chrome/Edge extension + Obsidian plugin. Nobody ships one engine across all three surfaces.
 
-**Editorial north star:** *Defend the human voice.* The sympathetic, link-worthy story (Rolling Stone, Air Mail) is real writers being falsely accused of AI for using em dashes — not "how to cheat detectors."
+**Editorial north star:** *Defend the human voice.* The sympathetic, link-worthy story (Rolling Stone, Air Mail) is real writers being falsely accused of AI for using em dashes - not "how to cheat detectors."
 
 **Tagline options:**
 
 | Use | Tagline |
 |---|---|
-| Homepage hero / lead | Remove em dashes & AI tells — free, no signup, nothing leaves your browser. |
-| Product Hunt | Remove em dashes & AI tells — free, no signup, nothing leaves your browser. |
+| Homepage hero / lead | Remove em dashes & AI tells - free, no signup, nothing leaves your browser. |
+| Product Hunt | Remove em dashes & AI tells - free, no signup, nothing leaves your browser. |
 | Show HN (title) | Show HN: Em Dash Remover – strip AI tells from text, 100% in-browser (no upload) |
 | LinkedIn / pro-writer | Recruiters now flag em dashes as AI. Check and clean any doc before you send it. |
 | Privacy-led variant | Privacy you can verify, not trust. A text cleaner that never sees your text. |
@@ -59,14 +59,14 @@ These are the things no single lens fully resolved. They are folded into the pla
 
 | Avoid | Why |
 |---|---|
-| "Bypass / evade / beat AI detection," "undetectable," "humanizer" | Google spam-policy-adjacent; risks AdSense approval; Originality.AI publicly debunks that removing invisible chars bypasses detectors — you'd be selling a lie and inheriting a penalized neighborhood. |
-| Leading with privacy *alone* | Table stakes — Originality.AI & CopyCleanse already say the exact same line. Pair privacy with breadth + proof. |
+| "Bypass / evade / beat AI detection," "undetectable," "humanizer" | Google spam-policy-adjacent; risks AdSense approval; Originality.AI publicly debunks that removing invisible chars bypasses detectors - you'd be selling a lie and inheriting a penalized neighborhood. |
+| Leading with privacy *alone* | Table stakes - Originality.AI & CopyCleanse already say the exact same line. Pair privacy with breadth + proof. |
 | Hype/superlatives in HN title | HN distrusts marketing; neutral-technical titles win. |
 | Implying watermarks are intentional/sinister | They're byproducts. Honest framing ("these are artifacts, not a secret watermark") wins trust and avoids the bypass trap. |
 | Same post blasted to all subreddits same day | Cross-post spam detection → shadowban. |
 
 **Ship this FAQ (captures high-intent query honestly + cements positioning):**
-*"Does this bypass AI detection?" → "No — and it doesn't work. Removing characters doesn't change the statistical patterns detectors use. We help your real writing not get mistaken for a robot's, not help robots hide."*
+*"Does this bypass AI detection?" → "No - and it doesn't work. Removing characters doesn't change the statistical patterns detectors use. We help your real writing not get mistaken for a robot's, not help robots hide."*
 
 ---
 
@@ -90,7 +90,7 @@ Genuine cut line: **must be true before the Show HN / PH go live.** (Items marke
 - [ ] Core funnel events wired on every tool island: `tool_view`, `input_received`, `clean_run`, `output_copied`, plus `extension_cta_click` / `obsidian_cta_click`.
 
 **Must-have engagement features**
-- [ ] `<RelatedTools currentSlug>` module on all 20 tool pages (3–4 hand-curated workflow tiles). *Today every page only links UP to `/tools` — confirmed one-way spokes.*
+- [ ] `<RelatedTools currentSlug>` module on all 20 tool pages (3–4 hand-curated workflow tiles). *Today every page only links UP to `/tools` - confirmed one-way spokes.*
 - [ ] Categorized footer tool-grid in `Base.astro` (all 20 tools, every page).
 - [ ] "Try a sample" button + real "Copied!" state on the core cleaner + Word Counter (kills empty-textarea bounce).
 - [ ] Live "Network requests this session: 0" counter + "No upload · No signup · Works offline" trust strip above tool output.
@@ -109,18 +109,18 @@ Launch on a **Tuesday–Thursday.**
 | Day | Channel | Action / exact framing |
 |---|---|---|
 | **Mon (T-1)** | Prep | Line up 15–30 warmed contacts (share link, never "please upvote"). Schedule PH for 00:01 PT. Finalize HN maker first-comment. |
-| **Tue 00:01 PT** | **Product Hunt** (self-hunt) | Tagline: *"Remove em dashes & AI tells — free, no signup, nothing leaves your browser."* 2+ gallery images + demo GIF (paste→clean + empty Network tab). Maker comment: the em-dash-as-AI-tell moment, client-side verifiable, explicitly **not** a detection bypass. |
+| **Tue 00:01 PT** | **Product Hunt** (self-hunt) | Tagline: *"Remove em dashes & AI tells - free, no signup, nothing leaves your browser."* 2+ gallery images + demo GIF (paste→clean + empty Network tab). Maker comment: the em-dash-as-AI-tell moment, client-side verifiable, explicitly **not** a detection bypass. |
 | **Tue 8–10am ET** | **Show HN** | Title: `Show HN: Em Dash Remover – strip AI tells from text, 100% in-browser (no upload)`. First comment: the WHY, link the open-source engine, "verify in DevTools Network tab," "not an AI-detection bypass." Reply to every comment in your own voice. |
-| **Tue AM** | **X + LinkedIn** | X: screen-recording of empty Network tab — "privacy you can verify, not trust"; quote-reply into the live em-dash discourse (Altman's fix tweet, Rolling Stone). LinkedIn: *"Recruiters now flag resumes with em dashes as AI — here's a free way to check and clean any doc before you send it."* All point at PH/HN. |
+| **Tue AM** | **X + LinkedIn** | X: screen-recording of empty Network tab - "privacy you can verify, not trust"; quote-reply into the live em-dash discourse (Altman's fix tweet, Rolling Stone). LinkedIn: *"Recruiters now flag resumes with em dashes as AI - here's a free way to check and clean any doc before you send it."* All point at PH/HN. |
 | **Tue** | **r/InternetIsBeautiful** | Free single-purpose framing: "I built a free, 100% in-browser tool that reveals the invisible characters hiding in AI text." (huge for free single-purpose tools) |
-| **Wed** | **r/ChatGPT (4.2M)** | Find/answer a "how do I remove em dashes" thread with the manual method, THEN: *"full disclosure, I also built a free tool that does this client-side — nothing leaves your browser."* Value first. |
+| **Wed** | **r/ChatGPT (4.2M)** | Find/answer a "how do I remove em dashes" thread with the manual method, THEN: *"full disclosure, I also built a free tool that does this client-side - nothing leaves your browser."* Value first. |
 | **Wed** | **Directories wave 1** | TAAFT, FutureTools, Futurepedia, TopAI.tools, **AlternativeTo** (list as alternative to undash, DashAway, QuoteCleaner, wordcounter.net, diffchecker, Hemingway). Do-follow + AI-citation layer. |
-| **Wed** | **Indie Hackers** | Build-in-public post: "I launched a privacy-first em dash remover — here's the why and the early numbers," not a link drop. |
+| **Wed** | **Indie Hackers** | Build-in-public post: "I launched a privacy-first em dash remover - here's the why and the early numbers," not a link drop. |
 | **Thu** | **r/writing + r/freelanceWriters + r/copywriting** | Emotional hook: real writers falsely accused of AI for using em dashes. Tool earns itself. |
 | **Thu** | **r/ObsidianMD + r/Notion** | Lead with the **plugin / paste-cleaner** use case ("my Obsidian plugin just got approved"), not the web app. |
 | **Thu** | **r/SEO (380K) + r/SideProject + r/SaaS / r/startups share threads** | r/SEO: the internal-linking/hub-spoke + privacy build story. Weekly share threads for the rest. |
 | **Fri** | **Peerlist + Uneed + MicroLaunch + SaaSHub** | Tier-2 directories for a second spike; extends the cycle. |
-| **Following week** | **Mini-launch #2** | Re-launch the **Invisible/Watermark Character Inspector** standalone (own URL + OG image) on Show HN / r/InternetIsBeautiful / X — the "wait, those were hidden in my text?!" reveal extends the news cycle. |
+| **Following week** | **Mini-launch #2** | Re-launch the **Invisible/Watermark Character Inspector** standalone (own URL + OG image) on Show HN / r/InternetIsBeautiful / X - the "wait, those were hidden in my text?!" reveal extends the news cycle. |
 
 > **Lobsters:** only if a member invites you; frame purely technically (client-side zero-width/homoglyph detection). Extremely marketing-allergic.
 
@@ -152,9 +152,9 @@ Launch on a **Tuesday–Thursday.**
 
 **Do NOT chase** "bypass AI detection / undetectable" head terms (penalty + brand risk).
 
-**Programmatic SEO across the 20 tools:** each `/tools/<slug>` is its own indexed landing page and link target — unique 400+ words, intent-matched H1, "how to + why" body, FAQ JSON-LD, BreadcrumbList JSON-LD, and 3–4 contextual `<RelatedTools>` links. Multiplies link-acquisition surface (e.g. pitch the word counter into "word counter" roundups, the diff viewer into "diffchecker alternative" lists).
+**Programmatic SEO across the 20 tools:** each `/tools/<slug>` is its own indexed landing page and link target - unique 400+ words, intent-matched H1, "how to + why" body, FAQ JSON-LD, BreadcrumbList JSON-LD, and 3–4 contextual `<RelatedTools>` links. Multiplies link-acquisition surface (e.g. pitch the word counter into "word counter" roundups, the diff viewer into "diffchecker alternative" lists).
 
-**Internal linking — hub & spoke:**
+**Internal linking - hub & spoke:**
 - **Hub:** `/` (core cleaner) + `/tools` index.
 - **Spokes:** every blog post deep-links its matching tool (e.g. "signs of AI writing" → human-voice-ai-tell-report, emoji-stripper, passive-voice-highlighter). Every tool page `<RelatedTools>` cross-links 3–4 siblings + back to the core. Footer grid puts a link to all 20 on every page. This routes link equity to the 15+ long-tail tools that won't earn external links alone.
 
@@ -170,7 +170,7 @@ Launch on a **Tuesday–Thursday.**
 
 | Layer | Tool | Job | Notes |
 |---|---|---|---|
-| SEO baseline | Cloudflare Web Analytics | pageviews, referrers, countries | already 1-click; cookieless, no banner; but no custom events, 10% sample, 15-row cap, 30-day retention — cannot build per-tool funnels |
+| SEO baseline | Cloudflare Web Analytics | pageviews, referrers, countries | already 1-click; cookieless, no banner; but no custom events, 10% sample, 15-row cap, 30-day retention - cannot build per-tool funnels |
 | Product analytics | **Umami Cloud Hobby (free, 100k events/mo)** | per-tool custom events, funnels | cookieless, no PII, no banner; data-attribute events; self-host fallback (~$5 VPS) when nearing cap |
 | SEO keywords | Google Search Console + Bing | impressions/clicks/position per URL | join key = tool slug |
 | Ad revenue | AdSense dashboard | CTR/revenue | reconcile in AdSense, don't pull PII into Umami |
@@ -187,7 +187,7 @@ Launch on a **Tuesday–Thursday.**
 | `input_received` `{tool, len_bucket}` | first paste/type | did they engage the textarea at all? |
 | `clean_run` `{tool, removed_total, em_dashes, smart_quotes, invisible}` | primary action | core usage + what AI tells are actually out there (PR data) |
 | `first_clean_run` `{tool}` | session's first clean | truest activation / "aha" signal |
-| `output_copied` `{tool}` | copy button | **value delivered** — the key metric |
+| `output_copied` `{tool}` | copy button | **value delivered** - the key metric |
 | `output_downloaded` `{tool, format}` | download | value for bulk/file tools |
 | `tool_switched` / `related_tool_clicked` `{from, to}` | nav between tools | does the `<RelatedTools>` curation actually drive flow? |
 | `next_step_clicked` `{from, to}` | workflow-chain button | cross-tool stickiness |
@@ -214,7 +214,7 @@ Ranked by leverage (impact × low effort), driving pages/session and the #1 conv
 | 3 | Contextual extension/Obsidian CTA, fires only after 2+ cleans (localStorage, dismissible) | Low | Targets #1 conversion; Chrome install conversion jumps to 10–30%+ with pre-existing demand |
 | 4 | "Try a sample" + real "Copied!" state, standardized across tools | Med | Kills empty-textarea bounce; first-time activation |
 | 5 | Workflow-chaining "next step" buttons w/ sessionStorage pre-fill (clean→diff→count→readability) | Med | Makes 20 islands feel like one app; removes re-paste friction |
-| 6 | Interactive "Network requests: 0" counter + "No upload · No signup · Works offline" trust strip | Med | Turns the privacy *claim* into provable *proof* — why people paste confidential text and return |
+| 6 | Interactive "Network requests: 0" counter + "No upload · No signup · Works offline" trust strip | Med | Turns the privacy *claim* into provable *proof* - why people paste confidential text and return |
 | 7 | PWA manifest + offline service worker + "Install app" (after first success, never first paint) | Med | Primary no-signup retention rail; reinforces "works in airplane mode" |
 | 8 | "Recently used tools" strip + header tool-switcher (localStorage MRU) | Low | One-tap return path for no-account repeat users |
 | 9 | Keyboard shortcuts (Cmd/Ctrl+Enter run, Cmd+Shift+C copy) + "?" hint | Med | Power-user retention; table-stakes on convertcase/wordcounter |
@@ -246,7 +246,7 @@ Ranked by leverage (impact × low effort), driving pages/session and the #1 conv
 | 8–9 | Short-form series: "Words that scream ChatGPT" / "The invisible characters hiding in your AI text" / "Why writers get falsely accused of AI" | meme-native | TikTok/Reels/Shorts + LinkedIn + X |
 | 9 | Readability for Writers: Beat the Grade-14 ChatGPT Average | readability checker / hemingway alternative | Blog → readability tool |
 | 10 | Passive Voice & Weasel Words: The Quiet AI Tells | passive voice checker / weasel words | Blog → highlighter |
-| 11 | "State of AI Text Artifacts" — aggregate removal stats (recurring) | citation bait | Blog + PR + newsletters |
+| 11 | "State of AI Text Artifacts" - aggregate removal stats (recurring) | citation bait | Blog + PR + newsletters |
 | 12 | Roundup-inclusion outreach sprint (operator prospecting, 100+ lists) + Featured.com/Qwoted ongoing | backlinks/branded search | Outreach |
 
 **Ongoing throughout:** Featured.com (revived HARO) + Qwoted answering "AI detection / em dash / ChatGPT / privacy" queries; AlternativeTo + Tier-2 directories on a recurring schedule; embeddable "AI-tell checker" widget + "Cleaned with Em Dash Remover" badge for widget link-building; small newsletter sponsorships (writer/SEO/AI), measuring branded-search lift in GSC.
@@ -257,17 +257,17 @@ Ranked by leverage (impact × low effort), driving pages/session and the #1 conv
 
 | Competitor | What it is | Gap you own |
 |---|---|---|
-| undash | Em-dash-only Chrome ext (294 PH upvotes) | Suite (10 tells not 1); users explicitly asked for curly quotes/spaces/phrases — you have them |
+| undash | Em-dash-only Chrome ext (294 PH upvotes) | Suite (10 tells not 1); users explicitly asked for curly quotes/spaces/phrases - you have them |
 | DashAway | Em-dash-only ext, unlisted (dev-mode install) | Properly listed, reliable across sites; multi-surface |
 | convertcase.net/em-dash-remover | Single tool + Ko-fi upsell on a generalist | AI-cleanup depth; suite; privacy proof |
 | Originality.AI Invisible Text Detector | Free, client-side, same privacy line | Breadth + extension + Obsidian; honest non-bypass framing; not a detection vendor |
 | CopyCleanse | Client-side cleaner, publishes aggregate stats | Suite breadth; do the stats *better* across 20 tools |
 | wordcounter.net (~14M/mo, 8.45K ref domains) | Generalist, huge authority | Don't fight head terms; out-depth on AI-cleanup long tail, cross-link into core |
 | diffchecker / Hemingway | Single-purpose giants | Your diff/readability tools capture their searchers and funnel to cleanup |
-| emdashremover.com / humanizer.ai / bypassgpt | "Evade detection" framed | Penalty/AdSense liability — position OPPOSITE; weaponize "we don't help you cheat" |
-| Obsidian: smart-typography, clean-ai-paste | Separate single-purpose plugins | Same engine as web + extension — one trusted brand |
+| emdashremover.com / humanizer.ai / bypassgpt | "Evade detection" framed | Penalty/AdSense liability - position OPPOSITE; weaponize "we don't help you cheat" |
+| Obsidian: smart-typography, clean-ai-paste | Separate single-purpose plugins | Same engine as web + extension - one trusted brand |
 
-**Gaps to own:** (1) the 20-tool privacy-first **suite**; (2) **provable** transparency (Network-tab counter, open-source, offline); (3) **one engine across 3 surfaces**; (4) the **invisible/watermark/zero-width** cluster with honest framing; (5) **on-device AI rewrite** (Gemini Nano / WebLLM) — the only "rewrite" that never leaves the device, literally uncopyable by server-bound humanizers; (6) the **anti-humanizer / defend-the-human-voice** editorial lane that earns journalist links the bypass crowd repels.
+**Gaps to own:** (1) the 20-tool privacy-first **suite**; (2) **provable** transparency (Network-tab counter, open-source, offline); (3) **one engine across 3 surfaces**; (4) the **invisible/watermark/zero-width** cluster with honest framing; (5) **on-device AI rewrite** (Gemini Nano / WebLLM) - the only "rewrite" that never leaves the device, literally uncopyable by server-bound humanizers; (6) the **anti-humanizer / defend-the-human-voice** editorial lane that earns journalist links the bypass crowd repels.
 
 ---
 

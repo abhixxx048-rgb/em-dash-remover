@@ -1,5 +1,5 @@
 /**
- * Trimmed plain-JS port of src/lib/cleaner.ts — the SAME grammar-aware engine
+ * Trimmed plain-JS port of src/lib/cleaner.ts - the SAME grammar-aware engine
  * the website uses, with zero DOM/network dependencies so it drops straight into
  * a Manifest V3 content script.
  *
@@ -7,7 +7,7 @@
  * should ideally bundle the TS source directly so this hand-port can be deleted.
  */
 
-const EM = '—'; // —
+const EM = '-'; // -
 const EN = '–'; // –
 
 // Zero-width & invisible characters frequently left in AI / web-copied text.

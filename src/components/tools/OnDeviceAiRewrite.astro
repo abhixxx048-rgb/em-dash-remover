@@ -16,7 +16,7 @@
         <span id="cap-icon" aria-hidden="true">○</span>
         <span id="cap-text">Checking on-device AI…</span>
       </span>
-      <span class="muted hidden text-xs sm:inline">🔒 Runs on your device — no text is sent to any server.</span>
+      <span class="muted hidden text-xs sm:inline">🔒 Runs on your device - no text is sent to any server.</span>
     </div>
 
     <!-- Controls -->
@@ -80,7 +80,7 @@
           ></textarea>
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
-            <p class="muted text-sm">Paste your text — or try an example:</p>
+            <p class="muted text-sm">Paste your text - or try an example:</p>
             <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
               <button data-sample="email" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✉️ AI email</button>
               <button data-sample="essay" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📝 Essay</button>
@@ -141,7 +141,7 @@
               style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
           </svg>
           <div class="absolute inset-0 flex flex-col items-center justify-center">
-            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">-</span>
             <span class="text-[9px] muted">/ 100</span>
           </div>
         </div>
@@ -165,7 +165,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 On-device path runs entirely in your browser — open DevTools → Network and you'll see zero requests during a rewrite.
+    🔒 On-device path runs entirely in your browser - open DevTools → Network and you'll see zero requests during a rewrite.
     The only network use is Chrome's one-time model download. No cloud fallback, ever.
   </p>
 </section>
@@ -344,7 +344,7 @@
     const num = $<HTMLSpanElement>('score-num');
     const ring = document.getElementById('ring') as unknown as SVGCircleElement;
     if (!output.value.trim() || !input.value.trim()) {
-      num.textContent = '—'; num.dataset.v = '0';
+      num.textContent = '-'; num.dataset.v = '0';
       ring.style.strokeDashoffset = String(RING);
       $<HTMLParagraphElement>('vm-label').textContent = 'Rewrite to preserve your voice';
       return;
@@ -473,7 +473,7 @@
     } catch (err) {
       // Aborted? Keep the partial output the user already saw (Section 5 #15).
       if ((err as DOMException)?.name === 'AbortError') {
-        if (output.value.trim()) { setOutput(output.value); toast('Stopped — kept the partial rewrite'); }
+        if (output.value.trim()) { setOutput(output.value); toast('Stopped - kept the partial rewrite'); }
         else toast('Cancelled');
       } else {
         // create() rejected (hardware/storage shortfall) → deterministic fallback.
@@ -481,7 +481,7 @@
         const det = deterministicRewrite(src);
         setOutput(det.text);
         paintNotes([...new Set([...pre.notes, ...det.notes])]);
-        toast('On-device AI failed — applied deterministic cleanup');
+        toast('On-device AI failed - applied deterministic cleanup');
       }
     } finally {
       $('dl-card').hidden = true;
@@ -560,7 +560,7 @@
   document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
     b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!]; onInput(); setPane('input'); }));
 
-  // ----- live, debounced input handling (rAF) — updates the empty state & stats
+  // ----- live, debounced input handling (rAF) - updates the empty state & stats
   let raf = 0;
   function onInput() {
     $<HTMLDivElement>('empty').hidden = input.value.length > 0;

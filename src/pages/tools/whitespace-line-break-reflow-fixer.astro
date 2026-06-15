@@ -7,7 +7,7 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Why does copying from a PDF add a line break after every line?',
-    a: 'A PDF stores text as positioned lines, not flowing paragraphs. When you copy, each visible line comes with its own line break — a "soft return" the layout added just to fit the page margin. Pasted into a document, those soft returns make a paragraph look like a list of fragments. This tool detects the soft returns and removes only them, stitching the fragments back into real paragraphs.',
+    a: 'A PDF stores text as positioned lines, not flowing paragraphs. When you copy, each visible line comes with its own line break - a "soft return" the layout added just to fit the page margin. Pasted into a document, those soft returns make a paragraph look like a list of fragments. This tool detects the soft returns and removes only them, stitching the fragments back into real paragraphs.',
   },
   {
     q: 'What is the difference between a soft return and a hard return?',
@@ -19,7 +19,7 @@ const faqs = [
   },
   {
     q: 'How do I rejoin words that were split with a hyphen at the end of a line?',
-    a: 'Turn on "Rejoin hyphen-split words". When a line ends in a word followed by a hyphen and the next line begins with a lowercase word — like "infor-" then "mation" — the tool joins them into "information" and drops the hyphen. Genuine compounds such as "well-known" and number ranges are left untouched because the hyphen is not at the end of a line.',
+    a: 'Turn on "Rejoin hyphen-split words". When a line ends in a word followed by a hyphen and the next line begins with a lowercase word - like "infor-" then "mation" - the tool joins them into "information" and drops the hyphen. Genuine compounds such as "well-known" and number ranges are left untouched because the hyphen is not at the end of a line.',
   },
   {
     q: 'How do I remove double spaces and extra whitespace from text?',
@@ -39,7 +39,7 @@ const webApp = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
   '@id': `${Astro.site}tools/whitespace-line-break-reflow-fixer#app`,
-  name: 'Whitespace & Line-Break Reflow Fixer — Remove Line Breaks Online',
+  name: 'Whitespace & Line-Break Reflow Fixer - Remove Line Breaks Online',
   url: `${Astro.site}tools/whitespace-line-break-reflow-fixer`,
   applicationCategory: 'UtilitiesApplication',
   operatingSystem: 'Web Browser',
@@ -70,8 +70,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Remove Line Breaks Online — Whitespace & Line-Break Reflow Fixer"
-  description="Free line break remover: fix PDF & email line breaks, remove extra spaces, drop blank lines, and reflow hard-wrapped text into clean paragraphs — including rejoining hyphen-split words. 100% in your browser."
+  title="Remove Line Breaks Online - Whitespace & Line-Break Reflow Fixer"
+  description="Free line break remover: fix PDF & email line breaks, remove extra spaces, drop blank lines, and reflow hard-wrapped text into clean paragraphs - including rejoining hyphen-split words. 100% in your browser."
 >
   <main class="halo">
     <!-- Hero -->
@@ -81,13 +81,13 @@ const faqSchema = {
         100% in your browser · free · no signup
       </p>
       <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
-        Remove Line Breaks — Clean Up Messy PDF &amp; Email Text
+        Remove Line Breaks - Clean Up Messy PDF &amp; Email Text
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Paste text mangled by copying out of a PDF, email or terminal and get
         back clean, readable paragraphs. It collapses extra spaces, trims trailing
         whitespace, drops stray blank lines, and <strong>smartly reflows</strong>
-        hard-wrapped lines — removing only the soft breaks and rejoining
+        hard-wrapped lines - removing only the soft breaks and rejoining
         hyphen-split words. Your text never leaves your browser.
       </p>
     </header>
@@ -135,7 +135,7 @@ const faqSchema = {
         to the document's wrap width, and whether the leftover space could have fit
         the next word. It never joins across a blank line, a bullet or numbered
         list item, a Markdown heading, a blockquote, a table row, or an indented
-        code block — so your lists and paragraphs survive intact.
+        code block - so your lists and paragraphs survive intact.
       </p>
 
       <h2 class="text-2xl font-bold">Rejoin hyphenated words split across lines</h2>
@@ -161,12 +161,12 @@ const faqSchema = {
         treated as a real boundary, so nested replies are not merged together.
       </p>
 
-      <h2 class="text-2xl font-bold">100% private — runs in your browser</h2>
+      <h2 class="text-2xl font-bold">100% private - runs in your browser</h2>
       <p class="muted">
         There is no server and no upload. Every transformation is deterministic
         string processing done with plain JavaScript on your device, so you can
         safely clean confidential documents. Your last-used options are remembered
-        locally for next time — but never your text. Open your browser's DevTools
+        locally for next time - but never your text. Open your browser's DevTools
         Network tab while you work and you'll see zero requests, and the tool keeps
         working with your connection turned off.
       </p>

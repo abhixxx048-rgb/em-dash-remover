@@ -2,7 +2,7 @@
 //
 // Brand promise: your text never leaves your device. This module sends
 // COUNTS and metadata ONLY. NEVER pass raw user text, paste contents, input
-// values, HTML or document bodies into track() — props are filtered, but the
+// values, HTML or document bodies into track() - props are filtered, but the
 // caller must never hand user content to this function in the first place.
 //
 // Everything here is defensive: it never throws, and it is a no-op unless
@@ -28,7 +28,7 @@ const ALLOWED = new Set([
   'share_click',
 ]);
 
-// Prop keys that might carry user text — always stripped.
+// Prop keys that might carry user text - always stripped.
 const BANNED_KEY = /text|content|input|value|paste|body|html/i;
 
 type Props = Record<string, string | number | boolean>;

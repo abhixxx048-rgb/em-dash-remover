@@ -3,7 +3,7 @@
   "name": "Em Dash Remover",
   "version": "0.1.0",
   "minAppVersion": "1.4.0",
-  "description": "Clean AI paste in Obsidian: grammar-aware em dash removal, curly quotes, ellipses and invisible watermark characters — 100% local, on paste or on demand.",
+  "description": "Clean AI paste in Obsidian: grammar-aware em dash removal, curly quotes, ellipses and invisible watermark characters - 100% local, on paste or on demand.",
   "author": "Em Dash Remover",
   "authorUrl": "https://emdashremover.com",
   "isDesktopOnly": false

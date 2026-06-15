@@ -7,19 +7,19 @@ import TrustStrip from '../../components/TrustStrip.astro';
 const faqs = [
   {
     q: 'Does this send my text anywhere?',
-    a: 'No. All emoji and symbol stripping happens entirely in your browser. Nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests — it even works offline.',
+    a: 'No. All emoji and symbol stripping happens entirely in your browser. Nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests - it even works offline.',
   },
   {
     q: 'Will it remove © ™ ° and currency symbols?',
-    a: 'No. By default the tool keeps semantically meaningful symbols — currency ($ € £ ¥), math and signs (° ± × ÷ → ≤ ≥), and legal marks (© ® ™ §). That is the #1 thing naive emoji removers get wrong. You can turn each safe-keep class off in Options if you really want to strip everything.',
+    a: 'No. By default the tool keeps semantically meaningful symbols - currency ($ € £ ¥), math and signs (° ± × ÷ → ≤ ≥), and legal marks (© ® ™ §). That is the #1 thing naive emoji removers get wrong. You can turn each safe-keep class off in Options if you really want to strip everything.',
   },
   {
     q: 'Does it handle skin-tone, family, and flag emoji?',
-    a: 'Yes. It removes whole emoji grapheme clusters — skin-tone modifiers, ZWJ-joined families and professions, regional-indicator flag pairs, and keycaps like 1️⃣ — so you never get an orphaned fragment such as a bare 1 or a dangling joiner left behind.',
+    a: 'Yes. It removes whole emoji grapheme clusters - skin-tone modifiers, ZWJ-joined families and professions, regional-indicator flag pairs, and keycaps like 1️⃣ - so you never get an orphaned fragment such as a bare 1 or a dangling joiner left behind.',
   },
   {
     q: 'What is the difference between an emoji and a decorative bullet?',
-    a: 'Emoji are pictographs like 🚀✅👍. Decorative bullets are the ornamental glyphs LLMs use to start list items and headings — ✦ ▶ ➤ ❖ ● and similar. The tool removes both, but with separate toggles, and a "list bullets only" mode that strips a decorative glyph only when it sits at the start of a line and leaves the same glyph alone mid-sentence.',
+    a: 'Emoji are pictographs like 🚀✅👍. Decorative bullets are the ornamental glyphs LLMs use to start list items and headings - ✦ ▶ ➤ ❖ ● and similar. The tool removes both, but with separate toggles, and a "list bullets only" mode that strips a decorative glyph only when it sits at the start of a line and leaves the same glyph alone mid-sentence.',
   },
   {
     q: 'Why does ChatGPT add emoji bullets and ✅ marks?',
@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     q: 'Can I turn decorative bullets into plain dashes?',
-    a: 'Yes. Enable "List bullets only" and pick what a leading bullet becomes — nothing, a hyphen (-), an asterisk (*), or a plain neutral bullet (•) — so your list structure stays intact instead of collapsing.',
+    a: 'Yes. Enable "List bullets only" and pick what a leading bullet becomes - nothing, a hyphen (-), an asterisk (*), or a plain neutral bullet (•) - so your list structure stays intact instead of collapsing.',
   },
 ];
 
@@ -65,8 +65,8 @@ const faqSchema = {
 ---
 
 <Base
-  title="Remove Emoji from Text — Free Emoji & Decorative-Symbol Stripper"
-  description="Remove emoji and decorative bullets (✦▶❖✅) from ChatGPT and AI text — free, private, 100% in your browser. Keeps your real symbols (©, °, $). Strip emoji and special characters instantly."
+  title="Remove Emoji from Text - Free Emoji & Decorative-Symbol Stripper"
+  description="Remove emoji and decorative bullets (✦▶❖✅) from ChatGPT and AI text - free, private, 100% in your browser. Keeps your real symbols (©, °, $). Strip emoji and special characters instantly."
 >
   <main class="halo">
     <!-- Hero -->
@@ -82,7 +82,7 @@ const faqSchema = {
       </h1>
       <p class="mx-auto mt-3 max-w-2xl text-lg muted">
         Strip the emoji, checkmarks, and ✦▶❖ ornamental bullets that scream
-        "an LLM wrote this" — instantly and privately. Grammar-safe defaults keep
+        "an LLM wrote this" - instantly and privately. Grammar-safe defaults keep
         your real symbols (©, °, $) while pulling the decoration. Clean AI writing
         for real quality, keep your human voice.
       </p>
@@ -97,9 +97,9 @@ const faqSchema = {
       <h2 class="text-2xl font-bold">What it removes (and what it keeps)</h2>
       <p class="muted">
         This tool removes emoji and ornamental symbols in two careful passes. The
-        emoji pass removes whole grapheme clusters — base emoji, variation
+        emoji pass removes whole grapheme clusters - base emoji, variation
         selectors, skin-tone modifiers, ZWJ-joined families and professions, flag
-        pairs, and keycap sequences like 1️⃣ — so you never get a stray
+        pairs, and keycap sequences like 1️⃣ - so you never get a stray
         <code>1</code> or a dangling joiner left behind, the classic failure of
         naive removers. The decorative pass strips dingbats and AI-bullet glyphs
         such as <code>✦ ▶ ➤ ❖ ● ✅</code>. Crucially, it
@@ -116,7 +116,7 @@ const faqSchema = {
         habits from web and chat data, then sprinkle 🚀✨🔹 through lists and
         headings. Dropped into an email, a LinkedIn post, a CMS, or a Word doc, that
         decoration instantly reads as machine-generated and off-brand. Removing it
-        is not about beating a detector — it is about presenting clean, professional
+        is not about beating a detector - it is about presenting clean, professional
         prose in your own voice. As a bonus, it also makes your text cleaner for
         screen readers, which would otherwise announce "white heavy check mark"
         before every line.
@@ -131,11 +131,11 @@ const faqSchema = {
       </ol>
       <p class="muted">
         Tip: press <kbd>Ctrl/Cmd + Enter</kbd> to re-run, and <kbd>Esc</kbd> to clear.
-        Your preset and toggle choices are remembered between visits — but your text
+        Your preset and toggle choices are remembered between visits - but your text
         is never saved.
       </p>
 
-      <h2 class="text-2xl font-bold">100% in your browser — your text never leaves your device</h2>
+      <h2 class="text-2xl font-bold">100% in your browser - your text never leaves your device</h2>
       <p class="muted">
         Everything here is deterministic string work that runs locally. There is no
         upload, no API key, and no cookie needed for the tool to function, so the

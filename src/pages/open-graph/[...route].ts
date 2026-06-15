@@ -3,14 +3,14 @@ import { OGImageRoute } from 'astro-og-canvas';
 // Build-time generated 1200×630 OG images, one per page. Tool pages use keys of
 // the form `tools-<slug>` (see Base.astro, which maps /tools/<slug> → that key).
 const pages = {
-  index: { title: 'Em Dash Remover', description: 'Free AI text cleaner — remove em dashes, smart quotes & invisible characters. 100% in your browser.' },
+  index: { title: 'Em Dash Remover', description: 'Free AI text cleaner - remove em dashes, smart quotes & invisible characters. 100% in your browser.' },
   about: { title: 'About Em Dash Remover', description: 'A free, privacy-first, grammar-aware AI text cleaner.' },
   contact: { title: 'Contact Us', description: 'Feedback, bugs, and partnership enquiries.' },
   terms: { title: 'Terms & Conditions', description: 'Terms of use for Em Dash Remover.' },
   privacy: { title: 'Privacy Policy', description: 'Your text never leaves your browser.' },
 
   // Tool hub + individual tools.
-  tools: { title: 'Free Text Tools', description: '20 free tools to clean, convert & improve writing — 100% in your browser.' },
+  tools: { title: 'Free Text Tools', description: '20 free tools to clean, convert & improve writing - 100% in your browser.' },
   'tools-invisible-watermark-character-inspector': { title: 'Invisible Character Inspector', description: 'See & strip hidden zero-width, watermark and bidi characters.' },
   'tools-word-reading-time-counter': { title: 'Word & Reading-Time Counter', description: 'Live word, character & sentence counts, reading time and platform limits.' },
   'tools-before-after-diff-viewer': { title: 'Before/After Diff Viewer', description: 'Compare original vs cleaned text with per-change accept/reject.' },

@@ -67,7 +67,7 @@
       <!-- Input / read surface -->
       <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
         <div class="mb-2 flex items-center justify-between">
-          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your writing — then hear it</h2>
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your writing - then hear it</h2>
           <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
         </div>
 
@@ -84,7 +84,7 @@
           <div id="reader" hidden
             class="max-h-[22rem] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 text-[16px] leading-relaxed"
             style="background: var(--c-paper);"
-            aria-label="Reading view — click a sentence to start there"></div>
+            aria-label="Reading view - click a sentence to start there"></div>
 
           <!-- Empty state -->
           <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
@@ -158,7 +158,7 @@
   </div>
 
   <p class="mt-3 text-center text-xs muted">
-    🔒 With a <span id="local-note" class="font-medium">local</span> voice this runs entirely on your device — nothing is uploaded. Works offline.
+    🔒 With a <span id="local-note" class="font-medium">local</span> voice this runs entirely on your device - nothing is uploaded. Works offline.
   </p>
 </section>
 
@@ -248,7 +248,7 @@
   let current: ProofAnalysis = analyze('');
   // The engine measures every offset against the *precleaned* text (invisible
   // chars stripped). Render and slice against this same cleaned string so the
-  // highlight coordinate space matches the engine's — otherwise spans drift.
+  // highlight coordinate space matches the engine's - otherwise spans drift.
   let source = '';
   let voices: SpeechSynthesisVoice[] = [];
   let playState: 'idle' | 'playing' | 'paused' = 'idle';
@@ -301,7 +301,7 @@
       badge.style.color = 'var(--color-ok)';
       $('local-note').textContent = 'local';
     } else {
-      badge.textContent = '☁ Cloud voice — text leaves your browser';
+      badge.textContent = '☁ Cloud voice - text leaves your browser';
       badge.style.background = 'color-mix(in srgb, var(--color-warn) 18%, transparent)';
       badge.style.color = 'var(--color-warn)';
       $('local-note').textContent = 'cloud';
@@ -390,8 +390,8 @@
 
     if (!items.length) {
       ul.innerHTML = current.stats.words
-        ? '<li class="muted">Nothing flagged yet — press Play and tap 🚩 when something sounds off.</li>'
-        : '<li class="muted">—</li>';
+        ? '<li class="muted">Nothing flagged yet - press Play and tap 🚩 when something sounds off.</li>'
+        : '<li class="muted">-</li>';
     } else {
       ul.innerHTML = items.join('');
     }
@@ -421,7 +421,7 @@
     if (stats.longestSentenceWords >= 25 && stats.longestSentenceChunk >= 0) {
       longest.hidden = false;
       longest.classList.remove('hidden');
-      longest.innerHTML = `📏 Longest sentence: <strong>${stats.longestSentenceWords} words</strong>. Listen hardest there — that's where flow usually breaks. <button data-jump="${stats.longestSentenceChunk}" class="text-accent underline">Find it</button>`;
+      longest.innerHTML = `📏 Longest sentence: <strong>${stats.longestSentenceWords} words</strong>. Listen hardest there - that's where flow usually breaks. <button data-jump="${stats.longestSentenceChunk}" class="text-accent underline">Find it</button>`;
     } else {
       longest.classList.add('hidden');
     }
@@ -529,7 +529,7 @@
     updateProgress();
 
     // Word-level highlight via boundary events (Chromium/Safari; absent on
-    // many Linux/Android engines — we degrade to sentence-level silently).
+    // many Linux/Android engines - we degrade to sentence-level silently).
     u.onboundary = (e: SpeechSynthesisEvent) => {
       boundarySeen = true;
       if (e.name === 'word' || e.charLength) {
@@ -564,9 +564,9 @@
     releaseWakeLock();
     reader.querySelectorAll('.rap-active').forEach((e) => e.classList.remove('rap-active'));
     setTransport();
-    $('progress-label').textContent = `Heard it all — ${current.flags.length + manualFlags.size} spot${current.flags.length + manualFlags.size === 1 ? '' : 's'} flagged`;
+    $('progress-label').textContent = `Heard it all - ${current.flags.length + manualFlags.size} spot${current.flags.length + manualFlags.size === 1 ? '' : 's'} flagged`;
     $('progress-bar').style.width = '100%';
-    toast('Done — review your fix-list');
+    toast('Done - review your fix-list');
   }
 
   function play() {
