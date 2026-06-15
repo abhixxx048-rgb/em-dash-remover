@@ -31,6 +31,7 @@ export const TOOLS: Tool[] = [
   t('case-converter', '🔠', 'Case Converter', 'UPPER, lower, Sentence, Title (AP/Chicago) and developer cases.', 'clean'),
   t('whitespace-line-break-reflow-fixer', '↹', 'Whitespace & Reflow Fixer', 'Collapse spaces and unwrap hard-wrapped PDF/email text into paragraphs.', 'clean'),
   t('paste-from-word-docs-cleaner', '📋', 'Paste-from-Word Cleaner', 'Strip Word/Docs formatting soup, keep real paragraphs.', 'clean'),
+  t('markdown-to-clean-prose', '📝', 'Markdown → Clean Prose', 'Strip ##, **bold**, bullets and tables from ChatGPT output into clean prose.', 'clean'),
   t('straight-to-curly-quotes-converter', '“”', 'Straight-to-Curly Quotes', 'Add correct curly quotes, apostrophes and proper dashes for publishing.', 'clean'),
   t('sentence-splitter', '✂️', 'Sentence Splitter', 'One sentence per line with a cadence chart for auditing rhythm.', 'clean'),
 
@@ -112,9 +113,14 @@ const RELATED: Record<string, string[]> = {
     'sentence-splitter',
   ],
   'paste-from-word-docs-cleaner': [
+    'markdown-to-clean-prose',
     'invisible-watermark-character-inspector',
     'whitespace-line-break-reflow-fixer',
-    'straight-to-curly-quotes-converter',
+  ],
+  'markdown-to-clean-prose': [
+    'emoji-decorative-symbol-stripper',
+    'paste-from-word-docs-cleaner',
+    'human-voice-ai-tell-report',
   ],
   'straight-to-curly-quotes-converter': [
     'case-converter',

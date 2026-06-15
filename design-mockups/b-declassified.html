@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Em Dash Remover — Declassify your AI text</title>
+<meta name="description" content="Strip em dashes, smart quotes, invisible characters and other AI tells from ChatGPT, Claude and Gemini text. 100% in-browser. No upload. No signup." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ground: #E4E0D6;
+    --surface: #F2EFE8;
+    --ink: #17150F;
+    --redaction: #0A0A0A;
+    --red: #C8102E;
+    --green: #1F7A4D;
+    --muted: #6A6555;
+    --hairline: #C7C2B4;
+
+    --display: "Saira Condensed", "Arial Narrow", sans-serif;
+    --body: "IBM Plex Sans", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent 0,
+        transparent 31px,
+        rgba(23, 21, 15, 0.025) 31px,
+        rgba(23, 21, 15, 0.025) 32px
+      ),
+      var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 3px solid var(--red);
+    outline-offset: 2px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Header ---------- */
+  header.site {
+    border-bottom: 2px solid var(--ink);
+    background: var(--surface);
+  }
+
+  .site-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 0;
+  }
+
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    font-family: var(--display);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .wordmark .glyph {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background: var(--redaction);
+    color: var(--ground);
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 2px;
+  }
+
+  .wordmark .em { color: var(--ink); }
+  .wordmark .strike {
+    position: relative;
+    color: var(--muted);
+  }
+  .wordmark .strike::after {
+    content: "";
+    position: absolute;
+    left: -2px; right: -2px;
+    top: 48%;
+    height: 5px;
+    background: var(--red);
+    transform: rotate(-3deg);
+  }
+
+  .case-tab {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--surface);
+    background: var(--ink);
+    padding: 6px 12px 5px;
+    border-radius: 4px 4px 0 0;
+    align-self: flex-end;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+  .header-meta .file-no { color: var(--ink); }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 44px 0 56px; }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  @media (min-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1.05fr 1.1fr;
+      align-items: start;
+      gap: 44px;
+    }
+  }
+
+  .kicker {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--red);
+    border: 1px solid var(--red);
+    padding: 5px 10px;
+    border-radius: 3px;
+    margin-bottom: 22px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.005em;
+    line-height: 0.95;
+    font-size: clamp(40px, 8.5vw, 76px);
+    margin: 0 0 18px;
+  }
+  h1 .hl {
+    color: var(--ink);
+    background: linear-gradient(transparent 62%, rgba(200,16,46,0.22) 62%);
+  }
+
+  .lede {
+    font-size: 18px;
+    max-width: 46ch;
+    margin: 0 0 26px;
+    color: #2c2a22;
+  }
+
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .btn {
+    font-family: var(--display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 17px;
+    text-decoration: none;
+    padding: 13px 22px;
+    border-radius: 3px;
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    transition: transform 0.08s ease;
+  }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--ground);
+  }
+  .btn-secondary {
+    background: transparent;
+    color: var(--ink);
+  }
+  .btn:active { transform: translateY(1px); }
+
+  .cta-note {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+  }
+
+  /* ---------- The dossier / signature ---------- */
+  .dossier {
+    position: relative;
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    box-shadow: 7px 7px 0 rgba(23, 21, 15, 0.16);
+  }
+
+  .dossier-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--ground);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .dossier-head .dots { display: inline-flex; gap: 6px; }
+  .dossier-head .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    border: 1.5px solid var(--ink);
+  }
+  .dossier-head .dot.red { background: var(--red); border-color: var(--red); }
+
+  .doc {
+    position: relative;
+    padding: 26px 24px 30px;
+    font-size: 16.5px;
+    line-height: 2.05;
+    color: #2a281f;
+  }
+
+  .doc p { margin: 0 0 4px; }
+
+  .doc .ln {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--hairline);
+    margin-right: 10px;
+    user-select: none;
+  }
+
+  /* redaction tells */
+  .tell {
+    position: relative;
+    display: inline-block;
+    white-space: nowrap;
+  }
+  .tell > .txt { position: relative; z-index: 0; }
+  .tell > .bar {
+    position: absolute;
+    inset: -2px -3px;
+    background: var(--redaction);
+    border-radius: 2px;
+    transform-origin: left center;
+    transform: scaleX(0);
+    z-index: 2;
+  }
+  .tell.invisible > .bar { background: var(--redaction); }
+
+  .animate .tell > .bar {
+    animation: wipe 0.5s cubic-bezier(0.7, 0, 0.3, 1) forwards;
+  }
+  .tell.t1 > .bar { animation-delay: 0.35s; }
+  .tell.t2 > .bar { animation-delay: 0.7s; }
+  .tell.t3 > .bar { animation-delay: 1.05s; }
+  .tell.t4 > .bar { animation-delay: 1.4s; }
+
+  @keyframes wipe {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+
+  /* annotation flags on bars */
+  .tell > .flag {
+    position: absolute;
+    top: -16px;
+    right: 0;
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    color: var(--red);
+    opacity: 0;
+    white-space: nowrap;
+    z-index: 3;
+  }
+  .animate .tell > .flag {
+    animation: flagIn 0.3s ease forwards;
+  }
+  .tell.t1 > .flag { animation-delay: 0.85s; }
+  .tell.t2 > .flag { animation-delay: 1.2s; }
+  .tell.t3 > .flag { animation-delay: 1.55s; }
+  .tell.t4 > .flag { animation-delay: 1.9s; }
+
+  @keyframes flagIn {
+    from { opacity: 0; transform: translateY(3px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* the stamp */
+  .stamp {
+    position: absolute;
+    right: 14px;
+    bottom: 18px;
+    z-index: 5;
+    font-family: var(--mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--green);
+    border: 2px solid var(--green);
+    border-radius: 5px;
+    padding: 8px 14px 6px;
+    text-align: center;
+    line-height: 1.15;
+    letter-spacing: 0.04em;
+    transform: rotate(-11deg) scale(1.3);
+    opacity: 0;
+    background: rgba(242, 239, 232, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(31,122,77,0.35);
+  }
+  .stamp .big { font-size: 19px; display: block; }
+  .stamp .small { font-size: 10px; letter-spacing: 0.14em; }
+
+  .animate .stamp {
+    animation: stampDown 0.32s cubic-bezier(0.18, 1.5, 0.4, 1) forwards;
+    animation-delay: 2.05s;
+  }
+  @keyframes stampDown {
+    0%   { opacity: 0; transform: rotate(-11deg) scale(1.6); }
+    60%  { opacity: 1; transform: rotate(-11deg) scale(0.94); }
+    100% { opacity: 1; transform: rotate(-11deg) scale(1); }
+  }
+
+  .doc-foot {
+    border-top: 1px dashed var(--hairline);
+    padding: 12px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .doc-foot .ok { color: var(--green); }
+
+  /* ---------- Tools strip ---------- */
+  .tools { padding: 8px 0 56px; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .section-label::after {
+    content: "";
+    flex: 1;
+    height: 2px;
+    background: var(--ink);
+  }
+
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 620px) {
+    .tool-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (min-width: 980px) {
+    .tool-grid { grid-template-columns: repeat(5, 1fr); }
+  }
+
+  .tool {
+    background: var(--surface);
+    border: 1.5px solid var(--ink);
+    border-radius: 4px;
+    padding: 16px 15px 18px;
+    position: relative;
+  }
+  .tool .idx {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--red);
+    display: block;
+    margin-bottom: 10px;
+  }
+  .tool h3 {
+    font-family: var(--display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    font-size: 19px;
+    line-height: 1.02;
+    margin: 0 0 8px;
+  }
+  .tool p {
+    margin: 0;
+    font-size: 13.5px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* ---------- Trust line ---------- */
+  .trust {
+    border-top: 2px solid var(--ink);
+    border-bottom: 2px solid var(--ink);
+    background: var(--ink);
+    color: var(--ground);
+  }
+  .trust-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 0;
+  }
+  .trust-claims {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 22px;
+    font-family: var(--display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 19px;
+  }
+  .trust-claims span { display: inline-flex; align-items: center; gap: 9px; }
+  .trust-claims .tick {
+    color: var(--green);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+
+  .net-monitor {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    border: 1.5px solid var(--green);
+    border-radius: 4px;
+    padding: 8px 13px;
+    background: rgba(31,122,77,0.12);
+    white-space: nowrap;
+  }
+  .net-monitor .pip {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 0 rgba(31,122,77,0.6);
+    animation: pip 2.4s ease-out infinite;
+  }
+  @keyframes pip {
+    0%   { box-shadow: 0 0 0 0 rgba(31,122,77,0.55); }
+    70%  { box-shadow: 0 0 0 7px rgba(31,122,77,0); }
+    100% { box-shadow: 0 0 0 0 rgba(31,122,77,0); }
+  }
+  .net-monitor .count { color: var(--green); font-weight: 700; }
+
+  /* ---------- Footer ---------- */
+  footer.site {
+    padding: 28px 0 40px;
+  }
+  .foot-inner {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: baseline;
+  }
+  .foot-inner .mark {
+    font-family: var(--display);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 16px;
+  }
+  .foot-meta {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+  .foot-meta a { text-decoration: none; }
+  .foot-meta a:hover { color: var(--red); }
+
+  .declass-line {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-top: 1px dashed var(--hairline);
+    margin-top: 22px;
+    padding-top: 14px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate .tell > .bar { animation: none; transform: scaleX(1); }
+    .animate .tell > .flag { animation: none; opacity: 1; }
+    .animate .stamp { animation: none; opacity: 1; transform: rotate(-11deg) scale(1); }
+    .net-monitor .pip { animation: none; }
+  }
+</style>
+</head>
+<body>
+  <header class="site">
+    <div class="wrap site-bar">
+      <a class="wordmark" href="#" aria-label="Em Dash Remover home">
+        <span class="glyph" aria-hidden="true">—</span>
+        <span><span class="em">EM&nbsp;DASH</span> <span class="strike">REMOVER</span></span>
+      </a>
+      <div class="header-meta">
+        <span class="file-no">FILE&nbsp;No.&nbsp;ED&#8209;000</span>
+        <span class="case-tab">CASE&nbsp;OPEN</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <span class="kicker">Classification // AI&nbsp;Text&nbsp;Cleanup</span>
+          <h1>Redact the <span class="hl">tells</span>.<br />Keep the&nbsp;voice.</h1>
+          <p class="lede">
+            Paste text from ChatGPT, Claude, or Gemini. We strip em dashes,
+            curly quotes, zero-width characters, and the giveaway phrases that
+            scream "machine wrote this" — right in your browser. Nothing leaves
+            your device.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#">Paste &amp; clean text</a>
+            <a class="btn btn-secondary" href="#tools">View the toolkit</a>
+          </div>
+          <p class="cta-note">No account. No upload. Open the source if you don't believe us.</p>
+        </div>
+
+        <!-- SIGNATURE: the dossier -->
+        <div class="dossier" id="dossier">
+          <div class="dossier-head">
+            <span>Exhibit&nbsp;A — raw_ai_draft.txt</span>
+            <span class="dots" aria-hidden="true">
+              <span class="dot"></span><span class="dot"></span><span class="dot red"></span>
+            </span>
+          </div>
+
+          <div class="doc">
+            <p>
+              <span class="ln">01</span>In today's<span class="tell t1"><span class="txt">&nbsp;fast&#8209;paced world</span><span class="bar"></span><span class="flag">cliché</span></span>, our team set out to
+            </p>
+            <p>
+              <span class="ln">02</span><span class="tell t2"><span class="txt">delve</span><span class="bar"></span><span class="flag">AI&nbsp;tell</span></span> into the data<span class="tell t3"><span class="txt">&nbsp;—&nbsp;</span><span class="bar"></span><span class="flag">em&nbsp;dash</span></span>and uncover insights
+            </p>
+            <p>
+              <span class="ln">03</span>that would, quite frankly, <span class="tell invisible t4"><span class="txt">reshape&#8203;</span><span class="bar"></span><span class="flag">zero&#8209;width&nbsp;U+200B</span></span> the conversation
+            </p>
+            <p>
+              <span class="ln">04</span>and move the needle going forward.
+            </p>
+
+            <div class="stamp" aria-hidden="true">
+              <span class="big">CLEANED</span>
+              <span class="small">0&nbsp;UPLOADS</span>
+            </div>
+          </div>
+
+          <div class="doc-foot">
+            <span>4&nbsp;tells&nbsp;detected</span>
+            <span class="ok">&#10003;&nbsp;Processed&nbsp;locally</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOLS -->
+    <section class="tools" id="tools">
+      <div class="wrap">
+        <h2 class="section-label">Supporting&nbsp;Toolkit</h2>
+        <div class="tool-grid">
+          <article class="tool">
+            <span class="idx">TOOL&nbsp;01</span>
+            <h3>Invisible Character Inspector</h3>
+            <p>Exposes zero-width and hidden Unicode the eye can't catch.</p>
+          </article>
+          <article class="tool">
+            <span class="idx">TOOL&nbsp;02</span>
+            <h3>Word Counter</h3>
+            <p>Live counts for words, characters, and reading time.</p>
+          </article>
+          <article class="tool">
+            <span class="idx">TOOL&nbsp;03</span>
+            <h3>Diff Viewer</h3>
+            <p>Shows exactly what got redacted, line by line.</p>
+          </article>
+          <article class="tool">
+            <span class="idx">TOOL&nbsp;04</span>
+            <h3>Readability Scorer</h3>
+            <p>Grades clarity so your edits stay human and plain.</p>
+          </article>
+          <article class="tool">
+            <span class="idx">TOOL&nbsp;05</span>
+            <h3>Case Converter</h3>
+            <p>Switch between sentence, title, upper, and lower case.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- TRUST -->
+  <section class="trust" aria-label="Privacy guarantees">
+    <div class="wrap trust-inner">
+      <div class="trust-claims">
+        <span><span class="tick">[&#10003;]</span> No upload</span>
+        <span><span class="tick">[&#10003;]</span> No signup</span>
+        <span><span class="tick">[&#10003;]</span> Works offline</span>
+      </div>
+      <div class="net-monitor" role="status" aria-live="polite">
+        <span class="pip" aria-hidden="true"></span>
+        Network requests:&nbsp;<span class="count" id="netCount">0</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site">
+    <div class="wrap">
+      <div class="foot-inner">
+        <span class="mark">Em&nbsp;Dash&nbsp;Remover</span>
+        <nav class="foot-meta" aria-label="Footer">
+          <a href="#">View source</a>
+          <a href="#">Privacy</a>
+          <a href="#tools">Toolkit</a>
+          <a href="#">Offline mode</a>
+        </nav>
+      </div>
+      <p class="declass-line">
+        Declassified for public use. Free, forever. Your text is processed
+        on your machine and never transmitted — verify it in your network tab.
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    // Trigger the redaction sequence when the dossier scrolls into view.
+    (function () {
+      var dossier = document.getElementById('dossier');
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (reduce) {
+        dossier.classList.add('animate');
+        return;
+      }
+
+      if (!('IntersectionObserver' in window)) {
+        dossier.classList.add('animate');
+        return;
+      }
+
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            dossier.classList.add('animate');
+            io.disconnect();
+          }
+        });
+      }, { threshold: 0.45 });
+
+      io.observe(dossier);
+
+      // Keep the verifiable counter honest: no network calls are made,
+      // so it stays at 0 for the life of the page.
+      var net = document.getElementById('netCount');
+      if (net && performance && performance.getEntriesByType) {
+        var n = performance.getEntriesByType('resource')
+          .filter(function (r) { return r.initiatorType === 'fetch' || r.initiatorType === 'xmlhttprequest'; })
+          .length;
+        net.textContent = String(n);
+      }
+    })();
+  </script>
+</body>
+</html>

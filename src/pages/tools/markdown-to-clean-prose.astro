@@ -1,0 +1,247 @@
+---
+import Base from '../../layouts/Base.astro';
+import MarkdownToCleanProse from '../../components/tools/MarkdownToCleanProse.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+
+const faqs = [
+  {
+    q: 'How do I convert markdown to plain text online?',
+    a: 'Paste your markdown into the box above and the clean version appears instantly. It strips heading hashes (#), bold and italic asterisks (** *), bullet and numbered list markers, blockquote arrows (>), inline code backticks, links, images, horizontal rules, and tables - leaving readable prose. Then click Copy or Download. It runs in your browser with no signup, no upload, and no character limit.',
+  },
+  {
+    q: 'Why does ChatGPT output have ** asterisks and ## hashes in it?',
+    a: 'ChatGPT, Claude, Copilot, and Gemini write in Markdown - a formatting syntax where ** means bold, ## means a heading, and - starts a bullet. Apps like the ChatGPT website render that markdown as styled text, but when you copy and paste it into Gmail, Google Docs, LinkedIn, Slack, Notion comments, or a CRM, those tools show the raw ** and ## characters instead. This converter removes the syntax so your text looks clean wherever you paste it.',
+  },
+  {
+    q: 'How do I remove asterisks and bold formatting from ChatGPT text?',
+    a: 'Paste the response and keep the default Clean prose recipe. The tool unwraps **bold**, *italic*, ***bold italic***, and ~~strikethrough~~ to plain words, so the asterisks disappear while the words stay. You can toggle this off under Options if you only want to strip headings or lists.',
+  },
+  {
+    q: 'Will it keep my paragraphs, lists, and line breaks?',
+    a: 'Yes. The converter only removes the markdown syntax characters - your words, paragraphs, and line breaks stay intact. Lists are kept as clean dashes by default, and you can switch them to bullets (•), strip the markers entirely, or keep the original markdown under Options. Pick "Keep link URLs" if you want each link shown as text followed by its address.',
+  },
+  {
+    q: 'Does it handle code blocks and tables?',
+    a: 'Yes. Fenced code blocks (```) are unwrapped to plain lines by default, so the code survives without the fence markers - or you can keep them fenced or remove the block entirely. Markdown tables are flattened into readable tab-separated rows by default, or you can strip the pipes or leave the table as-is.',
+  },
+  {
+    q: 'Is it safe to paste confidential text into this converter?',
+    a: 'Yes. All conversion happens entirely in your browser using deterministic string transforms. Nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests - it even works offline, which makes it safe for client work, unpublished drafts, and internal documents.',
+  },
+  {
+    q: 'What is the difference between this and the em dash remover?',
+    a: 'This tool removes Markdown formatting syntax (#, **, bullets, tables, backticks). The em dash remover and full cleaner remove AI punctuation tells - em dashes, smart quotes, and invisible characters. They are complementary: convert markdown to clean prose here, then run the full cleaner to strip dashes and other AI tells in one pass.',
+  },
+  {
+    q: 'Can I convert markdown to plain text for an email or LinkedIn post?',
+    a: 'That is exactly what it is for. Paste the markdown, use Clean prose for email and Docs, or Keep link URLs for newsletters where readers need the addresses. The result pastes cleanly into Gmail, Outlook, LinkedIn, Slack, and any plain-text field without stray asterisks or hashes.',
+  },
+  {
+    q: 'Does removing markdown help my writing sound less like AI?',
+    a: 'It removes one of the most visible signs of pasted AI output - the heading hashes, bolded phrases, and emoji-free bullet scaffolding that LLMs add by default. This is about presenting clean, professional prose in your own voice, not beating a detector. To go further, run the Human-Voice / AI-Tell Report to catch cadence and cliché patterns.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/markdown-to-clean-prose#app`,
+  name: 'Markdown to Clean-Prose Converter',
+  url: `${Astro.site}tools/markdown-to-clean-prose`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  dateModified: '2026-06-15',
+  featureList: [
+    'Convert markdown to plain text',
+    'Remove asterisks and bold from ChatGPT text',
+    'Strip heading hashes and list markers',
+    'Flatten markdown tables to readable rows',
+    'Unwrap or remove fenced code blocks',
+    'Keep link text or text plus URL',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howTo = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to convert markdown to clean prose',
+  step: [
+    {
+      '@type': 'HowToStep',
+      name: 'Paste your markdown',
+      text: 'Paste a ChatGPT or Claude answer, a README, or any markdown full of ## headings and **bold** into the box.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Choose a recipe',
+      text: 'Pick Clean prose for email and Docs, Plain text for the most aggressive strip, Keep link URLs for newsletters, or Keep bullets for chat.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Fine-tune the options',
+      text: 'Open Options to control headings, emphasis, links, images, lists, code blocks, and tables individually.',
+    },
+    {
+      '@type': 'HowToStep',
+      name: 'Copy the clean prose',
+      text: 'Review the output and the "what we changed" summary, then click Copy or Download to paste clean text anywhere.',
+    },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Markdown to Plain Text Converter - Remove ** and ## from ChatGPT"
+  description="Convert markdown to clean plain text free - strip ##, **bold**, bullets and tables from ChatGPT output so it pastes cleanly into Gmail, Docs and LinkedIn."
+>
+  <main class="halo">
+    <!-- Editorial header -->
+    <header class="tool-head mx-auto max-w-3xl px-4 pt-10 pb-6">
+      <a href="/tools" class="back-note inline-flex min-h-11 items-center text-accent hover:underline">&larr; All tools</a>
+      <p class="eyebrow mt-4 text-mark">Formatting stripped &middot; Free &middot; In your browser</p>
+      <h1 class="mt-2 text-4xl sm:text-5xl">
+        Markdown &rarr; Clean-Prose Converter
+      </h1>
+      <p class="lede mt-4 max-w-2xl">
+        Strip the <span class="struck">## headings, **bold**, bullets and |tables|</span>
+        that ChatGPT and Claude leave behind &mdash; instantly and privately &mdash; so your
+        text pastes cleanly into Gmail, Google Docs, LinkedIn, and Slack. Keep your words and
+        paragraphs, lose the syntax. Clean AI writing for real quality, keep your human voice.
+      </p>
+      <p class="definition mt-3 max-w-2xl muted text-sm">
+        A markdown to plain text converter is a free online tool that removes Markdown
+        formatting characters - heading hashes, bold and italic asterisks, list markers,
+        links, code fences, and tables - leaving readable prose with your structure intact.
+      </p>
+    </header>
+
+    <hr class="rule-dash mx-auto max-w-3xl px-4" />
+
+    <MarkdownToCleanProse />
+
+    <TrustStrip />
+
+    <!-- Who it's for -->
+    <section class="who mx-auto mt-16 max-w-3xl px-4">
+      <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">Who it's for</span>
+      <ul class="mt-4 grid gap-2 text-sm muted sm:grid-cols-2">
+        <li><strong>Anyone pasting ChatGPT into email</strong> who keeps getting stray ** and ## in Gmail or Outlook.</li>
+        <li><strong>Marketers &amp; social teams</strong> moving AI drafts into LinkedIn, X, or a CMS that shows raw markdown.</li>
+        <li><strong>Writers &amp; editors</strong> turning a Claude or ChatGPT draft into clean prose for Word or Google Docs.</li>
+        <li><strong>Support &amp; ops staff</strong> pasting answers into help-desk tools, CRMs, and Slack.</li>
+        <li><strong>Students</strong> who need plain-text essays without markdown formatting.</li>
+      </ul>
+    </section>
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <p class="eyebrow text-mark">The long version</p>
+      <hr class="rule-dash" />
+      <h2 class="text-2xl font-bold">Why ChatGPT text is full of ** and ##</h2>
+      <p class="muted">
+        Large language models write in <strong>Markdown</strong> - a lightweight syntax where
+        <code>**</code> marks bold, <code>##</code> marks a heading, <code>-</code> starts a
+        bullet, and <code>`backticks`</code> mark code. The ChatGPT and Claude websites quietly
+        render that syntax as styled text, so you never see the raw characters there. But the
+        moment you copy that answer into Gmail, Google Docs, LinkedIn, Slack, Notion, or a CRM,
+        those apps display the literal <code>**bold**</code> and <code>## Heading</code> instead
+        of formatting it. The result looks broken and obviously machine-generated. This converter
+        removes the syntax while keeping your words, so the text reads cleanly anywhere you paste it.
+      </p>
+
+      <h2 class="text-2xl font-bold">What it removes (and what it keeps)</h2>
+      <p class="muted">
+        The converter unwraps each kind of markdown in a careful, predictable order: heading
+        hashes (<code>#</code> to <code>######</code>), bold and italic and strikethrough
+        (<code>**</code>, <code>*</code>, <code>_</code>, <code>~~</code>), inline code backticks,
+        fenced code blocks, blockquote arrows (<code>&gt;</code>), links and images, horizontal
+        rules (<code>---</code>), and GFM tables. Crucially it <strong>keeps your real
+        content</strong>: the words, paragraphs, and line breaks survive, and lists stay as clean
+        dashes by default so structure is never flattened into a wall of text. Code you paste is
+        protected while the rest is cleaned, so a stray <code>*</code> inside a code sample is
+        never mistaken for bold. Every rule has its own toggle under Options, so you stay in control.
+      </p>
+
+      <h2 class="text-2xl font-bold">How to use it / recipes</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Paste your markdown into the box above (or click an example to see it work).</li>
+        <li>Pick a recipe: <strong>Clean prose</strong> (email &amp; Docs), <strong>Plain text</strong> (aggressive strip), <strong>Keep link URLs</strong> (newsletters), or <strong>Keep bullets</strong> (chat).</li>
+        <li>Optionally open <strong>Options</strong> to control headings, emphasis, links, images, lists, code blocks, and tables individually.</li>
+        <li>Review the output and the "what we changed" summary, then click <strong>Copy</strong> or <strong>Download</strong>.</li>
+      </ol>
+      <p class="muted">
+        Tip: press <kbd>Ctrl/Cmd + Enter</kbd> to re-run, and <kbd>Esc</kbd> to clear.
+        Your recipe and toggle choices are remembered between visits - but your text is never saved.
+      </p>
+
+      <h2 class="text-2xl font-bold">100% in your browser - your text never leaves your device</h2>
+      <p class="muted">
+        Everything here is deterministic string work that runs locally. There is no upload, no API
+        key, and no cookie needed for the tool to function, so the privacy story is airtight:
+        nothing you paste touches the network. That makes it safe for confidential client work and
+        unpublished drafts. Once the markdown is gone, the leftover AI tells are usually punctuation:
+        run the <a href="/">full em dash remover &amp; AI text cleaner</a> to strip em dashes and
+        smart quotes, the <a href="/tools/emoji-decorative-symbol-stripper">emoji &amp; symbol stripper</a>
+        to remove decorative bullets, or the
+        <a href="/tools/human-voice-ai-tell-report">Human-Voice / AI-Tell Report</a>
+        to catch cadence and cliché patterns next.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="faq-block mx-auto mt-16 max-w-3xl px-4">
+      <p class="eyebrow text-mark">In the margin</p>
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+      <p class="mt-6 text-xs muted">Last updated: June 2026</p>
+    </section>
+
+    <RelatedTools currentSlug="markdown-to-clean-prose" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howTo)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo kbd { font-family: var(--font-mono); font-size: 0.85em; padding: 1px 5px; border-radius: 5px; border: 1px solid color-mix(in srgb, var(--c-ink) 16%, transparent); }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+
+    /* Editorial header + section rhythm (shared across tool pages) */
+    .tool-head .back-note { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; }
+    .tool-head h1 { line-height: 1.05; }
+    .tool-head .lede { font-size: 1.2rem; line-height: 1.6; color: var(--c-muted); }
+    .seo h2, .faq-block h2 { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.15; margin-top: 0.25rem; }
+    .seo h2 + p, .seo h2 + ol, .seo h2 + ul { margin-top: 0.6rem; }
+  </style>
+</Base>

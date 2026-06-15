@@ -1,0 +1,5 @@
+# security.txt (RFC 9116) — how to report a security issue.
+Contact: mailto:hello@emdashremover.app
+Expires: 2027-06-15T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://emdashremover.app/.well-known/security.txt

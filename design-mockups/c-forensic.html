@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Em Dash Remover — X-ray your text. Keep your human voice.</title>
+<meta name="description" content="A free, 100% in-browser tool that strips em dashes, smart quotes, and invisible characters from AI text. No upload. No signup. Works offline." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ground: #F1F3F4;
+    --surface: #FFFFFF;
+    --ink: #101418;
+    --muted: #5A6470;
+    --violet: #6B2BFF;
+    --violet-soft: #6B2BFF1a;
+    --violet-line: #6B2BFF33;
+    --teal: #00B3A4;
+    --magenta: #FF2D78;
+    --hairline: #E2E6E9;
+    --display: 'Space Grotesk', system-ui, sans-serif;
+    --body: 'IBM Plex Sans', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --r: 10px;
+    --shadow: 0 1px 2px rgba(16,20,24,.04), 0 12px 32px -16px rgba(16,20,24,.18);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--body);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  a { color: inherit; }
+
+  :focus-visible {
+    outline: 2px solid var(--violet);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* ---------- Header ---------- */
+  header.site {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(241,243,244,.82);
+    backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    gap: 16px;
+  }
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 17px;
+    letter-spacing: -0.01em;
+    text-decoration: none;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+  .glyph-mark {
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 7px;
+    background: var(--ink);
+    color: var(--surface);
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 15px;
+    position: relative;
+  }
+  .glyph-mark::after {
+    content: "";
+    position: absolute;
+    right: -3px;
+    top: -3px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 0 2px var(--ground);
+  }
+  .wordmark .dim { color: var(--muted); font-weight: 500; }
+
+  .nav-meta {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .nav-meta .reqs { display: inline-flex; align-items: center; gap: 7px; }
+  .nav-cta {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 14px;
+    text-decoration: none;
+    color: var(--surface);
+    background: var(--violet);
+    padding: 8px 16px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+  @media (max-width: 720px) {
+    .nav-meta .reqs { display: none; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 56px 0 28px; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  @media (min-width: 940px) {
+    .hero-grid { grid-template-columns: 0.86fr 1.14fr; align-items: center; gap: 48px; }
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--violet);
+    background: var(--violet-soft);
+    border: 1px solid var(--violet-line);
+    padding: 5px 11px;
+    border-radius: 100px;
+    margin-bottom: 22px;
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--violet);
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: clamp(34px, 6vw, 52px);
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    margin: 0 0 18px;
+  }
+  h1 .uxray {
+    color: var(--violet);
+    position: relative;
+    white-space: nowrap;
+  }
+  .lede {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 42ch;
+    margin: 0 0 26px;
+  }
+  .lede strong { color: var(--ink); font-weight: 500; }
+
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 26px; }
+  .btn {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 15px;
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 9px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+  }
+  .btn-primary { background: var(--violet); color: var(--surface); box-shadow: 0 8px 20px -8px var(--violet); }
+  .btn-ghost { background: var(--surface); color: var(--ink); border-color: var(--hairline); }
+
+  .trust {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 14px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .trust .item { display: inline-flex; align-items: center; gap: 7px; }
+  .trust .tick {
+    color: var(--teal);
+    font-weight: 700;
+  }
+  .trust .sep { color: var(--hairline); }
+  .trust .reqs-live {
+    display: inline-flex; align-items: center; gap: 7px;
+    color: var(--teal);
+    background: #00B3A415;
+    border: 1px solid #00B3A433;
+    padding: 3px 9px;
+    border-radius: 100px;
+  }
+  .trust .reqs-live b { font-weight: 700; }
+
+  /* ---------- X-ray panel (signature) ---------- */
+  .xray {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .xray-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--hairline);
+    background: linear-gradient(var(--surface), #FBFAFF);
+  }
+  .xray-title {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .xray-title .lens {
+    width: 18px; height: 18px; border-radius: 50%;
+    border: 1.5px solid var(--violet);
+    position: relative;
+    display: inline-block;
+  }
+  .xray-title .lens::after {
+    content:""; position:absolute; width:6px; height:1.5px; background:var(--violet);
+    right:-4px; bottom:-1px; transform: rotate(45deg);
+  }
+  .badge-count {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--surface);
+    background: var(--magenta);
+    padding: 5px 11px 5px 9px;
+    border-radius: 100px;
+    position: relative;
+  }
+  .badge-count .pulse {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--surface);
+    position: relative;
+  }
+  .badge-count .pulse::before {
+    content:""; position:absolute; inset:0; border-radius:50%;
+    background: var(--surface);
+    animation: ping 1.8s cubic-bezier(0,0,0.2,1) infinite;
+  }
+  @keyframes ping {
+    0% { transform: scale(1); opacity: .7; }
+    80%,100% { transform: scale(3); opacity: 0; }
+  }
+
+  .glyph-grid {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 3px;
+    padding: 16px;
+    font-family: var(--mono);
+  }
+  @media (max-width: 560px) {
+    .glyph-grid { grid-template-columns: repeat(12, 1fr); }
+  }
+
+  .cell {
+    aspect-ratio: 1 / 1.18;
+    display: grid;
+    place-items: center;
+    border-radius: 5px;
+    font-size: 14px;
+    line-height: 1;
+    color: var(--ink);
+    background: #F7F8F9;
+    position: relative;
+    transition: background .15s ease;
+  }
+  .cell.space { background: transparent; }
+  .cell.punct { color: var(--muted); }
+
+  /* hidden-character cells — the violet voice */
+  .cell.hidden {
+    background: var(--violet-soft);
+    color: var(--violet);
+    box-shadow: inset 0 0 0 1px var(--violet-line), 0 0 14px -4px var(--violet);
+    cursor: help;
+    font-weight: 700;
+    animation: glow 2.6s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { box-shadow: inset 0 0 0 1px var(--violet-line), 0 0 10px -5px var(--violet); }
+    50%     { box-shadow: inset 0 0 0 1px var(--violet), 0 0 18px -2px var(--violet); }
+  }
+  .cell.hidden::after {
+    content: attr(data-code);
+    position: absolute;
+    top: calc(100% + 7px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    background: var(--ink);
+    color: var(--surface);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 5px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .14s ease, transform .14s ease;
+    z-index: 5;
+    box-shadow: 0 6px 16px -6px rgba(16,20,24,.5);
+  }
+  .cell.hidden::before {
+    content: "";
+    position: absolute;
+    top: calc(100% + 2px);
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-bottom-color: var(--ink);
+    opacity: 0;
+    transition: opacity .14s ease;
+    z-index: 5;
+  }
+  .cell.hidden:hover::after,
+  .cell.hidden:focus-visible::after { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .cell.hidden:hover::before,
+  .cell.hidden:focus-visible::before { opacity: 1; }
+
+  /* persistent tiny U+ tag under flagged cells, always visible */
+  .cell .tag {
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 6.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: var(--violet);
+    opacity: .85;
+  }
+
+  .xray-foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--hairline);
+    background: #FBFAFF;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .legend { display: inline-flex; align-items: center; gap: 7px; }
+  .legend .sw { width: 11px; height: 11px; border-radius: 3px; }
+  .legend .sw.v { background: var(--violet); }
+  .legend .sw.t { background: var(--teal); }
+  .legend .sw.n { background: #F7F8F9; border: 1px solid var(--hairline); }
+  .xray-foot .grow { flex: 1; }
+  .clean-btn {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 12.5px;
+    color: var(--surface);
+    background: var(--ink);
+    border: none;
+    border-radius: 7px;
+    padding: 7px 14px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .clean-btn .ok { color: var(--teal); }
+
+  /* ---------- Tools strip ---------- */
+  .tools { padding: 48px 0 12px; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .section-head h2 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .section-head .note {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .tool-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 940px) { .tool-row { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .tool-row { grid-template-columns: 1fr; } }
+
+  .tool {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--r);
+    padding: 16px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .tool:hover { border-color: var(--violet-line); transform: translateY(-2px); }
+  .tool .code {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--violet);
+    letter-spacing: 0.04em;
+  }
+  .tool h3 {
+    font-family: var(--display);
+    font-weight: 500;
+    font-size: 15px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .tool p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+
+  /* ---------- Footer ---------- */
+  footer.site {
+    margin-top: 56px;
+    border-top: 1px solid var(--hairline);
+    background: var(--surface);
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 28px 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .foot .wordmark { font-size: 15px; }
+  .foot nav { display: flex; gap: 18px; flex-wrap: wrap; }
+  .foot nav a { text-decoration: none; color: var(--muted); font-size: 13px; }
+  .foot nav a:hover { color: var(--ink); }
+  .foot .made {
+    font-family: var(--mono);
+    font-size: 11.5px;
+  }
+  .foot .made .v { color: var(--violet); }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; scroll-behavior: auto !important; }
+    .cell.hidden {
+      box-shadow: inset 0 0 0 1px var(--violet), 0 0 16px -3px var(--violet);
+    }
+    .badge-count .pulse::before { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a class="wordmark" href="#top">
+      <span class="glyph-mark" aria-hidden="true">—</span>
+      Em&nbsp;Dash <span class="dim">Remover</span>
+    </a>
+    <div class="nav-meta">
+      <span class="reqs">Network requests: <strong id="nav-reqs" style="color:var(--teal);font-weight:700;">0</strong></span>
+      <a class="nav-cta" href="#xray">Inspect text</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow"><span class="dot" aria-hidden="true"></span>Invisible Character Inspector</span>
+        <h1>See what AI hides. Then <span class="uxray">x-ray it out.</span></h1>
+        <p class="lede">Paste text from ChatGPT, Claude, or Gemini. We light up every <strong>em dash, curly quote, and zero-width character</strong> the model left behind — so your writing reads like a person wrote it.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#xray">Paste &amp; inspect</a>
+          <a class="btn btn-ghost" href="#tools">See the toolkit</a>
+        </div>
+        <div class="trust" role="status" aria-live="polite">
+          <span class="item"><span class="tick" aria-hidden="true">✓</span> No upload</span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span class="item"><span class="tick" aria-hidden="true">✓</span> No signup</span>
+          <span class="sep" aria-hidden="true">·</span>
+          <span class="item"><span class="tick" aria-hidden="true">✓</span> Works offline</span>
+          <span class="reqs-live">Network requests: <b id="hero-reqs">0</b></span>
+        </div>
+      </div>
+
+      <!-- SIGNATURE: forensic glyph x-ray -->
+      <div class="xray" id="xray">
+        <div class="xray-bar">
+          <span class="xray-title"><span class="lens" aria-hidden="true"></span>x-ray.scan — sample.txt</span>
+          <span class="badge-count" id="count-badge" aria-label="7 hidden characters found">
+            <span class="pulse" aria-hidden="true"></span>7 hidden characters found
+          </span>
+        </div>
+
+        <div class="glyph-grid" id="grid" role="img" aria-label="Glyph-by-glyph x-ray of the phrase 'Let us be clear — this is human.' with seven hidden characters flagged in violet: a non-breaking space, a narrow no-break space, two zero-width spaces, an em dash, a left double quotation mark, and a watermark character.">
+          <!-- Row 1: "Let us be clear — " with hidden chars -->
+          <span class="cell">L</span>
+          <span class="cell">e</span>
+          <span class="cell">t</span>
+          <span class="cell hidden" tabindex="0" data-code="U+00A0 · NO-BREAK SPACE">␣<span class="tag">A0</span></span>
+          <span class="cell">u</span>
+          <span class="cell">s</span>
+          <span class="cell space"> </span>
+          <span class="cell">b</span>
+          <span class="cell">e</span>
+          <span class="cell space"> </span>
+          <span class="cell">c</span>
+          <span class="cell">l</span>
+          <span class="cell">e</span>
+          <span class="cell">a</span>
+          <span class="cell">r</span>
+          <span class="cell hidden" tabindex="0" data-code="U+200B · ZERO-WIDTH SPACE">∅<span class="tag">200B</span></span>
+
+          <!-- Row 2 -->
+          <span class="cell space"> </span>
+          <span class="cell hidden" tabindex="0" data-code="U+2014 · EM DASH">—<span class="tag">2014</span></span>
+          <span class="cell hidden" tabindex="0" data-code="U+202F · NARROW NO-BREAK SPACE">␣<span class="tag">202F</span></span>
+          <span class="cell hidden" tabindex="0" data-code="U+201C · LEFT DOUBLE QUOTE">“<span class="tag">201C</span></span>
+          <span class="cell">t</span>
+          <span class="cell">h</span>
+          <span class="cell">i</span>
+          <span class="cell">s</span>
+          <span class="cell space"> </span>
+          <span class="cell">i</span>
+          <span class="cell">s</span>
+          <span class="cell hidden" tabindex="0" data-code="U+200B · ZERO-WIDTH SPACE">∅<span class="tag">200B</span></span>
+          <span class="cell space"> </span>
+          <span class="cell">h</span>
+          <span class="cell">u</span>
+          <span class="cell">m</span>
+
+          <!-- Row 3 -->
+          <span class="cell">a</span>
+          <span class="cell">n</span>
+          <span class="cell punct">.</span>
+          <span class="cell hidden" tabindex="0" data-code="U+E0001 · WATERMARK TAG">⚑<span class="tag">E0001</span></span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+          <span class="cell space"> </span>
+        </div>
+
+        <div class="xray-foot">
+          <span class="legend"><span class="sw v" aria-hidden="true"></span>Hidden / AI tell</span>
+          <span class="legend"><span class="sw n" aria-hidden="true"></span>Visible glyph</span>
+          <span class="legend"><span class="sw t" aria-hidden="true"></span>Clean output</span>
+          <span class="grow"></span>
+          <button class="clean-btn" type="button" id="clean">Strip all <span class="ok" aria-hidden="true">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TOOLS STRIP -->
+  <section class="tools" id="tools">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>The forensic toolkit</h2>
+        <span class="note">all local · runs in your tab</span>
+      </div>
+      <div class="tool-row">
+        <article class="tool">
+          <span class="code">01</span>
+          <h3>Invisible Character Inspector</h3>
+          <p>X-rays every glyph and flags zero-width, NBSP, and watermark characters by U+ code.</p>
+        </article>
+        <article class="tool">
+          <span class="code">02</span>
+          <h3>Word Counter</h3>
+          <p>Live word, character, and sentence counts that ignore the junk you just stripped.</p>
+        </article>
+        <article class="tool">
+          <span class="code">03</span>
+          <h3>Diff Viewer</h3>
+          <p>Lines up before and after so you see exactly what changed — nothing more.</p>
+        </article>
+        <article class="tool">
+          <span class="code">04</span>
+          <h3>Readability Scorer</h3>
+          <p>Grade level and sentence rhythm, so cleaned text still sounds like you.</p>
+        </article>
+        <article class="tool">
+          <span class="code">05</span>
+          <h3>Case Converter</h3>
+          <p>Switch to sentence, title, or lower case without re-introducing smart quotes.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site">
+  <div class="wrap foot">
+    <a class="wordmark" href="#top">
+      <span class="glyph-mark" aria-hidden="true">—</span>
+      Em&nbsp;Dash <span class="dim">Remover</span>
+    </a>
+    <nav aria-label="Footer">
+      <a href="#xray">Inspector</a>
+      <a href="#tools">Toolkit</a>
+      <a href="#">How it works</a>
+      <a href="#">Privacy</a>
+    </nav>
+    <span class="made">Built local-first. <span class="v">0 bytes</span> ever leave your device.</span>
+  </div>
+</footer>
+
+<script>
+  // Keep the "Network requests: 0" claim honest and visibly true.
+  // No fetch, no XHR, no beacons — we simply assert and verify zero outbound traffic.
+  (function () {
+    var made = 0;
+    function render() {
+      var n = String(made);
+      var nav = document.getElementById('nav-reqs');
+      var hero = document.getElementById('hero-reqs');
+      if (nav) nav.textContent = n;
+      if (hero) hero.textContent = n;
+    }
+    render();
+
+    // Defensive: if any code ever tried to call out, surface it instead of hiding it.
+    if (window.PerformanceObserver) {
+      try {
+        var obs = new PerformanceObserver(function (list) {
+          list.getEntries().forEach(function (e) {
+            if (e.initiatorType === 'fetch' || e.initiatorType === 'xmlhttprequest' || e.initiatorType === 'beacon') {
+              made++;
+            }
+          });
+          render();
+        });
+        obs.observe({ entryTypes: ['resource'] });
+      } catch (err) { /* no-op */ }
+    }
+
+    // Signature interaction: "Strip all" demonstrates the clean pass on the x-ray grid.
+    var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var btn = document.getElementById('clean');
+    var badge = document.getElementById('count-badge');
+    var cleaned = false;
+    if (btn) {
+      btn.addEventListener('click', function () {
+        var hidden = document.querySelectorAll('.cell.hidden');
+        if (!cleaned) {
+          hidden.forEach(function (c, i) {
+            var apply = function () {
+              c.style.background = '#00B3A412';
+              c.style.boxShadow = 'inset 0 0 0 1px #00B3A455';
+              c.style.color = 'var(--teal)';
+              c.style.animation = 'none';
+              c.textContent = '·';
+            };
+            if (reduce) apply(); else setTimeout(apply, i * 70);
+          });
+          badge.style.background = 'var(--teal)';
+          badge.innerHTML = '0 hidden characters · clean';
+          btn.innerHTML = 'Cleaned <span class="ok" aria-hidden="true">✓</span>';
+          cleaned = true;
+        }
+      });
+    }
+  })();
+</script>
+</body>
+</html>

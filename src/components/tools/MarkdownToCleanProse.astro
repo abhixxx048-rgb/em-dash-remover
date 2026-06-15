@@ -1,0 +1,451 @@
+---
+// Interactive Markdown → Clean-Prose island. Static HTML; behavior wired by the
+// client script, which imports the pure engine + jsdiff for the before/after
+// view. Styling mirrors WhitespaceLineBreakReflowFixer.astro / Cleaner.astro so
+// it looks native (same textarea / toolbar / toast / button language).
+---
+
+<section id="tool" aria-label="Markdown to clean-prose converter" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Recipe row: the primary one-click entry point -->
+    <div class="border-b border-ink/8 px-3 py-3 sm:px-4">
+      <div role="group" aria-label="Conversion recipes" class="flex flex-wrap gap-1.5 text-sm" id="recipes">
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="prose">📝 Clean prose</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="plain">📃 Plain text</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="keepLinks">🔗 Keep link URLs</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="keepLists">• Keep bullets</button>
+      </div>
+
+      <!-- Advanced per-rule options live behind a disclosure to keep the surface calm -->
+      <details class="group mt-3">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Options <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 grid gap-1 p-2 text-sm sm:grid-cols-2 sm:p-3">
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-headings" class="h-5 w-5" /> Strip heading marks (#)</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-emphasis" class="h-5 w-5" /> Unwrap bold / italic / strikethrough</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-inlinecode" class="h-5 w-5" /> Unwrap `inline code`</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-blockquotes" class="h-5 w-5" /> Strip blockquote marks (&gt;)</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-rules" class="h-5 w-5" /> Remove horizontal rules (---)</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-tidy" class="h-5 w-5" /> Tidy leftover whitespace</label>
+          <label class="flex min-h-11 items-center gap-2 px-2">
+            <span class="font-medium">Lists</span>
+            <select id="opt-lists" class="ctl px-3" aria-label="List marker handling">
+              <option value="dash">Dash (-)</option>
+              <option value="bullet">Bullet (•)</option>
+              <option value="plain">Plain (no marker)</option>
+              <option value="keep">Keep markdown</option>
+            </select>
+          </label>
+          <label class="flex min-h-11 items-center gap-2 px-2">
+            <span class="font-medium">Links</span>
+            <select id="opt-links" class="ctl px-3" aria-label="Link handling">
+              <option value="text">Keep text only</option>
+              <option value="text-url">Text (url)</option>
+              <option value="keep">Keep markdown</option>
+            </select>
+          </label>
+          <label class="flex min-h-11 items-center gap-2 px-2">
+            <span class="font-medium">Images</span>
+            <select id="opt-images" class="ctl px-3" aria-label="Image handling">
+              <option value="alt">Keep alt text</option>
+              <option value="remove">Remove</option>
+              <option value="keep">Keep markdown</option>
+            </select>
+          </label>
+          <label class="flex min-h-11 items-center gap-2 px-2">
+            <span class="font-medium">Code blocks</span>
+            <select id="opt-codeblocks" class="ctl px-3" aria-label="Code-block handling">
+              <option value="unwrap">Unwrap (drop ```)</option>
+              <option value="keep">Keep fenced</option>
+              <option value="remove">Remove</option>
+            </select>
+          </label>
+          <label class="flex min-h-11 items-center gap-2 px-2">
+            <span class="font-medium">Tables</span>
+            <select id="opt-tables" class="ctl px-3" aria-label="Table handling">
+              <option value="readable">Readable (tabs)</option>
+              <option value="strip">Strip pipes</option>
+              <option value="keep">Keep markdown</option>
+            </select>
+          </label>
+        </div>
+      </details>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Result</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste markdown</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Markdown to convert"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste a ChatGPT or Claude answer full of ## and **bold** - or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="chat" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 ChatGPT answer</button>
+              <button data-sample="readme" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📦 README snippet</button>
+              <button data-sample="table" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🔢 Table</button>
+            </div>
+            <p class="text-xs muted">Runs 100% in your browser - your text never leaves this page.</p>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats" aria-live="polite">0 lines · 0 words · 0 chars</p>
+      </div>
+
+      <!-- Output -->
+      <div class="p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <div class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
+            <button id="view-clean" class="min-h-9 rounded-md px-3 font-medium">Prose</button>
+            <button id="view-diff" class="min-h-9 rounded-md px-3 font-medium muted">Diff</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download prose as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <textarea id="output" rows="14" readonly aria-label="Clean prose output"
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+        <div id="diff" hidden
+          class="h-[calc(14*1.625em+1.5rem)] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed"
+          style="background: var(--c-paper);"></div>
+        <p class="mt-2 text-xs muted" id="out-stats" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <!-- "What we changed" summary -->
+    <div class="grid items-center gap-5 border-t border-ink/8 px-4 py-4 sm:grid-cols-[auto_1fr]">
+      <div class="flex items-center gap-4">
+        <div class="grid h-20 w-20 shrink-0 place-items-center rounded-full" style="background: var(--c-accent-soft);">
+          <div class="text-center leading-none">
+            <span id="score-num" class="text-2xl font-bold text-accent" data-v="0">-</span>
+            <span class="mt-0.5 block text-[9px] muted">marks</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide muted">Markdown removed</p>
+          <p id="band" class="text-sm font-semibold">Paste markdown to convert</p>
+          <p id="fixed" class="mt-0.5 text-xs text-emerald-600" aria-live="polite"></p>
+        </div>
+      </div>
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wide muted">What we changed</span>
+        <ul id="summary" class="mt-1.5 flex flex-wrap gap-1.5 text-xs" aria-live="polite">
+          <li class="muted">Paste markdown to convert.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser - open DevTools → Network and you'll see zero requests. Works offline.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<script>
+  import {
+    convert,
+    stats,
+    DEFAULT_OPTIONS,
+    RECIPES,
+    type MdOptions,
+    type LinkMode,
+    type ImageMode,
+    type ListMode,
+    type CodeBlockMode,
+    type TableMode,
+    type RecipeId,
+  } from '../../lib/tools/markdown-to-clean-prose';
+  import { diffWords } from 'diff';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+  const diffEl = $<HTMLDivElement>('diff');
+
+  // Pre-loaded markdown samples for the empty state.
+  const SAMPLES: Record<string, string> = {
+    chat: `## Getting Started with Sourdough\n\nMaking sourdough is **easier than you think**. Here's what you'll need:\n\n- A *active* starter (fed within the last 12 hours)\n- 500g of \`bread flour\`\n- 350g of water\n\n### The Process\n\n1. **Mix** the flour and water, then rest for 30 minutes.\n2. Add the starter and salt.\n3. Fold the dough every 30 minutes for ~2 hours.\n\n> Tip: a warmer kitchen speeds up fermentation.\n\nFor more, see [the full guide](https://example.com/sourdough).`,
+    readme: `# my-project\n\nA tiny utility for cleaning text.\n\n## Installation\n\n\`\`\`bash\nnpm install my-project\n\`\`\`\n\n## Usage\n\nImport the \`clean()\` function and call it with your **string**:\n\n\`\`\`js\nimport { clean } from 'my-project';\nclean('hello');\n\`\`\`\n\n---\n\nLicensed under MIT.`,
+    table: `Here is the comparison you asked for:\n\n| Plan | Price | Seats |\n|------|------:|-------|\n| Free | $0 | 1 |\n| Pro | $12 | 5 |\n| Team | $40 | 20 |\n\nLet me know if you'd like a **breakdown** by feature.`,
+  };
+
+  const CHECK_IDS = ['opt-headings', 'opt-emphasis', 'opt-inlinecode', 'opt-blockquotes', 'opt-rules', 'opt-tidy'];
+  const SELECT_IDS = ['opt-lists', 'opt-links', 'opt-images', 'opt-codeblocks', 'opt-tables'];
+
+  function readOptions(): MdOptions {
+    return {
+      ...DEFAULT_OPTIONS,
+      headings: $<HTMLInputElement>('opt-headings').checked,
+      emphasis: $<HTMLInputElement>('opt-emphasis').checked,
+      inlineCode: $<HTMLInputElement>('opt-inlinecode').checked,
+      blockquotes: $<HTMLInputElement>('opt-blockquotes').checked,
+      horizontalRules: $<HTMLInputElement>('opt-rules').checked,
+      tidy: $<HTMLInputElement>('opt-tidy').checked,
+      lists: $<HTMLSelectElement>('opt-lists').value as ListMode,
+      links: $<HTMLSelectElement>('opt-links').value as LinkMode,
+      images: $<HTMLSelectElement>('opt-images').value as ImageMode,
+      codeBlocks: $<HTMLSelectElement>('opt-codeblocks').value as CodeBlockMode,
+      tables: $<HTMLSelectElement>('opt-tables').value as TableMode,
+    };
+  }
+
+  /** Push an option object onto the UI controls. */
+  function writeOptions(o: MdOptions) {
+    $<HTMLInputElement>('opt-headings').checked = o.headings;
+    $<HTMLInputElement>('opt-emphasis').checked = o.emphasis;
+    $<HTMLInputElement>('opt-inlinecode').checked = o.inlineCode;
+    $<HTMLInputElement>('opt-blockquotes').checked = o.blockquotes;
+    $<HTMLInputElement>('opt-rules').checked = o.horizontalRules;
+    $<HTMLInputElement>('opt-tidy').checked = o.tidy;
+    $<HTMLSelectElement>('opt-lists').value = o.lists;
+    $<HTMLSelectElement>('opt-links').value = o.links;
+    $<HTMLSelectElement>('opt-images').value = o.images;
+    $<HTMLSelectElement>('opt-codeblocks').value = o.codeBlocks;
+    $<HTMLSelectElement>('opt-tables').value = o.tables;
+  }
+
+  // --- persistence (options only, never the text - keeps the privacy promise)
+  function saveOpts() {
+    try { localStorage.setItem('md2p-opts', JSON.stringify(readOptions())); } catch {}
+  }
+  function loadOpts() {
+    try {
+      const raw = localStorage.getItem('md2p-opts');
+      if (raw) writeOptions({ ...DEFAULT_OPTIONS, ...JSON.parse(raw) });
+      else writeOptions(DEFAULT_OPTIONS);
+    } catch { writeOptions(DEFAULT_OPTIONS); }
+  }
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up for the "marks removed" number
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to); el.dataset.v = String(to); return;
+    }
+    const from = parseInt(el.dataset.v || '0', 10);
+    if (from === to) { el.textContent = String(to); return; }
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // --- diff rendering (jsdiff, same as Cleaner.astro)
+  function renderDiff(before: string, after: string) {
+    diffEl.innerHTML = '';
+    for (const part of diffWords(before, after)) {
+      const span = document.createElement('span');
+      if (part.added) span.className = 'diff-ins';
+      else if (part.removed) span.className = 'diff-del';
+      span.textContent = part.value;
+      diffEl.appendChild(span);
+    }
+  }
+
+  // --- main render
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const inStat = stats(src);
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${inStat.lines} line${inStat.lines === 1 ? '' : 's'} · ${inStat.words} word${inStat.words === 1 ? '' : 's'} · ${inStat.chars} chars`;
+
+    const { text, counts } = convert(src, readOptions());
+    output.value = text;
+    $<HTMLButtonElement>('copy').disabled = text.length === 0;
+    ($('copy-bar') as HTMLButtonElement).disabled = text.length === 0;
+    renderDiff(src, text);
+
+    // Output stats.
+    const outStat = stats(text);
+    $<HTMLParagraphElement>('out-stats').textContent =
+      src.length ? `${outStat.words} words · ${outStat.chars} chars of clean prose` : '';
+
+    // "Marks removed" badge.
+    const scoreNum = $<HTMLSpanElement>('score-num');
+    if (!src.trim()) {
+      scoreNum.textContent = '-'; scoreNum.dataset.v = '0';
+      $<HTMLParagraphElement>('band').textContent = 'Paste markdown to convert';
+      $<HTMLParagraphElement>('fixed').textContent = '';
+    } else {
+      animateCount(scoreNum, counts.total);
+      $<HTMLParagraphElement>('band').textContent =
+        counts.total === 0 ? 'No markdown found ✓' : 'Clean prose ready';
+      $<HTMLParagraphElement>('fixed').textContent =
+        counts.total > 0 ? `✓ ${counts.total} markdown mark${counts.total === 1 ? '' : 's'} removed` : '';
+    }
+
+    renderSummary(src, counts);
+  }
+
+  // --- the "what we changed" chip row
+  function renderSummary(src: string, counts: ReturnType<typeof convert>['counts']) {
+    const el = $<HTMLUListElement>('summary');
+    el.innerHTML = '';
+    if (!src.trim()) {
+      el.innerHTML = '<li class="muted">Paste markdown to convert.</li>';
+      return;
+    }
+    const plural = (n: number, one: string, many = one + 's') => `${n} ${n === 1 ? one : many}`;
+    const chips: string[] = [];
+    if (counts.headings) chips.push(`${plural(counts.headings, 'heading')} unwrapped`);
+    if (counts.emphasis) chips.push(`${plural(counts.emphasis, 'bold/italic mark')} removed`);
+    if (counts.links) chips.push(`${plural(counts.links, 'link')} flattened`);
+    if (counts.images) chips.push(`${plural(counts.images, 'image')} handled`);
+    if (counts.inlineCode) chips.push(`${plural(counts.inlineCode, 'code span')} unwrapped`);
+    if (counts.codeBlocks) chips.push(`${plural(counts.codeBlocks, 'code block')} handled`);
+    if (counts.blockquotes) chips.push(`${plural(counts.blockquotes, 'quote line')} unmarked`);
+    if (counts.listItems) chips.push(`${plural(counts.listItems, 'list item')} converted`);
+    if (counts.tables) chips.push(`${plural(counts.tables, 'table')} flattened`);
+    if (counts.rules) chips.push(`${plural(counts.rules, 'rule')} removed`);
+
+    if (chips.length === 0) {
+      el.innerHTML = '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">No markdown found - nothing to convert ✓</li>';
+      return;
+    }
+    for (const c of chips) {
+      const li = document.createElement('li');
+      li.className = 'rounded-full px-2 py-0.5 text-accent';
+      li.style.background = 'var(--c-accent-soft)';
+      li.textContent = c;
+      el.appendChild(li);
+    }
+  }
+
+  // --- debounced via rAF
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  [...CHECK_IDS, ...SELECT_IDS].forEach((id) =>
+    $(id).addEventListener('change', () => { saveOpts(); run(); }));
+
+  // --- recipes (set all options at once)
+  document.querySelectorAll<HTMLButtonElement>('[data-recipe]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const recipe = RECIPES[b.dataset.recipe as RecipeId];
+      writeOptions(recipe.options);
+      saveOpts();
+      run();
+      toast(`Applied: ${recipe.label}`);
+    }));
+
+  // --- samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      input.value = SAMPLES[b.dataset.sample!];
+      run();
+      setPane('output');
+    }));
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- shared actions
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!output.value) return;
+    try {
+      await navigator.clipboard.writeText(output.value);
+      const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+      b.textContent = '✓ Copied'; toast('Copied to clipboard');
+      setTimeout(() => (b.textContent = prev), 1300);
+    } catch { output.select(); toast('Press Ctrl/Cmd+C to copy'); }
+  }
+  function doReset() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // download .txt
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    if (!output.value) { toast('Nothing to download yet'); return; }
+    const blob = new Blob([output.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'clean-prose.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded clean-prose.txt');
+  });
+
+  // view toggle (Prose vs Diff)
+  function setView(diff: boolean) {
+    output.hidden = diff; diffEl.hidden = !diff;
+    $<HTMLButtonElement>('view-clean').classList.toggle('muted', diff);
+    $<HTMLButtonElement>('view-diff').classList.toggle('muted', !diff);
+    $<HTMLButtonElement>('view-clean').style.background = diff ? '' : 'var(--c-accent-soft)';
+    $<HTMLButtonElement>('view-diff').style.background = diff ? 'var(--c-accent-soft)' : '';
+  }
+  $<HTMLButtonElement>('view-clean').addEventListener('click', () => setView(false));
+  $<HTMLButtonElement>('view-diff').addEventListener('click', () => setView(true));
+
+  // keyboard: Cmd/Ctrl+Enter re-runs; Esc clears
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); toast('Converted'); }
+    else if (e.key === 'Escape' && document.activeElement === input) { e.preventDefault(); doReset(); }
+  });
+
+  loadOpts();
+  setView(false);
+  setPane('input');
+  run();
+</script>
