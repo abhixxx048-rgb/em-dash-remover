@@ -3,28 +3,29 @@
 @variant dark (&:where(.dark, .dark *));
 
 /* ─────────────────────────────────────────────────────────────
-   "Marked-up manuscript" — the copyeditor's desk.
-   Paper + ink, blue pencil for actions, red pen for deletions.
+   "The Instrument" — a precise console for cleaning text.
+   Cool drafting paper + ink, electric cobalt for actions,
+   amber as the signal/caret, proof-green for "clean".
    ───────────────────────────────────────────────────────────── */
 @theme {
-  --color-ink: #221b14;          /* warm printer's-ink near-black */
-  --color-paper: #faf5ea;        /* warm manuscript paper          */
-  --color-surface: #fffdf7;      /* a fresh sheet (cards)          */
-  --color-muted: #6f6757;        /* pencil-grey                    */
-  --color-accent: #2f5da8;       /* blue pencil — actions, links   */
-  --color-accent-soft: #e7eefb;  /* blue wash                      */
-  --color-mark: #c5362c;         /* red pen — deletions, signature */
-  --color-mark-soft: #f7e4e0;    /* red wash                       */
-  --color-ok: #2f7d52;           /* proof-green "clean"            */
+  --color-ink: #14181f;          /* cool near-black ink            */
+  --color-paper: #edf0f2;        /* cool drafting white            */
+  --color-surface: #ffffff;      /* a fresh sheet (cards/console)  */
+  --color-muted: #5b6470;        /* graphite grey                  */
+  --color-accent: #1b3cf5;       /* electric cobalt — actions      */
+  --color-accent-soft: #e6eafe;  /* cobalt wash                    */
+  --color-mark: #ff9f1c;         /* amber — the signal / caret     */
+  --color-mark-soft: #fff1dd;    /* amber wash                     */
+  --color-ok: #18794e;           /* proof-green "clean"            */
   --color-warn: #b27a1d;
-  --color-bad: #c5362c;
+  --color-bad: #d23b2e;
 
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-sans: 'Newsreader', Georgia, 'Times New Roman', serif;
-  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
+  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --radius-card: 12px;
-  --shadow-card: 0 1px 0 rgb(34 27 20 / 0.04), 0 10px 30px -16px rgb(34 27 20 / 0.28);
+  --radius-card: 14px;
+  --shadow-card: 0 1px 2px rgb(20 24 31 / 0.04), 0 12px 32px -16px rgb(20 24 31 / 0.18);
 }
 
 :root {
@@ -34,19 +35,19 @@
   --c-muted: var(--color-muted);
   --c-accent-soft: var(--color-accent-soft);
   --c-mark-soft: var(--color-mark-soft);
-  --shadow-card: 0 1px 0 rgb(34 27 20 / 0.04), 0 10px 30px -16px rgb(34 27 20 / 0.28);
+  --shadow-card: 0 1px 2px rgb(20 24 31 / 0.04), 0 12px 32px -16px rgb(20 24 31 / 0.18);
 }
 
 .dark {
-  --c-ink: #ece3d3;              /* paper-coloured text on dark    */
-  --c-paper: #16120d;            /* the desk at night              */
-  --c-surface: #201a12;          /* sheet under lamplight          */
-  --c-muted: #a59b87;
-  --color-accent: #82a6e6;       /* blue pencil, brighter for dark */
-  --c-accent-soft: #1d2740;
-  --color-mark: #ef6a5e;         /* red pen, brighter for dark     */
-  --c-mark-soft: #3a201c;
-  --color-ok: #57b07e;
+  --c-ink: #e7eaef;             /* cool light text on dark        */
+  --c-paper: #0e1116;           /* the console at night           */
+  --c-surface: #171c24;         /* panel under lamplight          */
+  --c-muted: #8a93a0;
+  --color-accent: #6e8bff;      /* cobalt, brighter for dark      */
+  --c-accent-soft: #1b2440;
+  --color-mark: #ffb44d;        /* amber, brighter for dark       */
+  --c-mark-soft: #2a2418;
+  --color-ok: #3fb07a;
   --shadow-card: 0 1px 0 rgb(0 0 0 / 0.4), 0 14px 36px -16px rgb(0 0 0 / 0.7);
 }
 
@@ -63,14 +64,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Display face carries the personality; tight, confident headings. */
+/* Display face carries the personality; tight, confident grotesk headings. */
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
   font-optical-sizing: auto;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.03em;
 }
-h1 { font-weight: 600; line-height: 1.04; }
-h2, h3 { font-weight: 600; }
+h1 { font-weight: 800; line-height: 0.99; }
+h2, h3 { font-weight: 700; }
 
 /* Never allow a stray child to create a horizontal scrollbar on mobile. */
 html, body { overflow-x: clip; max-width: 100%; }
@@ -93,18 +94,18 @@ html, body { overflow-x: clip; max-width: 100%; }
   text-transform: uppercase;
 }
 
-/* The signature: a word struck out in red pen, the way an editor cuts a tell. */
+/* The signature: a tell struck out in cobalt, the way the console cuts it. */
 .struck {
   position: relative;
-  color: var(--color-mark);
+  color: var(--color-accent);
   white-space: nowrap;
 }
 .struck::after {
   content: '';
   position: absolute;
   left: -0.04em; right: -0.04em; top: 54%;
-  height: 0.09em;
-  background: var(--color-mark);
+  height: 0.1em;
+  background: var(--color-accent);
   transform: rotate(-2.2deg);
   border-radius: 2px;
 }
@@ -146,18 +147,19 @@ html, body { overflow-x: clip; max-width: 100%; }
 
 .muted { color: var(--c-muted); }
 
-/* Diff highlights — red pen cuts, blue pencil adds. Never colour alone (WCAG 1.4.1). */
+/* Diff highlights — cuts struck red, clean additions underlined green.
+   Never colour alone (WCAG 1.4.1): the strike/underline carries it too. */
 .diff-del {
-  background: var(--c-mark-soft);
-  color: var(--color-mark);
+  background: color-mix(in srgb, var(--color-bad) 12%, transparent);
+  color: var(--color-bad);
   text-decoration: line-through;
   text-decoration-thickness: 1.5px;
   border-radius: 3px;
   padding: 0 1px;
 }
 .diff-ins {
-  background: var(--c-accent-soft);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-ok) 14%, transparent);
+  color: var(--color-ok);
   text-decoration: underline;
   text-decoration-thickness: 1.5px;
   text-underline-offset: 2px;
