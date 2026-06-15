@@ -1,6 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import BeforeAfterDiffViewer from '../../components/tools/BeforeAfterDiffViewer.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
 
 const faqs = [
   {
@@ -88,6 +90,8 @@ const faqSchema = {
 
     <BeforeAfterDiffViewer />
 
+    <TrustStrip />
+
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
       <h2 class="text-2xl font-bold">Compare your original and cleaned text instantly</h2>
@@ -163,6 +167,8 @@ const faqSchema = {
         ))}
       </div>
     </section>
+
+    <RelatedTools currentSlug="before-after-diff-viewer" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />

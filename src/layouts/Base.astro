@@ -157,16 +157,30 @@ const orgGraph = {
           <span class="grid h-7 w-7 place-items-center rounded-lg bg-accent text-white">—</span>
           <span>Em Dash Remover</span>
         </a>
-        <nav class="flex items-center gap-1 text-sm">
-          {nav.map((n) => (
-            <a href={n.href} class="inline-flex min-h-11 items-center rounded-lg px-3 muted transition hover:bg-ink/5">{n.label}</a>
-          ))}
-          <button id="theme-toggle" aria-label="Toggle dark mode" class="ml-1 grid h-11 w-11 place-items-center rounded-lg transition hover:bg-ink/5">
+        <div class="flex items-center gap-1">
+          <!-- Desktop nav (hidden on mobile, where it would overflow) -->
+          <nav class="hidden items-center gap-1 text-sm sm:flex">
+            {nav.map((n) => (
+              <a href={n.href} class="inline-flex min-h-11 items-center rounded-lg px-3 muted transition hover:bg-ink/5">{n.label}</a>
+            ))}
+          </nav>
+          <button id="theme-toggle" aria-label="Toggle dark mode" class="grid h-11 w-11 place-items-center rounded-lg transition hover:bg-ink/5">
             <span class="dark:hidden">🌙</span>
             <span class="hidden dark:inline">☀️</span>
           </button>
-        </nav>
+          <!-- Mobile menu button -->
+          <button id="nav-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav" class="grid h-11 w-11 place-items-center rounded-lg transition hover:bg-ink/5 sm:hidden">
+            <svg id="nav-icon-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <svg id="nav-icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" class="hidden"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
+          </button>
+        </div>
       </div>
+      <!-- Mobile nav panel -->
+      <nav id="mobile-nav" hidden aria-label="Primary" class="border-t border-ink/8 px-3 py-2 sm:hidden">
+        {nav.map((n) => (
+          <a href={n.href} class="flex min-h-11 items-center rounded-lg px-3 text-sm muted transition hover:bg-ink/5">{n.label}</a>
+        ))}
+      </nav>
     </header>
 
     <slot />
@@ -228,6 +242,26 @@ const orgGraph = {
         const isDark = document.documentElement.classList.toggle('dark');
         localStorage.setItem('theme', isDark ? 'dark' : 'light');
       });
+
+      // Mobile menu toggle
+      (() => {
+        const btn = document.getElementById('nav-toggle');
+        const panel = document.getElementById('mobile-nav');
+        const iOpen = document.getElementById('nav-icon-open');
+        const iClose = document.getElementById('nav-icon-close');
+        if (!btn || !panel) return;
+        const setOpen = (open) => {
+          panel.toggleAttribute('hidden', !open);
+          btn.setAttribute('aria-expanded', String(open));
+          btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+          iOpen?.classList.toggle('hidden', open);
+          iClose?.classList.toggle('hidden', !open);
+        };
+        btn.addEventListener('click', () => setOpen(panel.hasAttribute('hidden')));
+        // Close when a link is tapped or when resizing up to desktop.
+        panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+        matchMedia('(min-width: 640px)').addEventListener('change', (e) => { if (e.matches) setOpen(false); });
+      })();
     </script>
   </body>
 </html>

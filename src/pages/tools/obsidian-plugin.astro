@@ -1,5 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
 
 const features = [
   {
@@ -193,6 +195,8 @@ const howToSchema = {
       </div>
     </header>
 
+    <TrustStrip />
+
     <!-- What it does -->
     <section class="mx-auto mt-12 max-w-3xl px-4">
       <div class="card p-6 sm:p-8">
@@ -334,6 +338,8 @@ const howToSchema = {
         ))}
       </div>
     </section>
+
+    <RelatedTools currentSlug="obsidian-plugin" />
 
     <script type="application/ld+json" set:html={JSON.stringify(softwareApp)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />

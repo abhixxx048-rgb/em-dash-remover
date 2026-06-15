@@ -1,6 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import HumanVoiceAiTellReport from '../../components/tools/HumanVoiceAiTellReport.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
 
 const faqs = [
   {
@@ -96,6 +98,8 @@ const faqSchema = {
 
     <HumanVoiceAiTellReport />
 
+    <TrustStrip />
+
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
       <h2 class="text-2xl font-bold">What counts as an "AI tell"?</h2>
@@ -181,6 +185,8 @@ const faqSchema = {
         ))}
       </div>
     </section>
+
+    <RelatedTools currentSlug="human-voice-ai-tell-report" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />

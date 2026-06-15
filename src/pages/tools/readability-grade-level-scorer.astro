@@ -1,6 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import ReadabilityGradeLevelScorer from '../../components/tools/ReadabilityGradeLevelScorer.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
 
 const faqs = [
   {
@@ -93,6 +95,8 @@ const faqSchema = {
     </header>
 
     <ReadabilityGradeLevelScorer />
+
+    <TrustStrip />
 
     <!-- Value props -->
     <section class="mx-auto mt-16 max-w-5xl px-4">
@@ -208,6 +212,8 @@ const faqSchema = {
         ))}
       </div>
     </section>
+
+    <RelatedTools currentSlug="readability-grade-level-scorer" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />

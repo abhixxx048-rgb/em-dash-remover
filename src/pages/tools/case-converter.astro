@@ -1,6 +1,8 @@
 ---
 import Base from '../../layouts/Base.astro';
 import CaseConverter from '../../components/tools/CaseConverter.astro';
+import RelatedTools from '../../components/RelatedTools.astro';
+import TrustStrip from '../../components/TrustStrip.astro';
 
 const faqs = [
   {
@@ -91,6 +93,8 @@ const faqSchema = {
 
     <CaseConverter />
 
+    <TrustStrip />
+
     <!-- SEO content -->
     <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
       <h2 class="text-2xl font-bold">How to use the case converter</h2>
@@ -167,6 +171,8 @@ const faqSchema = {
         ))}
       </div>
     </section>
+
+    <RelatedTools currentSlug="case-converter" />
 
     <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
     <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
