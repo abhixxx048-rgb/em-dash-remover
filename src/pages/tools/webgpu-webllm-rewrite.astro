@@ -1,0 +1,190 @@
+---
+import Base from '../../layouts/Base.astro';
+import WebgpuWebllmRewrite from '../../components/tools/WebgpuWebllmRewrite.astro';
+
+const faqs = [
+  {
+    q: 'Does my text get uploaded anywhere?',
+    a: 'No. The rewrite runs entirely in your browser with plain JavaScript — nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. It even works with your connection turned off.',
+  },
+  {
+    q: 'Does it work offline?',
+    a: 'Yes. The instant deterministic rewrite needs no model and no network, so it works offline immediately. The optional on-device LLM path (WebLLM) would download model weights once and then also run fully offline.',
+  },
+  {
+    q: 'Which browsers and devices does it support?',
+    a: 'The instant rewrite works in every modern browser, on any device, including older phones. The experimental on-device AI model path additionally requires WebGPU — available in current Chrome, Edge, Safari 26+, and Firefox where enabled. If WebGPU is missing, the tool detects this and falls back to the instant rewrite instead of showing an error.',
+  },
+  {
+    q: 'Will this beat an AI detector?',
+    a: 'That is not the goal. We optimize for human-readable quality — removing filler, inflated vocabulary, and AI tells so your writing keeps your voice. We never market or build for detector evasion.',
+  },
+  {
+    q: 'Is it free? Do I need an account?',
+    a: 'It is completely free with no signup and no limits. Because everything runs on your device, there is nothing to rate-limit and no account to create.',
+  },
+  {
+    q: 'What is the difference between rewrite and clean?',
+    a: 'Cleaning is a deterministic find-and-fix pass (em dashes, smart quotes, invisible characters). Rewriting goes further: it softens AI-sounding phrasing and adjusts tone by mode (Fluent, Formal, Casual, Shorten, Expand) while keeping your meaning. Use the cleaner for punctuation hygiene and the rewriter to change how the text reads.',
+  },
+  {
+    q: 'Why would the on-device AI model be a large first download?',
+    a: 'A real language model is hundreds of megabytes to a couple of gigabytes even when quantized. With WebLLM it downloads once, caches in your browser, and then runs locally on your GPU with no further network calls. The instant rewrite on this page has zero download and is what runs today.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/webgpu-webllm-rewrite#app`,
+  name: 'Private On-Device AI Rewriter — No Upload',
+  url: `${Astro.site}tools/webgpu-webllm-rewrite`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript. WebGPU optional for on-device AI model.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Rewrite text 100% in your browser with no upload',
+    'Six rewrite modes: Standard, Fluent, Formal, Casual, Shorten, Expand',
+    'Removes AI tells, filler, and inflated vocabulary',
+    'Before / after readability grade and AI-tell density meters',
+    'Word-level before/after diff view',
+    'WebGPU feature-detection with graceful fallback',
+    'Works offline — copy and download the result',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Private On-Device AI Rewriter — Runs in Your Browser, No Upload"
+  description="Free private AI rewriter that runs 100% in your browser — no upload, no signup, works offline. Rewrite and de-AI text with Fluent, Formal, Casual, Shorten and Expand modes. WebGPU-ready, with an instant fallback everywhere."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <a href="/tools" class="mb-4 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup · works offline
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Private AI Rewriter — runs 100% in your browser, no upload.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Rewrite and de-AI your text without it ever leaving your device. Pick a
+        mode — <strong>Fluent, Formal, Casual, Shorten</strong> or
+        <strong>Expand</strong> — and the rewrite happens instantly, offline, with
+        nothing uploaded. On WebGPU devices, an on-device AI model is coming next.
+        Clean AI writing for real quality — keep your human voice.
+      </p>
+    </header>
+
+    <WebgpuWebllmRewrite />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">How the on-device rewriter works</h2>
+      <p class="muted">
+        This tool is built around a simple, load-bearing promise: your text never
+        leaves your device. The rewrite you get today runs as plain JavaScript in
+        your browser — it strips the empty openers ("it's important to note
+        that"), swaps inflated vocabulary ("delve", "leverage", "robust") for plain
+        words, and adjusts tone by mode, all without sending a single byte to a
+        server. You can prove it: open your browser's DevTools, switch to the
+        Network tab, and rewrite — you'll see zero requests. Turn off your Wi-Fi and
+        it still works.
+      </p>
+      <p class="muted">
+        The roadmap adds an optional on-device <strong>WebGPU + WebLLM</strong>
+        path: a small, 4-bit quantized language model that downloads once, caches
+        in your browser, and then paraphrases on your own GPU with no further
+        network calls. The page already feature-detects WebGPU and shows whether
+        your device could run it — but the privacy guarantee is identical either
+        way, because both paths run locally.
+      </p>
+
+      <h2 class="text-2xl font-bold">Choose a rewrite mode</h2>
+      <p class="muted">
+        One paste, six ways to read it. Each mode is a distinct transform, and you
+        can tap between them with no reload:
+      </p>
+      <ul class="list-disc space-y-2 pl-6 muted">
+        <li><strong>Standard</strong> — removes AI tells while keeping your meaning, length, and voice.</li>
+        <li><strong>Fluent</strong> — drops empty connectives ("Moreover", "Furthermore") for smoother flow.</li>
+        <li><strong>Formal</strong> — lifts the register by expanding contractions and casual phrasing.</li>
+        <li><strong>Casual</strong> — warms the tone with contractions and a friendlier rhythm.</li>
+        <li><strong>Shorten</strong> — trims filler, hedging, and redundant intensifiers for a tighter draft.</li>
+        <li><strong>Expand</strong> — breaks long run-on sentences into clearer, separate ones.</li>
+      </ul>
+      <p class="muted">
+        Every mode is deterministic and content-preserving: it never invents facts
+        or hallucinates, so the result is always a faithful, readable version of
+        what you wrote. The before/after meters show your reading grade level and
+        AI-tell density dropping in real time.
+      </p>
+
+      <h2 class="text-2xl font-bold">Why on-device? Your text never leaves your device</h2>
+      <p class="muted">
+        Cloud paraphrasers — QuillBot, Scribbr, and the rest — are polished, but
+        every one of them uploads your text to a server, and several store it. That
+        is a non-starter for privacy-sensitive writing: a patient-note summary, a
+        termination email, an unpublished manuscript, or anything covered by a
+        company's data-loss-prevention policy. Because this rewriter runs entirely
+        in your browser, it makes a claim those tools structurally cannot: the text
+        physically never leaves your machine. That is the whole point — provable
+        privacy you can verify yourself, not a privacy policy you have to trust.
+      </p>
+
+      <h2 class="text-2xl font-bold">Works in Chrome, Edge, Safari and Firefox</h2>
+      <p class="muted">
+        The instant rewrite works everywhere — any modern browser, any device, even
+        an older phone — because it needs no GPU and no model. The experimental
+        on-device AI model path additionally needs WebGPU, which now ships across
+        Chrome, Edge, Safari 26+, and Firefox where enabled. Crucially, when WebGPU
+        is missing or blocked, the tool detects it and falls back to the instant
+        rewrite rather than showing a blank screen. Nobody hits a dead end. If you
+        only need to remove punctuation tells, the
+        <a href="/">deterministic em-dash cleaner</a> is the fastest universal
+        option and pairs naturally with this rewriter.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+  </style>
+</Base>

@@ -1,0 +1,194 @@
+---
+import Base from '../../layouts/Base.astro';
+import HomoglyphConfusablesDetector from '../../components/tools/HomoglyphConfusablesDetector.astro';
+
+const faqs = [
+  {
+    q: 'What is a homoglyph or confusable character?',
+    a: 'A homoglyph is a character that looks identical (or nearly identical) to another but is a different Unicode code point — usually from another script. The classic example is the Latin "a" (U+0061) versus the Cyrillic "а" (U+0430): they render the same in almost every font, but to a computer they are completely different letters. "Confusable" is the Unicode term for the same idea. This tool finds the look-alike letters hiding in your text and maps them back to plain Latin.',
+  },
+  {
+    q: 'Does this tool send my text anywhere?',
+    a: 'No. The entire scan, skeleton calculation, and normalization run in your browser with zero network calls. Open DevTools → Network while you use it and you will see no requests, and it works offline. The confusables data ships inside the page. Only your script-filter preferences are saved locally; your text never is.',
+  },
+  {
+    q: 'Will it flag my legitimate Russian, Greek or Japanese text?',
+    a: 'No. The detector first works out the document\'s dominant script. If your text is mostly Russian, its Cyrillic letters are the real content and are left alone — same for a Greek or Japanese paragraph. It only flags look-alike letters that mix into otherwise-Latin words (like a single Cyrillic "а" inside an English word), which is the real signature of a homoglyph swap.',
+  },
+  {
+    q: 'What is the "skeleton"?',
+    a: 'The skeleton is the Unicode UTS #39 canonical form of your text — what a machine effectively sees when it compares two strings for confusability. It maps every look-alike to its prototype letter, so "pаypаl" (with Cyrillic letters) and "paypal" produce the same skeleton. Seeing the skeleton side by side makes an invisible substitution obvious.',
+  },
+  {
+    q: 'Can it remove the fake letters automatically?',
+    a: 'Yes. Switch to the Normalized view (or use the Copy clean button) and every flagged look-alike is replaced with its plain Latin/ASCII equivalent. You can click any individual glyph in the Flagged view to "keep" it — handy when a Greek π or a real Cyrillic name is intentional — so normalization never destroys legitimate content.',
+  },
+  {
+    q: 'Why does AI or "humanizer" text sometimes contain Cyrillic letters?',
+    a: 'Some tools deliberately swap a few Latin letters for identical-looking Cyrillic or Greek ones to try to dodge AI-detection or word filters (the so-called homoglyph attack studied in the SilverSpeak research). We do not help create that — we help you clean it back to honest, all-Latin text so your writing is legitimate and reads correctly everywhere.',
+  },
+  {
+    q: 'Will it change my accented letters like é or ñ?',
+    a: 'No. Accented Latin letters (é, ñ, ü, ç) are genuine Latin characters, not confusables, so they are never flagged or altered. The tool only touches characters that exist in its cross-script confusables table or are fullwidth / mathematical-alphanumeric compatibility variants.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/homoglyph-confusables-detector#app`,
+  name: 'Homoglyph & Confusable Character Detector',
+  url: `${Astro.site}tools/homoglyph-confusables-detector`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Detect homoglyph and confusable characters in text',
+    'Find Cyrillic and Greek letters disguised as Latin',
+    'Detect fullwidth and mathematical-alphanumeric look-alikes',
+    'Compute the Unicode UTS #39 skeleton',
+    'Normalize look-alike characters back to clean Latin',
+    'Highlight mixed-script words inline with code points',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Homoglyph Detector — Find Cyrillic & Confusable Look-Alike Letters"
+  description="Free homoglyph & confusable character detector. Find Cyrillic, Greek and fullwidth letters disguised as Latin, see the Unicode skeleton, and normalize back to clean text — 100% in your browser."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <p class="mb-3">
+        <a href="/tools" class="inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      </p>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Homoglyph &amp; Confusable Character Detector — find fake look-alike letters.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Paste your text to catch the Cyrillic <strong>а</strong>, Greek
+        <strong>ο</strong> and fullwidth <strong>Ａ</strong> look-alikes hiding in
+        plain sight. Every mixed-script letter is highlighted with its
+        <strong>U+XXXX</strong> code point, you can see the Unicode
+        <strong>skeleton</strong> a machine really reads, and one click
+        <strong>normalizes</strong> everything back to clean Latin — never to beat
+        a detector, just to keep your writing genuine.
+      </p>
+    </header>
+
+    <HomoglyphConfusablesDetector />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">What are homoglyphs and confusable characters?</h2>
+      <p class="muted">
+        A <strong>homoglyph</strong> is a character that looks the same as another
+        but is a different Unicode code point — almost always borrowed from another
+        writing system. The textbook case is the Latin <strong>a</strong> (U+0061)
+        versus the Cyrillic <strong>а</strong> (U+0430): in nearly every font they
+        are pixel-for-pixel identical, yet to software they are entirely different
+        letters. Unicode calls these <strong>confusables</strong>, and the official
+        UTS #39 specification ships a data file mapping each one to the Latin glyph
+        it imitates. Cyrillic and Greek supply the most dangerous look-alikes (а, е,
+        о, р, с, ο, α, ν), but fullwidth forms (<strong>Ａ</strong>) and the
+        mathematical-alphanumeric letters (<strong>𝐀</strong>, <strong>𝕒</strong>)
+        cause the same confusion. This tool highlights every one of them inline so
+        you can see exactly which letters are fakes and where.
+      </p>
+
+      <h2 class="text-2xl font-bold">See the Unicode skeleton — what a machine really reads</h2>
+      <p class="muted">
+        The most revealing feature is the <strong>skeleton</strong> view. Following
+        the Unicode UTS #39 algorithm, the tool decomposes your text and maps every
+        confusable to its prototype letter, producing the canonical form that
+        software uses to decide whether two strings are "the same." A spoofed word
+        like <code>pаypаl</code> (with two Cyrillic letters) and the real
+        <code>paypal</code> collapse to an identical skeleton — which is exactly how
+        a phishing domain or a disguised username slips past a casual glance. Seeing
+        the original and its skeleton side by side turns an abstract, invisible
+        attack into something concrete you can act on.
+      </p>
+
+      <h2 class="text-2xl font-bold">One-click normalize — map look-alikes back to clean Latin</h2>
+      <p class="muted">
+        Detection is only half the job. Switch to the <strong>Normalized</strong>
+        view and every flagged look-alike is replaced with its plain Latin or ASCII
+        equivalent, ready to copy or download. Crucially, the tool checks the
+        document's <strong>dominant script</strong> first, so genuinely Russian,
+        Greek, or Japanese text is never mangled — only letters that mix into
+        otherwise-Latin words get rewritten. And if a particular glyph is meant to
+        be there — a real Greek π in a math note, an authentic Cyrillic name — click
+        it in the Flagged view to <strong>keep</strong> it out of normalization.
+        Clean copy, with nothing legitimate destroyed.
+      </p>
+
+      <h2 class="text-2xl font-bold">Why look-alike letters show up in AI and pasted text</h2>
+      <p class="muted">
+        Confusables creep in for several reasons. Copy-pasting from a webpage, PDF,
+        or bilingual keyboard can silently mix scripts. Some "humanizer" tools
+        deliberately swap Latin letters for identical-looking Cyrillic or Greek ones
+        to try to dodge AI detection — the homoglyph attack documented in the
+        SilverSpeak research. Either way, the result is text that fails search and
+        replace, breaks spellcheck, mis-sorts, and reads as manipulated. Our stance
+        is simple and on-brand: we help you <strong>clean</strong> that text back to
+        honest, all-Latin prose so it is legitimate everywhere — we never help create
+        spoofed text, and we ship no generator.
+      </p>
+
+      <h2 class="text-2xl font-bold">100% in your browser — your text never leaves your device</h2>
+      <p class="muted">
+        Every part of the detection, the skeleton calculation, and the normalization
+        runs locally in your browser with no network calls — the confusables data is
+        bundled into the page. Your text is never uploaded, stored, or logged; open
+        DevTools → Network and you will see zero requests, and the tool keeps working
+        offline. Only your script-filter preferences are saved (locally); the text
+        itself never is. That makes it safe for confidential documents, usernames,
+        brand names, and anything else you would rather not send to a server.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+  </style>
+</Base>

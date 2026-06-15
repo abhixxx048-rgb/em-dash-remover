@@ -1,0 +1,175 @@
+---
+import Base from '../../layouts/Base.astro';
+import EmojiDecorativeSymbolStripper from '../../components/tools/EmojiDecorativeSymbolStripper.astro';
+
+const faqs = [
+  {
+    q: 'Does this send my text anywhere?',
+    a: 'No. All emoji and symbol stripping happens entirely in your browser. Nothing is uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests — it even works offline.',
+  },
+  {
+    q: 'Will it remove © ™ ° and currency symbols?',
+    a: 'No. By default the tool keeps semantically meaningful symbols — currency ($ € £ ¥), math and signs (° ± × ÷ → ≤ ≥), and legal marks (© ® ™ §). That is the #1 thing naive emoji removers get wrong. You can turn each safe-keep class off in Options if you really want to strip everything.',
+  },
+  {
+    q: 'Does it handle skin-tone, family, and flag emoji?',
+    a: 'Yes. It removes whole emoji grapheme clusters — skin-tone modifiers, ZWJ-joined families and professions, regional-indicator flag pairs, and keycaps like 1️⃣ — so you never get an orphaned fragment such as a bare 1 or a dangling joiner left behind.',
+  },
+  {
+    q: 'What is the difference between an emoji and a decorative bullet?',
+    a: 'Emoji are pictographs like 🚀✅👍. Decorative bullets are the ornamental glyphs LLMs use to start list items and headings — ✦ ▶ ➤ ❖ ● and similar. The tool removes both, but with separate toggles, and a "list bullets only" mode that strips a decorative glyph only when it sits at the start of a line and leaves the same glyph alone mid-sentence.',
+  },
+  {
+    q: 'Why does ChatGPT add emoji bullets and ✅ marks?',
+    a: 'Models learn formatting patterns from web and chat text, where emoji bullets and checkmark headers are common. The result reads as obviously machine-generated and off-brand in formal email, LinkedIn posts, essays, or support replies. Stripping them restores a plain, human voice.',
+  },
+  {
+    q: 'Can I turn decorative bullets into plain dashes?',
+    a: 'Yes. Enable "List bullets only" and pick what a leading bullet becomes — nothing, a hyphen (-), an asterisk (*), or a plain neutral bullet (•) — so your list structure stays intact instead of collapsing.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/emoji-decorative-symbol-stripper#app`,
+  name: 'Emoji & Decorative-Symbol Stripper',
+  url: `${Astro.site}tools/emoji-decorative-symbol-stripper`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Remove emoji from text',
+    'Remove decorative bullets from ChatGPT text',
+    'Sequence-aware emoji removal (skin-tone, family, flag, keycap)',
+    'Keep currency, math and legal symbols by default',
+    'Remove special characters from text',
+    'Turn decorative bullets into plain dashes',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Remove Emoji from Text — Free Emoji & Decorative-Symbol Stripper"
+  description="Remove emoji and decorative bullets (✦▶❖✅) from ChatGPT and AI text — free, private, 100% in your browser. Keeps your real symbols (©, °, $). Strip emoji and special characters instantly."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <p class="mb-4">
+        <a href="/tools" class="inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      </p>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Remove Emoji &amp; Decorative Symbols from Text
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Strip the emoji, checkmarks, and ✦▶❖ ornamental bullets that scream
+        "an LLM wrote this" — instantly and privately. Grammar-safe defaults keep
+        your real symbols (©, °, $) while pulling the decoration. Clean AI writing
+        for real quality, keep your human voice.
+      </p>
+    </header>
+
+    <EmojiDecorativeSymbolStripper />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">What it removes (and what it keeps)</h2>
+      <p class="muted">
+        This tool removes emoji and ornamental symbols in two careful passes. The
+        emoji pass removes whole grapheme clusters — base emoji, variation
+        selectors, skin-tone modifiers, ZWJ-joined families and professions, flag
+        pairs, and keycap sequences like 1️⃣ — so you never get a stray
+        <code>1</code> or a dangling joiner left behind, the classic failure of
+        naive removers. The decorative pass strips dingbats and AI-bullet glyphs
+        such as <code>✦ ▶ ➤ ❖ ● ✅</code>. Crucially, it
+        <strong>keeps semantically meaningful symbols by default</strong>:
+        currency (<code>$ € £ ¥</code>), math and signs (<code>° ± × ÷ → ≤ ≥</code>),
+        and legal marks (<code>© ® ™ §</code>). You stay in control with one-tap
+        "keep" toggles, so your real content is never over-stripped.
+      </p>
+
+      <h2 class="text-2xl font-bold">Why AI text is full of emoji bullets</h2>
+      <p class="muted">
+        Emoji-as-bullets and ✅ checkmark headers are among the most visible signs
+        of pasted ChatGPT, Claude, or Gemini output. Models learn these formatting
+        habits from web and chat data, then sprinkle 🚀✨🔹 through lists and
+        headings. Dropped into an email, a LinkedIn post, a CMS, or a Word doc, that
+        decoration instantly reads as machine-generated and off-brand. Removing it
+        is not about beating a detector — it is about presenting clean, professional
+        prose in your own voice. As a bonus, it also makes your text cleaner for
+        screen readers, which would otherwise announce "white heavy check mark"
+        before every line.
+      </p>
+
+      <h2 class="text-2xl font-bold">How to use it / presets</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Paste your text into the box above (or click an example to see it work).</li>
+        <li>Pick a preset: <strong>AI bullet cleanup</strong> (decoration + emoji, keep real symbols), <strong>Emoji only</strong> (leave symbols), or <strong>Strip everything</strong> (aggressive).</li>
+        <li>Optionally open <strong>Options</strong> to keep currency/math/legal classes, switch on "list bullets only," or turn decorative bullets into plain dashes.</li>
+        <li>Review the cleaned output and the "what we removed" inventory, then click <strong>Copy</strong> or <strong>Download</strong>.</li>
+      </ol>
+      <p class="muted">
+        Tip: press <kbd>Ctrl/Cmd + Enter</kbd> to re-run, and <kbd>Esc</kbd> to clear.
+        Your preset and toggle choices are remembered between visits — but your text
+        is never saved.
+      </p>
+
+      <h2 class="text-2xl font-bold">100% in your browser — your text never leaves your device</h2>
+      <p class="muted">
+        Everything here is deterministic string work that runs locally. There is no
+        upload, no API key, and no cookie needed for the tool to function, so the
+        privacy story is airtight: nothing you paste touches the network. That makes
+        it safe for confidential emails, support replies, and unpublished drafts. If
+        you also need to remove em dashes, smart quotes, or invisible watermark
+        characters, run the
+        <a href="/">full em dash remover &amp; AI text cleaner</a> next.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo kbd { font-family: var(--font-mono); font-size: 0.85em; padding: 1px 5px; border-radius: 5px; border: 1px solid color-mix(in srgb, var(--c-ink) 16%, transparent); }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+  </style>
+</Base>

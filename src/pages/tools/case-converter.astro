@@ -1,0 +1,181 @@
+---
+import Base from '../../layouts/Base.astro';
+import CaseConverter from '../../components/tools/CaseConverter.astro';
+
+const faqs = [
+  {
+    q: 'Is "and" capitalized in a title?',
+    a: 'No. "And" is a coordinating conjunction, so AP, Chicago, APA and MLA all lowercase it in the middle of a title — unless it happens to be the first or last word, which is always capitalized.',
+  },
+  {
+    q: 'What is the difference between AP and Chicago title case?',
+    a: 'The main difference is prepositions. AP capitalizes prepositions of four or more letters (From, With, Into) and lowercases short ones (of, in, to). Chicago lowercases all prepositions regardless of length. Chicago also capitalizes "yet" and "so", while AP keeps them lowercase, and the two differ on hyphenated words.',
+  },
+  {
+    q: 'Does this work offline, and is my text uploaded?',
+    a: 'Everything runs in your browser using plain JavaScript. Your text is never uploaded, stored, or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. The tool also works offline.',
+  },
+  {
+    q: 'How do I convert camelCase to snake_case?',
+    a: 'Paste your identifier (for example getUserProfileByID), then click snake_case. The converter tokenizes on camelCase boundaries and handles acronym runs correctly, so XMLParser becomes xml_parser rather than x_m_l_parser.',
+  },
+  {
+    q: 'Why does Word\'s "Capitalize Each Word" get titles wrong?',
+    a: 'Word capitalizes the first letter of every word, including little words like "the", "of" and "and" that proper title case should lowercase. Our Title Case mode applies real style-guide small-word lists, so you get a correctly capitalized headline instead.',
+  },
+  {
+    q: 'How do I capitalize the first word after a colon?',
+    a: 'You do not have to — the converter does it automatically. Across all four style guides, the first word of a subtitle (the word right after a colon) is always capitalized.',
+  },
+  {
+    q: 'Does it keep brand names like iPhone correct?',
+    a: 'Yes. With "Keep brand names" enabled, terms such as iPhone, NASA, JavaScript and PostgreSQL keep their intended casing, and any word with internal capitals or an all-caps acronym is left untouched instead of being flattened to Iphone or Nasa.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/case-converter#app`,
+  name: 'Case Converter — UPPER, lower, Sentence & Title Case',
+  url: `${Astro.site}tools/case-converter`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Convert text to UPPER CASE and lower case',
+    'Sentence case with correct sentence detection',
+    'Title case for AP, Chicago, APA and MLA style guides',
+    'camelCase, PascalCase, snake_case, kebab-case, CONSTANT_CASE and dot.case',
+    'Proper-noun and acronym preservation',
+    'Live character, word, sentence and reading-time counters',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Case Converter — UPPER, lower, Sentence & Title Case (AP, Chicago, APA, MLA)"
+  description="Free case converter: convert text to UPPER CASE, lower case, Sentence case and Title Case (AP, Chicago, APA, MLA), plus camelCase and snake_case — instantly, 100% in your browser."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <a href="/tools" class="mb-4 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Case Converter — UPPER, lower, Sentence &amp; Title Case
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Convert any text to UPPER CASE, lower case, Sentence case or Title Case —
+        with real, style-guide-accurate capitalization for
+        <strong>AP, Chicago, APA and MLA</strong> — plus developer cases like
+        camelCase and snake_case. Done right, instantly, and your text never
+        leaves your browser.
+      </p>
+    </header>
+
+    <CaseConverter />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">How to use the case converter</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Type or paste your text into the box above (or tap an example).</li>
+        <li>Click the case you want — <strong>UPPER</strong>, <strong>lower</strong>, <strong>Sentence</strong>, <strong>Title</strong>, or a developer case.</li>
+        <li>For Title Case, pick your style guide (AP, Chicago, APA or MLA); the result updates live.</li>
+        <li>Hit <strong>Copy</strong> (or Ctrl/Cmd + Enter) and paste the result wherever you need it.</li>
+      </ol>
+
+      <h2 class="text-2xl font-bold">Title case rules by style guide</h2>
+      <p class="muted">
+        "Title case" is not one rule — each style guide capitalizes the little
+        words differently, which is why a naive "capitalize every word" tool gets
+        headlines wrong. All four styles always capitalize the first word, the
+        last word, and the first word after a colon, and they all lowercase the
+        articles <em>a, an, the</em> and the conjunctions <em>and, but, or, nor,
+        for</em>. The differences are in the prepositions:
+      </p>
+      <ul class="list-disc space-y-2 pl-6 muted">
+        <li><strong>AP</strong> — lowercases prepositions of three letters or fewer (<em>of, in, to, at</em>) but capitalizes those of four or more letters (<em>From, With, Into</em>). It also lowercases <em>yet</em> and <em>so</em>.</li>
+        <li><strong>Chicago (CMOS)</strong> — lowercases <em>all</em> prepositions regardless of length, and capitalizes only the first part of a hyphenated word (<em>Self-care</em>).</li>
+        <li><strong>APA 7</strong> — lowercases prepositions of three letters or fewer and capitalizes any major word of four letters or more.</li>
+        <li><strong>MLA</strong> — lowercases prepositions of any length, along with articles and coordinating conjunctions.</li>
+      </ul>
+
+      <h2 class="text-2xl font-bold">Sentence case vs Capitalize Each Word</h2>
+      <p class="muted">
+        These two are easy to confuse. <strong>Sentence case</strong> capitalizes
+        only the first letter of each sentence (and proper nouns) — exactly how
+        normal prose is written — so it is the right choice for fixing text that
+        was typed in ALL CAPS or all lowercase. <strong>Capitalize Each Word</strong>
+        capitalizes the first letter of every single word, which looks like a
+        title but ignores the small-word rules; it is rarely correct for real
+        headlines. When in doubt for a heading, use Title Case with a style guide.
+      </p>
+
+      <h2 class="text-2xl font-bold">Developer cases: camelCase, snake_case, kebab-case, CONSTANT_CASE</h2>
+      <p class="muted">
+        For code, the converter re-tokenizes your text on spaces, underscores,
+        hyphens, dots and camelCase boundaries, then re-emits it in the target
+        format. The tokenizer is acronym-aware, so <code>XMLParser</code> becomes
+        <code>xml_parser</code> rather than <code>x_m_l_parser</code>. Use
+        <strong>camelCase</strong> and <strong>PascalCase</strong> for variables
+        and types, <strong>snake_case</strong> for database columns and Python,
+        <strong>kebab-case</strong> for URLs and CSS, <strong>CONSTANT_CASE</strong>
+        for environment variables, and <strong>dot.case</strong> for config keys.
+      </p>
+
+      <h2 class="text-2xl font-bold">Privacy — everything runs in your browser</h2>
+      <p class="muted">
+        There is no server and no upload. All casing is done with plain
+        JavaScript on your device, so you can safely convert confidential or
+        unpublished text. Open your browser's DevTools Network tab while you work
+        and you'll see zero requests — and the tool keeps working with your
+        connection turned off.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+  </style>
+</Base>

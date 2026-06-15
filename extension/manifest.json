@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+  "name": "Em Dash Remover — Clean AI Text in Any Field",
+  "version": "0.1.0",
+  "description": "Grammar-aware em dash & AI-tell remover. Right-click clean selection, clean-on-paste, and clean ChatGPT/Claude/Gemini output. 100% local.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": ["contextMenus", "storage", "scripting", "activeTab"],
+  "optional_host_permissions": [
+    "https://chatgpt.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://www.perplexity.ai/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Em Dash Remover",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["cleaner.js", "content-script.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "commands": {
+    "clean-selection": {
+      "suggested_key": {
+        "default": "Alt+Shift+C"
+      },
+      "description": "Clean the current selection"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["cleaner.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

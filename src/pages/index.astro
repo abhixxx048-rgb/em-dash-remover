@@ -157,6 +157,33 @@ const faqSchema = {
       </p>
     </article>
 
+    <!-- More tools -->
+    <section class="mx-auto mt-20 max-w-5xl px-4">
+      <div class="flex items-end justify-between">
+        <h2 class="text-2xl font-bold">More free text tools</h2>
+        <a href="/tools" class="text-sm font-medium text-accent hover:underline">See all 20 →</a>
+      </div>
+      <p class="mt-1 text-sm muted">Every tool runs 100% in your browser. No signup, no upload.</p>
+      <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {[
+          { href: '/tools/invisible-watermark-character-inspector', icon: '👻', title: 'Invisible Character Inspector', desc: 'See & strip hidden zero-width and watermark characters.' },
+          { href: '/tools/word-reading-time-counter', icon: '🔢', title: 'Word & Reading-Time Counter', desc: 'Live counts, reading time and platform limits.' },
+          { href: '/tools/readability-grade-level-scorer', icon: '📊', title: 'Readability Scorer', desc: 'Flesch-Kincaid grade levels and hard sentences.' },
+          { href: '/tools/human-voice-ai-tell-report', icon: '🫀', title: 'AI-Tell Report', desc: 'Find what makes your writing read like AI.' },
+          { href: '/tools/emoji-decorative-symbol-stripper', icon: '🚫', title: 'Emoji Stripper', desc: 'Remove emoji and decorative bullets from text.' },
+          { href: '/tools/case-converter', icon: '🔠', title: 'Case Converter', desc: 'UPPER, lower, Sentence and Title case.' },
+        ].map((t) => (
+          <a href={t.href} class="card group flex gap-3 p-4 transition hover:border-accent" style="text-decoration: none;">
+            <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg" style="background: var(--c-accent-soft);">{t.icon}</span>
+            <span class="min-w-0">
+              <span class="block font-semibold group-hover:text-accent">{t.title}</span>
+              <span class="mt-0.5 block text-sm muted">{t.desc}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
+
     <!-- FAQ -->
     <section class="mx-auto mt-16 max-w-3xl px-4">
       <h2 class="text-2xl font-bold">Frequently asked questions</h2>

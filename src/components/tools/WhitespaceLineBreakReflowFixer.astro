@@ -1,0 +1,444 @@
+---
+// Interactive Whitespace & Line-Break Reflow Fixer island. Static HTML;
+// behavior wired by the client script, which imports the pure engine + jsdiff
+// for the before/after view. Styling mirrors Cleaner.astro / CaseConverter.astro
+// so it looks native (same textarea / toolbar / toast / button language).
+---
+
+<section id="tool" aria-label="Whitespace and line-break reflow fixer" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Recipe row: the primary one-click entry point -->
+    <div class="border-b border-ink/8 px-3 py-3 sm:px-4">
+      <div role="group" aria-label="Quick cleanup recipes" class="flex flex-wrap gap-1.5 text-sm" id="recipes">
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="pdf">📄 PDF paste cleanup</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="email">✉️ Email cleanup</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="codeSafe">💻 Code-safe</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="collapse">␣ Just collapse spaces</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-recipe="removeBreaks">↵ Remove all line breaks</button>
+      </div>
+
+      <!-- Advanced per-toggle options live behind a disclosure to keep the surface calm -->
+      <details class="group mt-3">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Options <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 grid gap-1 p-2 text-sm sm:grid-cols-2 sm:p-3">
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-reflow" class="h-5 w-5" /> Smart reflow (join soft breaks)</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-hyphens" class="h-5 w-5" /> Rejoin hyphen-split words</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-collapse" class="h-5 w-5" /> Collapse extra spaces/tabs</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-trailing" class="h-5 w-5" /> Trim trailing whitespace</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-leading" class="h-5 w-5" /> Trim leading whitespace</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-unicode" class="h-5 w-5" /> Normalize Unicode spaces</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-tabs" class="h-5 w-5" /> Tabs → spaces</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-quotes" class="h-5 w-5" /> Strip email quote markers (&gt;)</label>
+          <label class="flex min-h-11 items-center gap-2 px-2">
+            <span class="font-medium">Blank lines</span>
+            <select id="opt-blank" class="ctl px-3" aria-label="Blank-line handling">
+              <option value="collapse">Collapse runs to one</option>
+              <option value="keep">Keep as-is</option>
+              <option value="remove">Remove all</option>
+            </select>
+          </label>
+          <label class="flex min-h-11 items-center gap-2 px-2">
+            <span class="font-medium">Newlines</span>
+            <select id="opt-newline" class="ctl px-3" aria-label="Newline convention">
+              <option value="lf">LF (Unix)</option>
+              <option value="crlf">CRLF (Windows)</option>
+              <option value="cr">CR (old Mac)</option>
+            </select>
+          </label>
+        </div>
+      </details>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Result</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to fix"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste text copied from a PDF or email — or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="pdf" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📄 PDF abstract</button>
+              <button data-sample="email" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✉️ Quoted email</button>
+              <button data-sample="spaces" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">␣ Double-spaced</button>
+            </div>
+            <p class="text-xs muted">Runs 100% in your browser — your text never leaves this page.</p>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats" aria-live="polite">0 lines · 0 words · 0 chars</p>
+      </div>
+
+      <!-- Output -->
+      <div class="p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <div class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
+            <button id="view-clean" class="min-h-9 rounded-md px-3 font-medium">Fixed</button>
+            <button id="view-diff" class="min-h-9 rounded-md px-3 font-medium muted">Diff</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download fixed text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <textarea id="output" rows="14" readonly aria-label="Fixed text"
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+        <div id="diff" hidden
+          class="h-[calc(14*1.625em+1.5rem)] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed"
+          style="background: var(--c-paper);"></div>
+        <p class="mt-2 text-xs muted" id="out-stats" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <!-- Cleanliness meter + "what we changed" summary -->
+    <div class="grid items-center gap-5 border-t border-ink/8 px-4 py-4 sm:grid-cols-[auto_1fr]">
+      <div class="flex items-center gap-4">
+        <div class="relative h-20 w-20 shrink-0">
+          <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+            <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+            <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+              stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+              style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span class="text-[9px] muted">/ 100</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide muted">Cleanliness</p>
+          <p id="band" class="text-sm font-semibold">Paste text to clean</p>
+          <p id="fixed" class="mt-0.5 text-xs text-emerald-600" aria-live="polite"></p>
+        </div>
+      </div>
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wide muted">What we changed</span>
+        <ul id="summary" class="mt-1.5 flex flex-wrap gap-1.5 text-xs" aria-live="polite">
+          <li class="muted">Paste text to clean.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<script>
+  import {
+    fix,
+    stats,
+    tidiness,
+    DEFAULT_OPTIONS,
+    RECIPES,
+    type ReflowOptions,
+    type BlankLineMode,
+    type NewlineStyle,
+    type RecipeId,
+  } from '../../lib/tools/whitespace-line-break-reflow-fixer';
+  import { diffWords } from 'diff';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+  const diffEl = $<HTMLDivElement>('diff');
+
+  // Pre-loaded messy samples for the empty state (§5.6).
+  const SAMPLES: Record<string, string> = {
+    pdf: `Recent advances in transformer architectures have signifi-\ncantly improved the state of the art across a wide range of\nnatural language processing tasks. In this paper, we present\na lightweight model that achieves competitive perfor-\nmance while reducing inference cost.\n\nWe evaluate our approach on three benchmark datasets and\nreport consistent gains over prior work.`,
+    email: `> Hi there,\n>\n> I wanted to follow up on the proposal we discussed last\n> week. Could you let me know whether the revised timeline\n> works on your end? We are hoping to lock things down\n> before the end of the month.\n>\n> Thanks,\n> Jordan`,
+    spaces: `This  sentence   has    way  too many spaces.   \nAnd  this  line  has  trailing  whitespace.    \n\n\n\nPlus  far  too  many  blank  lines  above.`,
+  };
+
+  // --- option IDs for persistence / wiring
+  const CHECK_IDS = ['opt-reflow', 'opt-hyphens', 'opt-collapse', 'opt-trailing', 'opt-leading', 'opt-unicode', 'opt-tabs', 'opt-quotes'];
+  const SELECT_IDS = ['opt-blank', 'opt-newline'];
+
+  function readOptions(): ReflowOptions {
+    return {
+      ...DEFAULT_OPTIONS,
+      reflow: $<HTMLInputElement>('opt-reflow').checked,
+      rejoinHyphens: $<HTMLInputElement>('opt-hyphens').checked,
+      collapseSpaces: $<HTMLInputElement>('opt-collapse').checked,
+      trimTrailing: $<HTMLInputElement>('opt-trailing').checked,
+      trimLeading: $<HTMLInputElement>('opt-leading').checked,
+      normalizeUnicode: $<HTMLInputElement>('opt-unicode').checked,
+      tabsToSpaces: $<HTMLInputElement>('opt-tabs').checked,
+      stripQuoteMarkers: $<HTMLInputElement>('opt-quotes').checked,
+      blankLines: $<HTMLSelectElement>('opt-blank').value as BlankLineMode,
+      newline: $<HTMLSelectElement>('opt-newline').value as NewlineStyle,
+    };
+  }
+
+  /** Push an option object onto the UI controls. */
+  function writeOptions(o: ReflowOptions) {
+    $<HTMLInputElement>('opt-reflow').checked = o.reflow;
+    $<HTMLInputElement>('opt-hyphens').checked = o.rejoinHyphens;
+    $<HTMLInputElement>('opt-collapse').checked = o.collapseSpaces;
+    $<HTMLInputElement>('opt-trailing').checked = o.trimTrailing;
+    $<HTMLInputElement>('opt-leading').checked = o.trimLeading;
+    $<HTMLInputElement>('opt-unicode').checked = o.normalizeUnicode;
+    $<HTMLInputElement>('opt-tabs').checked = o.tabsToSpaces;
+    $<HTMLInputElement>('opt-quotes').checked = o.stripQuoteMarkers;
+    $<HTMLSelectElement>('opt-blank').value = o.blankLines;
+    $<HTMLSelectElement>('opt-newline').value = o.newline;
+  }
+
+  // --- persistence (options only, never the text — keeps the privacy promise)
+  function saveOpts() {
+    try { localStorage.setItem('wsr-opts', JSON.stringify(readOptions())); } catch {}
+  }
+  function loadOpts() {
+    try {
+      const raw = localStorage.getItem('wsr-opts');
+      if (raw) writeOptions({ ...DEFAULT_OPTIONS, ...JSON.parse(raw) });
+      else writeOptions(DEFAULT_OPTIONS);
+    } catch { writeOptions(DEFAULT_OPTIONS); }
+  }
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up for the cleanliness number
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to); el.dataset.v = String(to); return;
+    }
+    const from = parseInt(el.dataset.v || '0', 10);
+    if (from === to) { el.textContent = String(to); return; }
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // --- diff rendering (jsdiff, same as Cleaner.astro)
+  function renderDiff(before: string, after: string) {
+    diffEl.innerHTML = '';
+    for (const part of diffWords(before, after)) {
+      const span = document.createElement('span');
+      if (part.added) span.className = 'diff-ins';
+      else if (part.removed) span.className = 'diff-del';
+      span.textContent = part.value;
+      diffEl.appendChild(span);
+    }
+  }
+
+  const RING = 213.6;
+
+  // --- main render
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const inStat = stats(src);
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${inStat.lines} line${inStat.lines === 1 ? '' : 's'} · ${inStat.words} word${inStat.words === 1 ? '' : 's'} · ${inStat.chars} chars`;
+
+    const { text, counts } = fix(src, readOptions());
+    output.value = text;
+    $<HTMLButtonElement>('copy').disabled = text.length === 0;
+    ($('copy-bar') as HTMLButtonElement).disabled = text.length === 0;
+    renderDiff(src, text);
+
+    // Output stats with before→after deltas (§5.8).
+    const outStat = stats(text);
+    if (src.length) {
+      $<HTMLParagraphElement>('out-stats').textContent =
+        `Lines ${inStat.lines} → ${outStat.lines} · Paragraphs ${inStat.paragraphs} → ${outStat.paragraphs}`;
+    } else {
+      $<HTMLParagraphElement>('out-stats').textContent = '';
+    }
+
+    // Cleanliness meter: before → after.
+    const ring = document.getElementById('ring') as unknown as SVGCircleElement;
+    const scoreNum = $<HTMLSpanElement>('score-num');
+    if (!src.trim()) {
+      scoreNum.textContent = '—'; scoreNum.dataset.v = '0';
+      ring.style.strokeDashoffset = String(RING);
+      $<HTMLParagraphElement>('band').textContent = 'Paste text to clean';
+      $<HTMLParagraphElement>('fixed').textContent = '';
+    } else {
+      const after = tidiness(text);
+      const before = tidiness(src);
+      animateCount(scoreNum, after);
+      ring.style.strokeDashoffset = String(RING * (1 - after / 100));
+      ring.style.stroke = after >= 90 ? 'var(--color-ok)' : after >= 60 ? 'var(--color-warn)' : 'var(--color-bad)';
+      $<HTMLParagraphElement>('band').textContent =
+        counts.total === 0 ? 'Nothing to fix ✓' : `Tidiness ${before}% → ${after}%`;
+      $<HTMLParagraphElement>('fixed').textContent =
+        counts.total > 0 ? `✓ ${counts.total} fix${counts.total === 1 ? '' : 'es'} applied` : '';
+    }
+
+    renderSummary(src, counts);
+  }
+
+  // --- the "what we changed" chip row (§5.3)
+  function renderSummary(src: string, counts: ReturnType<typeof fix>['counts']) {
+    const el = $<HTMLUListElement>('summary');
+    el.innerHTML = '';
+    if (!src.trim()) {
+      el.innerHTML = '<li class="muted">Paste text to clean.</li>';
+      return;
+    }
+    const chips: string[] = [];
+    if (counts.softBreaksRemoved) chips.push(`${counts.softBreaksRemoved} soft break${counts.softBreaksRemoved === 1 ? '' : 's'} removed`);
+    if (counts.hyphensRejoined) chips.push(`${counts.hyphensRejoined} hyphen-split${counts.hyphensRejoined === 1 ? '' : 's'} rejoined`);
+    if (counts.spacesCollapsed) chips.push(`${counts.spacesCollapsed} space run${counts.spacesCollapsed === 1 ? '' : 's'} collapsed`);
+    if (counts.trailingTrimmed) chips.push(`${counts.trailingTrimmed} line${counts.trailingTrimmed === 1 ? '' : 's'} trimmed`);
+    if (counts.blankLinesDropped) chips.push(`${counts.blankLinesDropped} blank line${counts.blankLinesDropped === 1 ? '' : 's'} dropped`);
+    if (counts.unicodeNormalized) chips.push(`${counts.unicodeNormalized} Unicode space${counts.unicodeNormalized === 1 ? '' : 's'} normalized`);
+    if (counts.quoteMarkersStripped) chips.push(`${counts.quoteMarkersStripped} quote marker${counts.quoteMarkersStripped === 1 ? '' : 's'} stripped`);
+
+    if (chips.length === 0) {
+      el.innerHTML = '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">Already clean — nothing to fix ✓</li>';
+      return;
+    }
+    for (const c of chips) {
+      const li = document.createElement('li');
+      li.className = 'rounded-full px-2 py-0.5 text-accent';
+      li.style.background = 'var(--c-accent-soft)';
+      li.textContent = c;
+      el.appendChild(li);
+    }
+  }
+
+  // --- debounced via rAF
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  [...CHECK_IDS, ...SELECT_IDS].forEach((id) =>
+    $(id).addEventListener('change', () => { saveOpts(); run(); }));
+
+  // --- recipes (set all options at once)
+  document.querySelectorAll<HTMLButtonElement>('[data-recipe]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const recipe = RECIPES[b.dataset.recipe as RecipeId];
+      writeOptions(recipe.options);
+      saveOpts();
+      run();
+      toast(`Applied: ${recipe.label}`);
+    }));
+
+  // --- samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      input.value = SAMPLES[b.dataset.sample!];
+      // Auto-pick a sensible recipe for the loaded sample.
+      if (b.dataset.sample === 'email') writeOptions(RECIPES.email.options);
+      else if (b.dataset.sample === 'pdf') writeOptions(RECIPES.pdf.options);
+      saveOpts();
+      run();
+      setPane('output');
+    }));
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- shared actions
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!output.value) return;
+    try {
+      await navigator.clipboard.writeText(output.value);
+      const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+      b.textContent = '✓ Copied'; toast('Copied to clipboard');
+      setTimeout(() => (b.textContent = prev), 1300);
+    } catch { output.select(); toast('Press Ctrl/Cmd+C to copy'); }
+  }
+  function doReset() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // download .txt
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    if (!output.value) { toast('Nothing to download yet'); return; }
+    const blob = new Blob([output.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'fixed.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded fixed.txt');
+  });
+
+  // view toggle (Fixed vs Diff)
+  function setView(diff: boolean) {
+    output.hidden = diff; diffEl.hidden = !diff;
+    $<HTMLButtonElement>('view-clean').classList.toggle('muted', diff);
+    $<HTMLButtonElement>('view-diff').classList.toggle('muted', !diff);
+    $<HTMLButtonElement>('view-clean').style.background = diff ? '' : 'var(--c-accent-soft)';
+    $<HTMLButtonElement>('view-diff').style.background = diff ? 'var(--c-accent-soft)' : '';
+  }
+  $<HTMLButtonElement>('view-clean').addEventListener('click', () => setView(false));
+  $<HTMLButtonElement>('view-diff').addEventListener('click', () => setView(true));
+
+  // keyboard: Cmd/Ctrl+Enter re-runs; Esc clears
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); toast('Reflowed'); }
+    else if (e.key === 'Escape' && document.activeElement === input) { e.preventDefault(); doReset(); }
+  });
+
+  loadOpts();
+  setView(false);
+  setPane('input');
+  run();
+</script>

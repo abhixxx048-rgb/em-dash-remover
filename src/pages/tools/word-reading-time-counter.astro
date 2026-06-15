@@ -1,0 +1,168 @@
+---
+import Base from '../../layouts/Base.astro';
+import WordReadingTimeCounter from '../../components/tools/WordReadingTimeCounter.astro';
+
+const faqs = [
+  {
+    q: 'How is reading time calculated?',
+    a: 'We divide your word count by a words-per-minute rate. The default, 238 wpm, is the average silent-reading speed from a large 2019 meta-analysis by Brysbaert. You can switch to Slow (150), Fast (350), so the estimate matches how you actually read.',
+  },
+  {
+    q: 'What words-per-minute do you use for speaking time?',
+    a: 'Speaking time uses 130 wpm, a comfortable presentation pace. Conversational speech runs faster (150–160 wpm), but 130 leaves room for pauses and emphasis, which is what most speakers actually need when timing a talk.',
+  },
+  {
+    q: 'Does my text get uploaded anywhere?',
+    a: 'No. Every count, limit and estimate is computed in your browser with JavaScript. Nothing is sent to a server, stored remotely, or logged. Open DevTools → Network while you type and you will see zero requests. It even works offline.',
+  },
+  {
+    q: 'What is the X / Twitter character limit in 2026?',
+    a: 'A standard X post is 280 characters. Verified subscribers can post much longer, but 280 is the limit most people write to, so that is the pill we show. Links count toward the limit on the platform itself.',
+  },
+  {
+    q: 'Why do emojis count differently for SMS?',
+    a: 'A plain GSM-7 text message fits 160 characters per segment. The moment you include an emoji, a curly quote, or an em dash, the whole message switches to UCS-2 encoding, which only fits 70 characters per segment. Our SMS panel flags exactly which characters forced that switch.',
+  },
+  {
+    q: 'How are sentences and paragraphs counted?',
+    a: 'Sentences are segmented with the browser’s Intl.Segmenter where available, which handles abbreviations and decimals far better than a naive split on “.?!”. Paragraphs are blocks of text separated by a blank line. Lines are simply newline-delimited.',
+  },
+  {
+    q: 'Why does my count differ from Microsoft Word?',
+    a: 'Word and every counter make slightly different choices about hyphenated words, numbers, and symbols. We count Unicode-aware word-like runs (so contractions and hyphenated words count as one, and CJK or emoji text counts correctly), which can differ by a few words from Word’s rules.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/word-reading-time-counter#app`,
+  name: 'Word & Reading-Time Counter',
+  url: `${Astro.site}tools/word-reading-time-counter`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Live word and character counter',
+    'Reading time and speaking time calculator',
+    'Twitter / X, LinkedIn, Instagram, Threads and SMS character limits',
+    'SEO title and meta description length checker',
+    'Keyword density and readability grade',
+    '100% client-side — text never leaves your browser',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Word & Character Counter + Reading-Time Calculator (Free, Private)"
+  description="Free in-browser word and character counter with live reading time, speaking time, and X, LinkedIn, Instagram, SMS and SEO character limits. No sign-up, nothing uploaded."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <p class="mb-3">
+        <a href="/tools" class="text-sm font-medium text-accent hover:underline">← All tools</a>
+      </p>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Word &amp; Reading-Time Counter — free, private, in-browser.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Paste any text to see live <strong>word</strong>, <strong>character</strong>,
+        sentence and paragraph counts, plus <strong>reading and speaking time</strong>
+        and platform-limit pills for X, LinkedIn, Instagram, Threads, SMS and SEO.
+        Nothing is uploaded — your text never leaves your browser.
+      </p>
+    </header>
+
+    <WordReadingTimeCounter />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">Live counts: words, characters, sentences, paragraphs</h2>
+      <p class="muted">
+        As you type or paste, the counter updates instantly — no “count” button. It
+        uses Unicode-aware counting (via the browser’s <code>Intl.Segmenter</code>),
+        so hyphenated words and contractions count as one word, accented letters and
+        emoji count as a single character, and non-Latin scripts are handled
+        correctly. You also get characters without spaces, sentence and paragraph
+        counts, raw line counts, and average word length — everything a student,
+        editor or freelancer needs to hit a target or stay under a cap.
+      </p>
+
+      <h2 class="text-2xl font-bold">Reading &amp; speaking time, and how we calculate it</h2>
+      <p class="muted">
+        Reading time is your word count divided by a words-per-minute rate. The
+        default of <strong>238 wpm</strong> is the average silent-reading speed from
+        Brysbaert’s 2019 meta-analysis; switch to Slow (150) or Fast (350) to match
+        how you actually read. Speaking time uses <strong>130 wpm</strong>, a
+        realistic presentation pace with room for pauses — handy when you need to fit
+        a script into a five-minute slot.
+      </p>
+
+      <h2 class="text-2xl font-bold">Platform limits: X, LinkedIn, Instagram, Threads, SMS &amp; SEO</h2>
+      <p class="muted">
+        The limit pills tell you at a glance whether your text fits where you want to
+        post it. Each pill shows used / limit and turns amber as you approach the cap
+        and red when you go over, paired with an icon and an “over by N” label so the
+        status never relies on color alone. We cover X (280), Threads (500), LinkedIn
+        (3,000), Instagram captions (2,200), SMS segments, an SEO title (~60
+        characters) and a meta description (~155). The SMS panel even flags which
+        emoji or curly quotes forced your message into the shorter Unicode encoding.
+      </p>
+
+      <h2 class="text-2xl font-bold">100% client-side — your text never leaves your browser</h2>
+      <p class="muted">
+        This is the difference. Most word counters run ads and quietly send your
+        keystrokes to a server; ours computes everything locally in JavaScript. There
+        is no upload, no account, and no logging — open your browser’s DevTools,
+        switch to the Network tab, and you will see zero requests as you type. That
+        makes it safe for confidential drafts, client work and anything you would not
+        paste into a random website. It is the same provable-privacy promise behind
+        our em-dash and AI-text cleaning tools: clean writing for real quality, with
+        your human voice kept intact.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <style is:global>
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+  </style>
+</Base>

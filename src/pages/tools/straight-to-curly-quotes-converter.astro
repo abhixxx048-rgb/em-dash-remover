@@ -1,0 +1,196 @@
+---
+import Base from '../../layouts/Base.astro';
+import StraightToCurlyQuotesConverter from '../../components/tools/StraightToCurlyQuotesConverter.astro';
+
+const faqs = [
+  {
+    q: 'Why did Word curl my ’90s the wrong way?',
+    a: 'Word (and most auto-correct) sees an apostrophe at the start of "90s" and assumes it is an opening single quote, so it curls it as ‘90s. But the apostrophe stands in for the missing "19", so it should face the other way — a closing apostrophe, ’90s. This converter detects the apostrophe-then-digits pattern and curls it correctly as ’90s by default.',
+  },
+  {
+    q: 'Which quote is opening and which is closing?',
+    a: 'The opening quotes are “ (double) and ‘ (single); the closing quotes are ” and ’. As a rule, a quote that follows a space, a bracket, or the start of a line opens; a quote that follows a letter closes. An apostrophe inside or at the end of a word (don’t, Hastings’) is always the closing form ’.',
+  },
+  {
+    q: 'How do I make foot and inch marks (primes) instead of quotes?',
+    a: 'Keep the "Feet/inch primes" option on. The tool detects measurement patterns like 6\'2", 5\' 10" and 5" and emits true prime ′ and double-prime ″ symbols instead of curly quotes, so 6\'2" becomes 6′2″ rather than 6’2”. Turn the option off if you would rather those marks stay plain.',
+  },
+  {
+    q: 'What is the difference between curly and straight quotes?',
+    a: 'Straight quotes (" and \') are typewriter marks — the same glyph is used to open and close. Curly, or "smart", quotes are directional (“ ” and ‘ ’) and are what professional typesetting uses. Straight quotes in published copy are the number-one "looks amateur" tell.',
+  },
+  {
+    q: 'Are smart quotes safe to use in code or URLs?',
+    a: 'No — code and URLs need straight quotes, and curly ones will break them. This converter leaves anything inside backticks, fenced code blocks, and URLs or file paths untouched, so the straight quotes that must stay straight are preserved automatically.',
+  },
+  {
+    q: 'Does this upload my text?',
+    a: 'No. All conversion runs in your browser with plain JavaScript. Nothing is uploaded, stored, or logged — open your DevTools Network tab while you use it and you will see zero requests. It also works offline, which makes it safe for confidential manuscripts.',
+  },
+  {
+    q: 'How do I convert curly quotes back to straight?',
+    a: 'Use the reverse tool — the site\'s curly→straight cleaner turns smart quotes, em dashes and ellipses back into plain typewriter punctuation. The two tools are a matched pair: smarten or dumb-down your quotes either direction.',
+  },
+  {
+    q: 'What does SmartyPants do?',
+    a: 'SmartyPants is the classic algorithm (by John Gruber) that "educates" straight quotes, dashes and ellipses into typographic ones. This converter is a hand-rolled adaptation of it, extended to fix the cases SmartyPants is known to miss: decades (’90s), leading contractions (’Twas, ’em) and feet/inch primes.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/straight-to-curly-quotes-converter#app`,
+  name: 'Smart Quotes Converter — Straight to Curly Quotes',
+  url: `${Astro.site}tools/straight-to-curly-quotes-converter`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Convert straight quotes to curly (smart) quotes',
+    'Directional opening and closing quotes done right',
+    'Fix decade apostrophes (’90s) and leading contractions (’Twas, ’em)',
+    'Feet and inch prime symbols (6′2″) instead of curly quotes',
+    'Convert -- and --- to en and em dashes, ... to an ellipsis',
+    'Leave code, backticks and URLs untouched',
+    'US, UK, German and French quote styles',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Smart Quotes Converter — Straight to Curly Quotes (Done Right)"
+  description="Free smart quotes converter: turn straight quotes into correctly-directional curly quotes, true apostrophes, en/em dashes and primes. Fixes ’90s, ’Twas and 6′2″ — 100% in your browser."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <a href="/tools" class="mb-4 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Smart Quotes Converter — Straight Quotes to Curly Quotes
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Turn typewriter quotes, apostrophes, <code>--</code> and <code>...</code>
+        into correctly-directional curly quotes, true apostrophes, proper en/em
+        dashes and a real ellipsis — with the tricky cases (<strong>’90s</strong>,
+        <strong>’Twas</strong>, <strong>6′2″</strong>) actually handled right.
+        Done in your browser, instantly.
+      </p>
+    </header>
+
+    <StraightToCurlyQuotesConverter />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">How to use the smart quotes converter</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Paste or type text with straight quotes into the box above (or tap an example).</li>
+        <li>Pick your quote <strong>style</strong> — US/UK English, German „ “ or French « » — and toggle primes, dashes and the ellipsis to taste.</li>
+        <li>Watch the curly result update live; switch to <strong>Diff</strong> to verify exactly which marks changed.</li>
+        <li>Hit <strong>Copy</strong> (or Ctrl/Cmd + Enter) and paste the typeset text wherever you publish.</li>
+      </ol>
+
+      <h2 class="text-2xl font-bold">Straight vs curly quotes — which way does each mark face?</h2>
+      <p class="muted">
+        Straight quotes (<code>"</code> and <code>'</code>) are typewriter
+        leftovers: the same glyph opens and closes. Professional typesetting uses
+        directional <em>curly</em> quotes instead. The opening marks are
+        <strong>“</strong> and <strong>‘</strong>; the closing marks are
+        <strong>”</strong> and <strong>’</strong>. The rule of thumb: a quote that
+        follows a space, a bracket, or the start of a line <em>opens</em>, and a
+        quote that follows a letter <em>closes</em>. An apostrophe inside or at the
+        end of a word — <em>don’t</em>, <em>Hastings’</em> — is always the closing
+        form ’.
+      </p>
+
+      <h2 class="text-2xl font-bold">The tricky cases we get right: ’90s, ’Twas, and foot/inch marks (6'2")</h2>
+      <p class="muted">
+        This is where Word, Google Docs and most thin converter clones fail. When
+        an apostrophe leads a decade — <strong>’90s</strong>, <strong>’08</strong> —
+        it stands in for the dropped "19", so it must curl as a <em>closing</em>
+        apostrophe ’, not an opening ‘. Auto-correct almost always gets this
+        backwards. The same is true for leading contractions like
+        <strong>’Twas</strong>, <strong>’em</strong>, <strong>’cause</strong> and
+        <strong>’round</strong>. And foot/inch measurements such as
+        <strong>6'2"</strong> or <strong>5' 10"</strong> should become true prime
+        symbols (<strong>6′2″</strong>), not curly quotes. This converter detects
+        all three patterns by default and lights up a chip so you can see it caught
+        them.
+      </p>
+
+      <h2 class="text-2xl font-bold">En dash vs em dash vs hyphen, and -- / --- shortcuts</h2>
+      <p class="muted">
+        Three different marks do three different jobs: the hyphen (-) joins words
+        (well-known), the en dash (–) spans ranges (10–20, May–September), and the
+        em dash (—) marks a strong break in a sentence. The classic typewriter
+        shortcut is <code>--</code> for an en dash and <code>---</code> for an em
+        dash, and this tool expands both automatically. It also turns three dots
+        (<code>...</code>) into a single ellipsis character (…) so your line breaks
+        and spacing behave the way a typesetter expects.
+      </p>
+
+      <h2 class="text-2xl font-bold">For developers — Unicode vs HTML entities, code and URLs</h2>
+      <p class="muted">
+        Curly quotes are great in prose and terrible in code. This converter runs a
+        preserve guard that skips anything inside backticks, fenced code blocks, and
+        URLs or file paths, so the straight quotes that must stay straight are left
+        alone. If your CMS stores SmartyPants-style entities, switch on
+        <strong>Output HTML entities</strong> to emit <code>&amp;#8220;</code> /
+        <code>&amp;#8217;</code> instead of literal Unicode. Everything is plain,
+        deterministic JavaScript — no SmartyPants build step required.
+      </p>
+
+      <h2 class="text-2xl font-bold">Privacy — everything runs in your browser</h2>
+      <p class="muted">
+        There is no server and no upload. All conversion happens on your device, so
+        you can safely typeset confidential or unpublished manuscripts. Open your
+        browser's DevTools Network tab while you work and you'll see zero requests —
+        and the tool keeps working with your connection turned off.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+  </style>
+</Base>

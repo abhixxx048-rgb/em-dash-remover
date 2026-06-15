@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Em Dash Remover</title>
+    <style>
+      :root {
+        --ink: #15161a;
+        --muted: #5f6672;
+        --accent: #6d5efc;
+        --line: rgba(21, 22, 26, 0.12);
+        color-scheme: light dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root { --ink: #e7e8ea; --muted: #9aa0aa; --line: rgba(255, 255, 255, 0.14); }
+        body { background: #16181d; }
+      }
+      body {
+        width: 280px;
+        margin: 0;
+        padding: 14px;
+        font: 13px/1.45 system-ui, sans-serif;
+        color: var(--ink);
+      }
+      h1 { font-size: 14px; margin: 0 0 2px; }
+      p.sub { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+      fieldset { border: 1px solid var(--line); border-radius: 10px; margin: 0 0 12px; padding: 8px 10px; }
+      legend { padding: 0 4px; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+      label { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+      select { width: 100%; padding: 5px; border: 1px solid var(--line); border-radius: 8px; background: transparent; color: inherit; }
+      .row { display: flex; align-items: center; justify-content: space-between; }
+      .counter { color: var(--muted); font-size: 12px; }
+      a { color: var(--accent); }
+      footer { margin-top: 4px; font-size: 11px; color: var(--muted); }
+    </style>
+  </head>
+  <body>
+    <h1>Em Dash Remover</h1>
+    <p class="sub">Right-click any selection → "Clean selection", or press Alt+Shift+C.</p>
+
+    <fieldset>
+      <legend>Preset</legend>
+      <select id="preset" aria-label="Cleaning preset">
+        <option value="smart">Smart — grammar-aware (default)</option>
+        <option value="plain">Plain — strip everything</option>
+        <option value="publish">Publish — keep proper punctuation</option>
+      </select>
+    </fieldset>
+
+    <fieldset>
+      <legend>Rules</legend>
+      <label><input type="checkbox" id="enDashes" /> En dashes</label>
+      <label><input type="checkbox" id="smartQuotes" /> Smart quotes → straight</label>
+      <label><input type="checkbox" id="ellipsis" /> Ellipsis → ...</label>
+      <label><input type="checkbox" id="invisibles" /> Invisible / zero-width chars</label>
+      <label><input type="checkbox" id="whitespace" /> Whitespace cleanup</label>
+      <label><input type="checkbox" id="markdown" /> Strip markdown</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>This site</legend>
+      <label class="row">
+        <span>Clean on paste here</span>
+        <input type="checkbox" id="cleanOnPaste" />
+      </label>
+    </fieldset>
+
+    <div class="row">
+      <span class="counter" id="counter">0 fixes this session</span>
+      <a href="#" id="openFull" target="_blank" rel="noopener">Open full cleaner ↗</a>
+    </div>
+
+    <footer>100% local · zero network requests · no telemetry.</footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

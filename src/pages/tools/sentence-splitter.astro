@@ -1,0 +1,226 @@
+---
+import Base from '../../layouts/Base.astro';
+import SentenceSplitter from '../../components/tools/SentenceSplitter.astro';
+
+const faqs = [
+  {
+    q: "Why does a normal splitter break on 'Dr.' or 'e.g.'?",
+    a: 'Most "split text into sentences" tools simply break on every period. But a period also ends abbreviations (Dr., e.g., U.S.), decimals (3.14), initials (J. R. R.), and URLs — so naive splitters cut "Dr. Smith went home." into two wrong lines. This tool uses the browser\'s Unicode-aware sentence segmenter and then re-joins anything that was split on a known non-boundary period, so abbreviations stay intact.',
+  },
+  {
+    q: 'How does this handle decimals, dates, currency and quotes?',
+    a: 'Decimals and currency like 3.14 or $1,000.50 are kept together, version numbers like v1.2.3 are protected, and URLs and emails are never split inside. For quotes, dialogue tags stay attached: "Is it raining?" she asked. remains one sentence, while "He left." She stayed. correctly splits into two.',
+  },
+  {
+    q: 'What is the one-sentence-per-line writing method?',
+    a: 'It is a drafting and editing technique where you put each sentence on its own line. Seeing sentences stacked vertically makes your rhythm visible: you instantly spot run-ons, repeated sentence starts, and three short sentences marching in a row. Editors and copywriters use it to vary sentence length and tighten flow, then rejoin the lines back into a paragraph when they are done.',
+  },
+  {
+    q: 'Does my text get uploaded anywhere?',
+    a: 'No. All segmentation runs locally in your browser using the built-in Intl.Segmenter API and plain JavaScript. There is no server, no upload, no logging, and it works offline. Open your DevTools Network tab while you use it and you will see zero requests.',
+  },
+  {
+    q: 'Can I add my own abbreviations?',
+    a: 'Yes. Open the Abbreviations panel and add domain terms like Fig., Eq., or Approx. as a comma-separated list. They are saved in your browser and applied on the next split, so law, science, and academic writers can teach the splitter their own shorthand.',
+  },
+  {
+    q: 'How do I turn one-per-line back into a paragraph?',
+    a: 'Click the rejoin button (↩) above the output. It reverses the split, joining your sentences back into flowing paragraphs and preserving blank lines between paragraphs — handy when you have finished editing in one-sentence-per-line mode.',
+  },
+  {
+    q: 'Why are uniform sentence lengths a sign of AI writing?',
+    a: 'Human prose naturally varies: a long, winding sentence gives way to a short punchy one. AI-generated text often defaults to a steady medium length, sentence after sentence. The uniformity meter scores the variation in your sentence lengths so you can see — and break up — that robotic, metronomic cadence.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/sentence-splitter#app`,
+  name: 'Sentence Splitter — One Sentence Per Line',
+  url: `${Astro.site}tools/sentence-splitter`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Split text into sentences, one sentence per line',
+    'Abbreviation-aware segmentation (Dr., e.g., U.S. stay intact)',
+    'Keeps decimals, currency, initials, URLs and emails together',
+    'Per-sentence word count and length bands',
+    'Sentence cadence and uniformity (monotony) audit',
+    'Numbered, Markdown list and CSV output modes',
+    'Rejoin one-per-line back into paragraphs',
+    'Copy and download as .txt or .csv',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+
+const breadcrumb = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Tools', item: `${Astro.site}tools` },
+    { '@type': 'ListItem', position: 2, name: 'Sentence Splitter', item: `${Astro.site}tools/sentence-splitter` },
+  ],
+};
+---
+
+<Base
+  title="Sentence Splitter — One Sentence Per Line (Abbreviation-Aware)"
+  description="Free sentence splitter: paste text and get one sentence per line. Abbreviation-aware, so Dr., e.g. and 3.14 stay intact. Audit your cadence — 100% in your browser, no signup."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <div class="mb-3 flex justify-center">
+        <a href="/tools" class="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">← All tools</a>
+      </div>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Sentence Splitter — one sentence per line, done right.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Paste any text and split it into <strong>one sentence per line</strong> —
+        abbreviation-aware, so <strong>Dr.</strong>, <strong>e.g.</strong> and
+        <strong>3.14</strong> don't break in the wrong place. Then see your
+        rhythm at a glance and keep your human voice.
+      </p>
+    </header>
+
+    <SentenceSplitter />
+
+    <!-- Value props -->
+    <section class="mx-auto mt-16 max-w-5xl px-4">
+      <div class="grid gap-6 sm:grid-cols-3">
+        <div class="card p-5">
+          <h2 class="font-semibold">Accurate, not naive</h2>
+          <p class="mt-1.5 text-sm muted">Built on the browser's Unicode segmenter plus an abbreviation guard, so titles, decimals, initials and URLs stay intact instead of breaking on every period.</p>
+        </div>
+        <div class="card p-5">
+          <h2 class="font-semibold">See your cadence</h2>
+          <p class="mt-1.5 text-sm muted">Each sentence gets a length bar and word count, plus a uniformity meter — so you can spot the 50-word run-on and break up robotic, metronomic rhythm.</p>
+        </div>
+        <div class="card p-5">
+          <h2 class="font-semibold">Private by design</h2>
+          <p class="mt-1.5 text-sm muted">Pure in-browser segmentation. No upload, no server, no signup. Check the Network tab — zero requests. Safe for confidential drafts, works offline.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">Split your text into sentences</h2>
+      <p class="muted">
+        Paste a paragraph above and it is rewritten as one sentence per line,
+        live as you type. Each line keeps its original casing and punctuation —
+        only leading and trailing whitespace is trimmed. Whether you came from
+        ChatGPT, a Word document, an email draft, or a school essay, the goal is
+        the same: a clean, reliable list of sentences you can copy, download, or
+        audit for rhythm. Everything runs in your browser, so even confidential
+        text is safe.
+      </p>
+
+      <h2 class="text-2xl font-bold">How it works (and why "Dr." and "3.14" don't break)</h2>
+      <p class="muted">
+        A period is ambiguous. It can end a sentence, but it can also mark an
+        abbreviation (<code>Dr.</code>, <code>e.g.</code>, <code>U.S.</code>), a
+        decimal (<code>3.14</code>, <code>$1,000.50</code>), an initial
+        (<code>J. R. R. Tolkien</code>), an ellipsis, or sit inside a URL or
+        email. Naive tools that "split on the period" break on all of these. This
+        splitter uses the browser's built-in
+        <strong>Intl.Segmenter</strong> with sentence granularity as the base
+        tokenizer, then runs a <strong>suppression pass</strong> that re-joins any
+        segment that was split on a known non-boundary period — a curated
+        abbreviation list, single-letter initials, decimals and currency, spaced
+        ellipses, and URLs/emails. The result is the accuracy a real editor
+        expects. You can also add your own domain abbreviations, and they're saved
+        in your browser for next time.
+      </p>
+
+      <h2 class="text-2xl font-bold">Audit your cadence — see your sentence rhythm</h2>
+      <p class="muted">
+        Splitting is only half the value. Once your sentences are stacked one per
+        line, the tool renders each as a horizontal <strong>length bar</strong>
+        scaled to its word count and tints it by band — short (≤8 words), medium
+        (9–20), long (21–35), or very long (36+). A varied skyline of bar lengths
+        reads human; a wall of identical bars reads robotic. The
+        <strong>uniformity meter</strong> turns that into a single score from the
+        variation in your sentence lengths, and the stats strip gives you the exact
+        numbers editors quote: total words, average words per sentence, and your
+        longest and shortest sentence (click either to jump straight to it). Use it
+        to break up run-ons and add the short, punchy sentences that give prose
+        momentum.
+      </p>
+
+      <h2 class="text-2xl font-bold">One sentence per line, the writer's editing method</h2>
+      <p class="muted">
+        Many editors and copywriters draft and revise in
+        <strong>one-sentence-per-line</strong> format. Putting each sentence on its
+        own line makes structure visible: you can see repeated sentence openings,
+        catch three short sentences in a row, and reorder ideas by dragging lines
+        before committing. When you're done, hit <strong>rejoin</strong> to flow
+        the sentences back into paragraphs. Need the data instead? Switch the
+        output to <strong>Numbered</strong>, <strong>Markdown list</strong>, or
+        <strong>CSV (sentence,words)</strong> for translation memories, TTS
+        scripts, flashcards, or per-sentence diffs. If you also want a readability
+        grade for those sentences, run them through our
+        <a href="/tools/readability-grade-level-scorer">Readability / Grade-Level Scorer</a>,
+        or clean AI tells first with the <a href="/">Em Dash Remover</a>.
+      </p>
+
+      <h2 class="text-2xl font-bold">Privacy — runs entirely in your browser</h2>
+      <p class="muted">
+        Sentence segmentation is just text processing, so there is no reason to
+        send your writing anywhere — and we don't. The <code>Intl.Segmenter</code>
+        API is built into your browser and the merge logic is local JavaScript.
+        There is no network call, no account, and no storage beyond the
+        preferences and custom abbreviations you choose to save in your own
+        browser. That makes it safe for drafts under embargo, legal language,
+        client work, or anything you'd rather not paste into a server.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumb)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-size: 0.85em; background: color-mix(in srgb, var(--c-ink) 7%, transparent); padding: 0.1em 0.35em; border-radius: 4px; }
+  </style>
+</Base>

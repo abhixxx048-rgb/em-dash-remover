@@ -1,0 +1,335 @@
+---
+// Interactive Straight-to-Curly Quotes Converter island. Static HTML; behavior
+// wired by the client script, which imports the pure engine. Styling mirrors
+// Cleaner.astro / CaseConverter.astro so it looks native (same textarea /
+// toolbar / toast / button language).
+---
+
+<section id="tool" aria-label="Smart quotes converter" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Style</span>
+        <select id="opt-locale" class="ctl px-3" aria-label="Quote style / locale">
+          <option value="us">US English “ ”</option>
+          <option value="uk">UK English “ ”</option>
+          <option value="de">German „ “</option>
+          <option value="fr">French « »</option>
+        </select>
+      </label>
+
+      <details class="group relative w-full sm:w-auto">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Options <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 w-full space-y-1 p-2 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-72 sm:p-3 sm:shadow-lg">
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-primes" checked class="h-5 w-5" /> Feet/inch primes (6′2″)</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-dashes" checked class="h-5 w-5" /> Dashes (-- → –, --- → —)</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-ellipsis" checked class="h-5 w-5" /> Ellipsis (... → …)</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-entities" class="h-5 w-5" /> Output HTML entities (&amp;#8220;)</label>
+        </div>
+      </details>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Curly</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste straight quotes</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="13"
+            aria-label="Text with straight quotes to convert"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste text with straight quotes — or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="demo" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✨ Tricky demo</button>
+              <button data-sample="dialogue" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💬 Dialogue</button>
+              <button data-sample="measure" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📏 6'2" measurement</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats" aria-live="polite">0 words · 0 chars</p>
+      </div>
+
+      <!-- Output -->
+      <div class="p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <div class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
+            <button id="view-clean" class="min-h-9 rounded-md px-3 font-medium">Curly</button>
+            <button id="view-diff" class="min-h-9 rounded-md px-3 font-medium muted">Diff</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download curly text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <textarea id="output" rows="13" readonly aria-label="Converted curly-quote text"
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+        <div id="diff" hidden
+          class="h-[calc(13*1.625em+1.5rem)] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed"
+          style="background: var(--c-paper);"></div>
+      </div>
+    </div>
+
+    <!-- Counters + edge-case spotlight chips -->
+    <div class="border-t border-ink/8 px-4 py-3 text-sm">
+      <div class="flex flex-wrap gap-x-5 gap-y-1" aria-live="polite">
+        <span><span id="c-double" class="font-semibold" data-v="0">0</span> <span class="muted">double quotes</span></span>
+        <span><span id="c-single" class="font-semibold" data-v="0">0</span> <span class="muted">apostrophes / single</span></span>
+        <span><span id="c-dash" class="font-semibold" data-v="0">0</span> <span class="muted">dashes</span></span>
+        <span><span id="c-ellip" class="font-semibold" data-v="0">0</span> <span class="muted">ellipses</span></span>
+        <span><span id="c-prime" class="font-semibold" data-v="0">0</span> <span class="muted">primes</span></span>
+      </div>
+      <!-- Spotlight chips light up when a known tricky pattern is detected. -->
+      <ul id="chips" class="mt-2 flex flex-wrap gap-1.5 text-xs" aria-live="polite"></ul>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Your text never leaves your browser — open DevTools → Network and you'll see zero requests. Works offline.
+    <a href="/" class="text-accent hover:underline">↔ Need the reverse? Curly → straight cleaner</a>
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<script>
+  import {
+    educate,
+    stats,
+    DEFAULT_OPTIONS,
+    DEMO_TEXT,
+    type EducateOptions,
+    type Locale,
+  } from '../../lib/tools/straight-to-curly-quotes-converter';
+  import { diffChars } from 'diff';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+  const diffEl = $<HTMLDivElement>('diff');
+
+  // Sample text for the empty state.
+  const SAMPLES: Record<string, string> = {
+    demo: DEMO_TEXT,
+    dialogue: `"I can't believe it's already the '90s," she said. 'Twas a strange decade -- and we knew it.`,
+    measure: `He's exactly 6'2" tall, and the desk is 5' 10" wide... give or take an inch.`,
+  };
+
+  function readOptions(): EducateOptions {
+    return {
+      ...DEFAULT_OPTIONS,
+      locale: $<HTMLSelectElement>('opt-locale').value as Locale,
+      primes: $<HTMLInputElement>('opt-primes').checked,
+      dashes: $<HTMLInputElement>('opt-dashes').checked,
+      ellipsis: $<HTMLInputElement>('opt-ellipsis').checked,
+      htmlEntities: $<HTMLInputElement>('opt-entities').checked,
+    };
+  }
+
+  // --- persistence (locale + toggles are sticky per spec)
+  const OPT_IDS = ['opt-locale', 'opt-primes', 'opt-dashes', 'opt-ellipsis', 'opt-entities'];
+  function saveOpts() {
+    const s: Record<string, string | boolean> = {};
+    s['opt-locale'] = $<HTMLSelectElement>('opt-locale').value;
+    for (const id of OPT_IDS.slice(1)) s[id] = $<HTMLInputElement>(id).checked;
+    localStorage.setItem('s2c-opts', JSON.stringify(s));
+  }
+  function loadOpts() {
+    try {
+      const s = JSON.parse(localStorage.getItem('s2c-opts') || '{}');
+      if (s['opt-locale']) $<HTMLSelectElement>('opt-locale').value = s['opt-locale'];
+      for (const id of OPT_IDS.slice(1)) if (id in s) $<HTMLInputElement>(id).checked = s[id];
+    } catch {}
+  }
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up for the counters bar
+  function animateCount(el: HTMLElement, to: number, dur = 500) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to); el.dataset.v = String(to); return;
+    }
+    const from = parseInt(el.dataset.v || '0', 10);
+    if (from === to) { el.textContent = String(to); return; }
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // --- character-level diff so individual curled marks are visible
+  function renderDiff(before: string, after: string) {
+    diffEl.innerHTML = '';
+    for (const part of diffChars(before, after)) {
+      const span = document.createElement('span');
+      if (part.added) span.className = 'diff-ins';
+      else if (part.removed) span.className = 'diff-del';
+      span.textContent = part.value;
+      diffEl.appendChild(span);
+    }
+  }
+
+  // --- main render
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const { text, counts, flags } = educate(src, readOptions());
+    output.value = text;
+    $<HTMLButtonElement>('copy').disabled = text.length === 0;
+    ($('copy-bar') as HTMLButtonElement).disabled = text.length === 0;
+    renderDiff(src, text);
+
+    // counters
+    animateCount($('c-double'), counts.doubleQuotes);
+    animateCount($('c-single'), counts.singleQuotes);
+    animateCount($('c-dash'), counts.dashes);
+    animateCount($('c-ellip'), counts.ellipses);
+    animateCount($('c-prime'), counts.primes);
+
+    const st = stats(src);
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${st.words} word${st.words === 1 ? '' : 's'} · ${st.chars} chars`;
+
+    // edge-case spotlight chips (text + icon, not color-only)
+    const chips = $<HTMLUListElement>('chips');
+    chips.innerHTML = '';
+    const items: string[] = [];
+    if (flags.decade) items.push(`✓ Decade (’90s) — curled as closing`);
+    if (flags.contraction) items.push(`✓ Leading contraction (’Twas / ’em) — fixed`);
+    if (flags.measurement) items.push(`✓ Foot/inch measurement — using primes ′ ″`);
+    if (flags.nested) items.push(`✓ Nested single-in-double quotes`);
+    if (!src.trim()) {
+      chips.innerHTML = '<li class="muted">Tricky cases we catch will show up here.</li>';
+    } else if (items.length === 0) {
+      chips.innerHTML = '<li class="muted">No tricky edge cases in this text.</li>';
+    } else {
+      for (const label of items) {
+        const li = document.createElement('li');
+        li.className = 'rounded-full px-2 py-0.5 text-accent';
+        li.style.background = 'var(--c-accent-soft)';
+        li.textContent = label;
+        chips.appendChild(li);
+      }
+    }
+  }
+
+  // debounced via rAF
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  OPT_IDS.forEach((id) => $(id).addEventListener('change', () => { saveOpts(); run(); }));
+
+  // samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!]; run(); setPane('output'); }));
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- shared actions (bound to both in-card and sticky-bar buttons)
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!output.value) return;
+    try {
+      await navigator.clipboard.writeText(output.value);
+      const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+      b.textContent = '✓ Copied'; toast('Copied to clipboard');
+      setTimeout(() => (b.textContent = prev), 1300);
+    } catch { output.select(); toast('Press Ctrl/Cmd+C to copy'); }
+  }
+  function doReset() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // download .txt
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    if (!output.value) { toast('Nothing to download yet'); return; }
+    const blob = new Blob([output.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'curly-quotes.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded curly-quotes.txt');
+  });
+
+  // view toggle (Curly / Diff)
+  function setView(diff: boolean) {
+    output.hidden = diff; diffEl.hidden = !diff;
+    $<HTMLButtonElement>('view-clean').classList.toggle('muted', diff);
+    $<HTMLButtonElement>('view-diff').classList.toggle('muted', !diff);
+    $<HTMLButtonElement>('view-clean').style.background = diff ? '' : 'var(--c-accent-soft)';
+    $<HTMLButtonElement>('view-diff').style.background = diff ? 'var(--c-accent-soft)' : '';
+  }
+  $<HTMLButtonElement>('view-clean').addEventListener('click', () => setView(false));
+  $<HTMLButtonElement>('view-diff').addEventListener('click', () => setView(true));
+
+  // keyboard: Cmd/Ctrl+Enter copies the result
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); doCopy(); }
+  });
+
+  loadOpts();
+  setView(false);
+  setPane('input');
+  run();
+</script>

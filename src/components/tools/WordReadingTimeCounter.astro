@@ -1,0 +1,340 @@
+---
+// The interactive Word & Reading-Time Counter island. Static HTML below; all
+// behavior is wired up by the client client script, which imports the pure engine.
+// No network, no DOM logic in the engine — everything runs in the browser.
+---
+
+<section id="tool" aria-label="Word and reading-time counter" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Reading speed</span>
+        <select id="opt-wpm" class="ctl px-3" aria-label="Reading speed in words per minute">
+          <option value="150">Slow · 150 wpm</option>
+          <option value="238" selected>Normal · 238 wpm</option>
+          <option value="350">Fast · 350 wpm</option>
+        </select>
+      </label>
+
+      <label class="flex min-w-0 items-center gap-2">
+        <input type="checkbox" id="opt-stop" checked class="h-5 w-5" />
+        <span class="font-medium">Ignore common words</span>
+      </label>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Editor + stats -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-[1.4fr_1fr]">
+      <!-- Input -->
+      <div class="p-4" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="16"
+            aria-label="Text to count"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste your text — or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="tweet" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🐦 Tweet</button>
+              <button data-sample="essay" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📝 Essay</button>
+              <button data-sample="speech" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🎤 Speech</button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex flex-wrap items-center gap-1.5">
+          <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy text</button>
+          <button id="copy-stats" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft disabled:opacity-40" disabled>Copy summary</button>
+          <button id="download" aria-label="Download text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+        </div>
+      </div>
+
+      <!-- Stats panel -->
+      <div class="p-4" style="background: var(--c-surface);">
+        <div id="stats" aria-live="polite">
+          <!-- Primary stats -->
+          <div class="grid grid-cols-3 gap-2">
+            <div class="card p-3 text-center">
+              <span id="s-words" class="block text-2xl font-bold leading-none" data-v="0">0</span>
+              <span class="mt-1 block text-[11px] uppercase tracking-wide muted">Words</span>
+            </div>
+            <div class="card p-3 text-center">
+              <span id="s-chars" class="block text-2xl font-bold leading-none" data-v="0">0</span>
+              <span class="mt-1 block text-[11px] uppercase tracking-wide muted">Characters</span>
+            </div>
+            <div class="card p-3 text-center">
+              <span id="s-read" class="block text-lg font-bold leading-tight">0 sec</span>
+              <span class="mt-1 block text-[11px] uppercase tracking-wide muted">Read time</span>
+            </div>
+          </div>
+
+          <!-- Secondary stats -->
+          <dl class="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+            <div class="flex justify-between"><dt class="muted">No spaces</dt><dd id="s-nospace" class="font-medium tabular-nums">0</dd></div>
+            <div class="flex justify-between"><dt class="muted">Sentences</dt><dd id="s-sentences" class="font-medium tabular-nums">0</dd></div>
+            <div class="flex justify-between"><dt class="muted">Paragraphs</dt><dd id="s-paragraphs" class="font-medium tabular-nums">0</dd></div>
+            <div class="flex justify-between"><dt class="muted">Lines</dt><dd id="s-lines" class="font-medium tabular-nums">0</dd></div>
+            <div class="flex justify-between"><dt class="muted">Avg word</dt><dd id="s-avg" class="font-medium tabular-nums">0</dd></div>
+            <div class="flex justify-between" title="At 130 words per minute"><dt class="muted">Speak time</dt><dd id="s-speak" class="font-medium tabular-nums">0 sec</dd></div>
+          </dl>
+
+          <!-- Readability + best-fit -->
+          <p id="readability" class="mt-3 text-sm" hidden>
+            <span class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium" style="background: var(--c-accent-soft); color: var(--color-accent);">
+              <span id="read-grade">Grade —</span><span id="read-label"></span>
+            </span>
+          </p>
+          <p id="bestfit" class="mt-2 text-xs muted">Paste or type some text to see where it fits.</p>
+        </div>
+
+        <!-- Platform-limit pills -->
+        <div class="mt-4">
+          <h3 class="mb-1.5 text-[11px] font-semibold uppercase tracking-wide muted">Platform limits</h3>
+          <ul id="pills" class="flex flex-wrap gap-1.5 text-xs"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accordions: SMS encoding + keyword density -->
+    <div class="grid gap-px border-t border-ink/8 bg-ink/8 sm:grid-cols-2">
+      <details class="group p-4" style="background: var(--c-surface);">
+        <summary class="cursor-pointer list-none text-sm font-semibold marker:hidden">
+          <span class="inline-flex w-full items-center justify-between">
+            📱 SMS encoding &amp; segments
+            <span class="ml-4 muted transition group-open:rotate-45">+</span>
+          </span>
+        </summary>
+        <div id="sms" class="mt-2 text-sm muted">Type to see SMS segment count and encoding.</div>
+      </details>
+
+      <details class="group p-4" style="background: var(--c-surface);">
+        <summary class="cursor-pointer list-none text-sm font-semibold marker:hidden">
+          <span class="inline-flex w-full items-center justify-between">
+            🔑 Keyword density
+            <span class="ml-4 muted transition group-open:rotate-45">+</span>
+          </span>
+        </summary>
+        <ul id="keywords" class="mt-2 space-y-1 text-sm muted"><li>Type to see your most-used words.</li></ul>
+      </details>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-5 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<script>
+  import {
+    count, readingTime, evaluateLimits, smsInfo, keywordDensity, readability,
+    bestFitHint, statsSummary, WPM_PRESETS, SPEAKING_WPM,
+    type PillResult,
+  } from '../../lib/tools/word-reading-time-counter';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+
+  const SAMPLES: Record<string, string> = {
+    tweet: `Just shipped a tiny tool I'm genuinely proud of: a private, in-browser word & reading-time counter. No sign-up, no upload, no ads. Paste, count, copy. That's it. What would you add next? 👇`,
+    essay: `The printing press did not simply make books cheaper; it rewired how societies stored and shared knowledge. Before Gutenberg, a single manuscript could take a scribe months to copy, and errors crept in with every reproduction. Movable type changed the economics of information overnight. Ideas that had circulated among a handful of scholars could suddenly reach thousands of readers, and those readers could compare, challenge, and build on what they read. The result was not just more books but a different kind of reader: one who questioned authority because, for the first time, the evidence was sitting on the desk in front of them.`,
+    speech: `Good evening, everyone. Thank you for being here. I want to talk tonight about a small idea with large consequences: attention. We treat attention as if it were infinite, but it is the most finite resource we own. Every notification, every open tab, every half-finished task spends a little of it. Tonight I am not going to ask you to do more. I am going to ask you to do less, on purpose, and to give your full attention to the few things that actually matter to you. That, I believe, is where a good life quietly begins.`,
+  };
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up animation (respects reduced motion)
+  function animateCount(el: HTMLElement, to: number, dur = 500) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to); el.dataset.v = String(to); return;
+    }
+    const from = parseInt(el.dataset.v || '0', 10);
+    if (from === to) { el.textContent = String(to); return; }
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // --- status icon + color (never color-only; pairs an icon with text)
+  const STATUS_ICON: Record<PillResult['status'], string> = {
+    empty: '', ok: '✓', warn: '!', over: '✕',
+  };
+  function statusVar(status: PillResult['status']): string {
+    return status === 'ok' ? 'var(--color-ok)'
+      : status === 'warn' ? 'var(--color-warn)'
+      : status === 'over' ? 'var(--color-bad)'
+      : 'var(--c-muted)';
+  }
+
+  function renderPills(pills: PillResult[]) {
+    const el = $<HTMLUListElement>('pills');
+    el.innerHTML = '';
+    for (const p of pills) {
+      const li = document.createElement('li');
+      li.className = 'inline-flex items-center gap-1 rounded-full border px-2 py-0.5';
+      const color = statusVar(p.status);
+      li.style.borderColor = `color-mix(in srgb, ${color} 45%, transparent)`;
+      li.style.color = color;
+      const icon = STATUS_ICON[p.status];
+      const tail = p.status === 'over' ? `over by ${Math.abs(p.remaining)}` : `${p.used}/${p.limit}`;
+      li.textContent = `${icon ? icon + ' ' : ''}${p.label} ${tail}`;
+      if (p.note) li.title = p.note;
+      el.appendChild(li);
+    }
+  }
+
+  function renderSms(text: string) {
+    const el = $<HTMLDivElement>('sms');
+    const s = smsInfo(text);
+    if (s.used === 0) { el.textContent = 'Type to see SMS segment count and encoding.'; return; }
+    let html = `<strong>${s.segments}</strong> segment${s.segments === 1 ? '' : 's'} · ${s.encoding} encoding · ${s.used}/${s.perSegment} per segment.`;
+    if (s.offenders.length) {
+      const list = s.offenders.map((c) => `<code>${c === ' ' ? '␠' : c.replace(/[<>&]/g, '')}</code>`).join(' ');
+      html += `<br><span class="text-xs">Forced Unicode (UCS-2) by: ${list}. Removing these would shrink your segments.</span>`;
+    }
+    el.innerHTML = html;
+  }
+
+  function renderKeywords(text: string, excludeStop: boolean) {
+    const el = $<HTMLUListElement>('keywords');
+    const hits = keywordDensity(text, { excludeStopWords: excludeStop, top: 10 });
+    if (hits.length === 0) { el.innerHTML = '<li>Type to see your most-used words.</li>'; return; }
+    el.innerHTML = '';
+    for (const h of hits) {
+      const li = document.createElement('li');
+      li.className = 'flex items-center justify-between gap-2';
+      li.innerHTML = `<span class="truncate">${h.word.replace(/[<>&]/g, '')}</span><span class="tabular-nums">${h.count} · ${(h.density * 100).toFixed(1)}%</span>`;
+      el.appendChild(li);
+    }
+  }
+
+  // --- main compute pass
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const c = count(src);
+    const wpm = parseInt($<HTMLSelectElement>('opt-wpm').value, 10) || WPM_PRESETS.normal;
+
+    animateCount($('s-words'), c.words);
+    animateCount($('s-chars'), c.chars);
+    $('s-read').textContent = readingTime(c.words, wpm).label;
+    $('s-speak').textContent = readingTime(c.words, SPEAKING_WPM).label;
+    $('s-nospace').textContent = String(c.charsNoSpaces);
+    $('s-sentences').textContent = String(c.sentences);
+    $('s-paragraphs').textContent = String(c.paragraphs);
+    $('s-lines').textContent = String(c.lines);
+    $('s-avg').textContent = String(c.avgWordLength);
+
+    // readability badge
+    const r = readability(src, c);
+    const rEl = $<HTMLParagraphElement>('readability');
+    if (r) {
+      rEl.hidden = false;
+      $('read-grade').textContent = `Grade ${r.grade}`;
+      $('read-label').textContent = ` · ${r.label}`;
+    } else {
+      rEl.hidden = true;
+    }
+
+    const sms = smsInfo(src);
+    $('bestfit').textContent = bestFitHint(c, sms);
+
+    renderPills(evaluateLimits(c));
+    renderSms(src);
+    renderKeywords(src, $<HTMLInputElement>('opt-stop').checked);
+
+    const has = src.length > 0;
+    $<HTMLButtonElement>('copy').disabled = !has;
+    $<HTMLButtonElement>('copy-stats').disabled = !has;
+
+    // autosave (local, private)
+    try { localStorage.setItem('wrtc-text', src); } catch {}
+  }
+
+  // --- debounced via rAF (cheap; engine is instant well past 50k words)
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  $('opt-wpm').addEventListener('change', () => { try { localStorage.setItem('wrtc-wpm', $<HTMLSelectElement>('opt-wpm').value); } catch {} run(); });
+  $('opt-stop').addEventListener('change', run);
+
+  // samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!]; run(); input.focus(); }));
+
+  // actions
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); toast('Pasted'); }
+    catch { input.focus(); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!input.value) return;
+    await navigator.clipboard.writeText(input.value);
+    toast('Text copied');
+  }
+  async function doCopyStats() {
+    if (!input.value) return;
+    await navigator.clipboard.writeText(statsSummary(input.value));
+    toast('Summary copied');
+  }
+  function doReset() {
+    input.value = ''; run(); input.focus();
+    try { localStorage.removeItem('wrtc-text'); } catch {}
+    toast('Cleared');
+  }
+
+  $('paste').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-stats').addEventListener('click', doCopyStats);
+  $('reset').addEventListener('click', doReset);
+
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    const blob = new Blob([input.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'text.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded text.txt');
+  });
+
+  // keyboard: Cmd/Ctrl+Enter recomputes (and refocuses), like the cleaner.
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); }
+  });
+
+  // --- restore saved draft + settings (private, no account)
+  function restore() {
+    try {
+      const wpm = localStorage.getItem('wrtc-wpm');
+      if (wpm) $<HTMLSelectElement>('opt-wpm').value = wpm;
+      const saved = localStorage.getItem('wrtc-text');
+      if (saved) { input.value = saved; toast('Restored your draft'); }
+    } catch {}
+  }
+
+  restore();
+  run();
+</script>

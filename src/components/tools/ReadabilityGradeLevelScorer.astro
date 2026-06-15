@@ -1,0 +1,517 @@
+---
+// Interactive island for the Readability / Grade-Level Scorer.
+// Static HTML here; behavior is wired by the client client script, which imports the
+// pure engine. Styling reuses the same utility classes + tokens as Cleaner.astro
+// so it looks native in both light and dark mode.
+---
+
+<section id="tool" aria-label="Readability scorer" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Target audience</span>
+        <select id="opt-target" class="ctl px-3" aria-label="Target reading level">
+          <option value="web">General web — grade 7-9</option>
+          <option value="plain">Wide / plain language — grade 6</option>
+          <option value="academic">Academic — grade 13+</option>
+          <option value="none">No target</option>
+        </select>
+      </label>
+
+      <label class="ctl flex cursor-pointer items-center gap-2 px-3">
+        <input type="checkbox" id="opt-highlight" checked class="h-5 w-5" />
+        <span>Highlight hard sentences</span>
+      </label>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Write</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Scores</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste or type your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to analyze"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste your writing — or try a sample:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="easy" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🟢 Easy</button>
+              <button data-sample="medium" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🟡 Medium</button>
+              <button data-sample="hard" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🔴 Hard (legalese)</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats">0 words · 0 sentences</p>
+      </div>
+
+      <!-- Output / scores rail -->
+      <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Reading level</h2>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download readability report as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download report">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy results</button>
+          </div>
+        </div>
+
+        <!-- Headline meter -->
+        <div class="flex items-center gap-4">
+          <div class="relative h-20 w-20 shrink-0">
+            <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+              <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+              <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+                stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+                style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="grade-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+              <span class="text-[9px] muted">grade</span>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide muted">Consensus grade level</p>
+            <p id="grade-label" class="text-sm font-semibold">Paste text to score</p>
+            <p id="target-note" class="mt-0.5 text-xs font-medium" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <!-- Plain-language verdict (screen-reader announced) -->
+        <p id="verdict" class="mt-3 rounded-lg border border-ink/10 p-3 text-sm" style="background: var(--c-paper);" aria-live="polite"></p>
+
+        <!-- Formula tiles -->
+        <div id="tiles" class="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3"></div>
+
+        <!-- Document stats -->
+        <details class="mt-3 group">
+          <summary class="ctl flex cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden">
+            📊 Document stats <span class="ml-auto transition group-open:rotate-180">▾</span>
+          </summary>
+          <ul id="docstats" class="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 px-2 text-xs muted"></ul>
+        </details>
+
+        <!-- Hardest sentences -->
+        <div class="mt-3">
+          <p class="text-xs font-semibold uppercase tracking-wide muted">Top hardest sentences</p>
+          <ol id="hardest" class="mt-1.5 space-y-1.5 text-sm" aria-live="polite"></ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlight surface + legend -->
+    <div class="border-t border-ink/8 px-4 py-4">
+      <div class="mb-2 flex flex-wrap items-center gap-3 text-xs">
+        <span class="font-semibold uppercase tracking-wide muted">Highlighted text</span>
+        <span class="inline-flex items-center gap-1"><span class="sent-hard inline-block h-3 w-4 rounded-sm align-middle"></span> hard</span>
+        <span class="inline-flex items-center gap-1"><span class="sent-veryHard inline-block h-3 w-4 rounded-sm align-middle"></span> very hard</span>
+        <span class="muted">Hover a sentence for its grade.</span>
+      </div>
+      <div id="highlight" class="max-h-72 w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 text-[15px] leading-relaxed" style="background: var(--c-paper);">
+        <span class="muted">Your text will appear here with the hardest sentences flagged.</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<style>
+  /* Sentence-difficulty highlights never rely on color alone (WCAG 1.4.1):
+     hard = underline, very hard = double underline + bolder background. */
+  .sent-hard {
+    background: rgb(245 158 11 / 0.22);
+    text-decoration: underline wavy rgb(180 110 4 / 0.7);
+    border-radius: 3px;
+  }
+  .sent-veryHard {
+    background: rgb(244 63 94 / 0.22);
+    text-decoration: underline double rgb(190 30 50 / 0.8);
+    border-radius: 3px;
+  }
+  :global(.dark) .sent-hard { background: rgb(245 158 11 / 0.28); text-decoration-color: #fcd34d; }
+  :global(.dark) .sent-veryHard { background: rgb(244 63 94 / 0.30); text-decoration-color: #fda4af; }
+  .sent-pulse { animation: sentPulse 1.1s ease; }
+  @keyframes sentPulse {
+    0%, 100% { outline: 2px solid transparent; }
+    30% { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .sent-pulse { animation: none; } }
+</style>
+
+<script>
+  import {
+    analyze,
+    preclean,
+    hardestSentences,
+    buildReport,
+    readingEaseBand,
+    gradeLabel,
+    type Analysis,
+    type SentenceStat,
+  } from '../../lib/tools/readability-grade-level-scorer';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+
+  // --- sample texts for the empty state
+  const SAMPLES: Record<string, string> = {
+    easy: `I like to write in short sentences. They are easy to read. Each one says just one thing. You do not have to stop and think. The words are plain and clear. A child could read this and get it. That is the goal. Write so a real person reads you with ease.`,
+    medium: `Most web writing lands best around a seventh to ninth grade reading level. That does not mean it is dumb. It means it respects the reader's time. Short sentences and common words help busy people skim and still understand. When a paragraph runs long, break it up. When a word has a simpler twin, use the twin.`,
+    hard: `Notwithstanding any provision herein to the contrary, the indemnifying party shall, upon receipt of written notification delineating the particulars of any claim, assume responsibility for the defense thereof, provided that such assumption shall not be construed as an admission of liability, and the indemnified party, in its sole and absolute discretion, reserves the prerogative to participate in such defense utilizing counsel of its own selection at its own expense.`,
+  };
+
+  const TARGETS: Record<string, { label: string; low: number; high: number }> = {
+    web: { label: 'general web', low: 7, high: 9 },
+    plain: { label: 'plain language', low: 0, high: 6 },
+    academic: { label: 'academic', low: 13, high: 99 },
+    none: { label: '', low: 0, high: 99 },
+  };
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- animated count-up for the headline grade
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to);
+      el.dataset.v = String(to);
+      return;
+    }
+    const from = parseFloat(el.dataset.v || '0');
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = (from + (to - from) * e).toFixed(1);
+      if (p < 1) requestAnimationFrame(tick);
+      else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  const RING = 213.6;
+  // Map a grade to ring fill: grade 18 = full ring. Higher grade = more filled.
+  function gradeFill(grade: number): number {
+    return Math.max(0, Math.min(1, grade / 18));
+  }
+
+  let lastReport = '';
+
+  function escapeHtml(s: string): string {
+    return s.replace(/[&<>"]/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  }
+
+  // --- render the highlight surface with per-sentence flagging
+  function renderHighlights(src: string, a: Analysis, show: boolean) {
+    const el = $<HTMLDivElement>('highlight');
+    if (!src.trim()) {
+      el.innerHTML = '<span class="muted">Your text will appear here with the hardest sentences flagged.</span>';
+      return;
+    }
+    let html = '';
+    let cursor = 0;
+    a.sentences.forEach((s, i: number) => {
+      // emit any gap (whitespace/newlines) before this sentence verbatim
+      if (s.start > cursor) html += escapeHtml(src.slice(cursor, s.start));
+      const raw = src.slice(s.start, s.end);
+      const cls = show && s.level !== 'ok' ? `sent-${s.level}` : '';
+      const title = `Grade ${s.grade} · ${s.words} words · ${s.complexWords} complex`;
+      html += `<span data-si="${i}" data-start="${s.start}" class="${cls}" title="${escapeHtml(title)}">${escapeHtml(raw)}</span>`;
+      cursor = s.end;
+    });
+    if (cursor < src.length) html += escapeHtml(src.slice(cursor));
+    el.innerHTML = html;
+  }
+
+  function tile(name: string, value: number | string, note = '', warn = false): string {
+    return `<div class="rounded-lg border border-ink/10 p-2" style="background: var(--c-paper);">
+      <div class="text-[10px] font-semibold uppercase tracking-wide muted">${name}${warn ? ' ⚠' : ''}</div>
+      <div class="text-base font-bold">${value}</div>
+      ${note ? `<div class="text-[10px] muted">${note}</div>` : ''}
+    </div>`;
+  }
+
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const a = analyze(src);
+    const { stats, scores } = a;
+
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${stats.words} word${stats.words === 1 ? '' : 's'} · ${stats.sentences} sentence${stats.sentences === 1 ? '' : 's'}` +
+      (stats.words ? ` · ~${stats.readingMinutes} min read` : '');
+
+    const gradeNum = $<HTMLSpanElement>('grade-num');
+    const ring = document.getElementById('ring') as unknown as SVGCircleElement;
+    const copyBtn = $<HTMLButtonElement>('copy');
+    const copyBar = $<HTMLButtonElement>('copy-bar');
+
+    if (!src.trim()) {
+      gradeNum.textContent = '—';
+      gradeNum.dataset.v = '0';
+      ring.style.strokeDashoffset = String(RING);
+      $<HTMLParagraphElement>('grade-label').textContent = 'Paste text to score';
+      $<HTMLParagraphElement>('target-note').textContent = '';
+      $<HTMLParagraphElement>('verdict').textContent = 'Paste at least a sentence or two to see your reading level.';
+      $<HTMLDivElement>('tiles').innerHTML = '';
+      $<HTMLUListElement>('docstats').innerHTML = '';
+      $<HTMLOListElement>('hardest').innerHTML = '<li class="muted">—</li>';
+      $<HTMLDivElement>('highlight').innerHTML =
+        '<span class="muted">Your text will appear here with the hardest sentences flagged.</span>';
+      copyBtn.disabled = true;
+      copyBar.disabled = true;
+      lastReport = '';
+      return;
+    }
+
+    const g = scores.consensusGrade;
+    animateCount(gradeNum, g);
+    ring.style.strokeDashoffset = String(RING * (1 - gradeFill(g)));
+    // Color band: easy = ok, mid = warn, hard = bad.
+    const color = g <= 9 ? 'var(--color-ok)' : g <= 12 ? 'var(--color-warn)' : 'var(--color-bad)';
+    ring.style.stroke = color;
+    $<HTMLParagraphElement>('grade-label').textContent = a.lowConfidence
+      ? 'Low confidence — add more text'
+      : gradeLabel(g);
+    $<HTMLParagraphElement>('verdict').textContent = a.verdict;
+
+    // Target comparison
+    const target = TARGETS[$<HTMLSelectElement>('opt-target').value];
+    const noteEl = $<HTMLParagraphElement>('target-note');
+    if (target.label && !a.lowConfidence) {
+      if (g > target.high) {
+        const over = Math.round(g - target.high);
+        noteEl.textContent = `▲ ${over} grade${over === 1 ? '' : 's'} above ${target.label} target`;
+        noteEl.style.color = 'var(--color-warn)';
+      } else if (g < target.low) {
+        noteEl.textContent = `✓ Below ${target.label} target — very accessible`;
+        noteEl.style.color = 'var(--color-ok)';
+      } else {
+        noteEl.textContent = `✓ On target for ${target.label}`;
+        noteEl.style.color = 'var(--color-ok)';
+      }
+    } else {
+      noteEl.textContent = '';
+    }
+
+    // Formula tiles
+    $<HTMLDivElement>('tiles').innerHTML = [
+      tile('Reading Ease', scores.fleschReadingEase, readingEaseBand(scores.fleschReadingEase)),
+      tile('Flesch-Kincaid', scores.fleschKincaidGrade, 'grade'),
+      tile('Gunning Fog', scores.gunningFog, 'grade'),
+      tile('SMOG', scores.smog, a.smogLowConfidence ? 'needs 30+ sents' : 'grade', a.smogLowConfidence),
+      tile('Coleman-Liau', scores.colemanLiau, 'grade'),
+      tile('ARI', scores.automatedReadabilityIndex, 'grade'),
+    ].join('');
+
+    // Document stats
+    $<HTMLUListElement>('docstats').innerHTML = [
+      ['Words', stats.words],
+      ['Sentences', stats.sentences],
+      ['Paragraphs', stats.paragraphs],
+      ['Syllables', stats.syllables],
+      ['Complex words', stats.complexWords],
+      ['Avg words/sentence', stats.avgWordsPerSentence],
+      ['Avg syllables/word', stats.avgSyllablesPerWord],
+      ['Reading time', `~${stats.readingMinutes} min`],
+      ['Speaking time', `~${stats.speakingMinutes} min`],
+    ].map(([k, v]) => `<li class="flex justify-between gap-2"><span>${k}</span><span class="font-medium" style="color: var(--c-ink);">${v}</span></li>`).join('');
+
+    // Hardest sentences list (jump-to)
+    const hard = hardestSentences(a.sentences, 5);
+    const list = $<HTMLOListElement>('hardest');
+    if (hard.length === 0 || hard.every((s) => s.level === 'ok')) {
+      list.innerHTML = '<li class="muted">No notably hard sentences — nicely readable ✓</li>';
+    } else {
+      list.innerHTML = '';
+      hard.forEach((s) => {
+        const li = document.createElement('li');
+        li.innerHTML = `<button data-jump="${s.start}" class="ctl flex w-full items-start gap-2 px-2 py-1.5 text-left text-xs transition hover:border-accent">
+          <span class="font-bold text-accent">${s.grade}</span>
+          <span class="line-clamp-2">${escapeHtml(s.text.slice(0, 120))}${s.text.length > 120 ? '…' : ''}</span>
+        </button>`;
+        list.appendChild(li);
+      });
+    }
+
+    // analyze() strips invisible chars before measuring, so the sentence
+    // offsets in `a` index the PRECLEANED text. Render the highlight surface
+    // over that same string so spans land on the right characters.
+    renderHighlights(preclean(src), a, $<HTMLInputElement>('opt-highlight').checked);
+
+    copyBtn.disabled = false;
+    copyBar.disabled = false;
+    lastReport = buildReport(a);
+    saveDraft(src);
+  }
+
+  // --- debounced live update
+  let raf = 0;
+  const schedule = () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(run);
+  };
+  input.addEventListener('input', schedule);
+  $('opt-target').addEventListener('change', () => { savePrefs(); run(); });
+  $('opt-highlight').addEventListener('change', () => { savePrefs(); run(); });
+
+  // --- jump-to-sentence: scroll the highlight surface and pulse the sentence
+  $('hardest').addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-jump]') as HTMLButtonElement | null;
+    if (!btn) return;
+    const start = btn.dataset.jump;
+    const wanted = document.querySelector<HTMLElement>(`#highlight [data-start="${start}"]`);
+    if (!wanted) return;
+    wanted.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    wanted.classList.remove('sent-pulse');
+    void wanted.offsetWidth; // reflow to restart the pulse animation
+    wanted.classList.add('sent-pulse');
+  });
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      input.value = SAMPLES[b.dataset.sample!];
+      run();
+      setPane('output');
+    }));
+
+  // --- shared actions
+  async function doPaste() {
+    try {
+      input.value = await navigator.clipboard.readText();
+      run();
+      setPane('input');
+      toast('Pasted');
+    } catch {
+      input.focus();
+      setPane('input');
+      toast('Press Ctrl/Cmd+V to paste');
+    }
+  }
+  async function doCopy() {
+    if (!lastReport) return;
+    await navigator.clipboard.writeText(lastReport);
+    const b = $<HTMLButtonElement>('copy');
+    const prev = b.textContent;
+    b.textContent = '✓ Copied';
+    toast('Results copied to clipboard');
+    setTimeout(() => (b.textContent = prev), 1300);
+  }
+  function doReset() {
+    input.value = '';
+    run();
+    input.focus();
+    setPane('input');
+    toast('Cleared');
+  }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // --- download report
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    if (!lastReport) return;
+    const blob = new Blob([lastReport], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'readability-report.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Downloaded readability-report.txt');
+  });
+
+  // --- keyboard: Cmd/Ctrl+Enter re-runs, Esc clears
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      run();
+      toast('Re-scored');
+    }
+  });
+
+  // --- persistence (last draft + prefs)
+  function saveDraft(text: string) {
+    try { localStorage.setItem('rgls_draft', text); } catch {}
+  }
+  function savePrefs() {
+    try {
+      localStorage.setItem('rgls_prefs', JSON.stringify({
+        target: $<HTMLSelectElement>('opt-target').value,
+        highlight: $<HTMLInputElement>('opt-highlight').checked,
+      }));
+    } catch {}
+  }
+  function loadPrefs() {
+    try {
+      const p = JSON.parse(localStorage.getItem('rgls_prefs') || '{}');
+      if (p.target) $<HTMLSelectElement>('opt-target').value = p.target;
+      if (typeof p.highlight === 'boolean') $<HTMLInputElement>('opt-highlight').checked = p.highlight;
+      const draft = localStorage.getItem('rgls_draft');
+      if (draft) input.value = draft;
+    } catch {}
+  }
+
+  loadPrefs();
+  setPane('input');
+  run();
+</script>

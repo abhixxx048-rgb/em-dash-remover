@@ -1,0 +1,199 @@
+---
+import Base from '../../layouts/Base.astro';
+import WhitespaceLineBreakReflowFixer from '../../components/tools/WhitespaceLineBreakReflowFixer.astro';
+
+const faqs = [
+  {
+    q: 'Why does copying from a PDF add a line break after every line?',
+    a: 'A PDF stores text as positioned lines, not flowing paragraphs. When you copy, each visible line comes with its own line break — a "soft return" the layout added just to fit the page margin. Pasted into a document, those soft returns make a paragraph look like a list of fragments. This tool detects the soft returns and removes only them, stitching the fragments back into real paragraphs.',
+  },
+  {
+    q: 'What is the difference between a soft return and a hard return?',
+    a: 'A hard return is a real paragraph or list boundary you intended. A soft return is a break that was inserted automatically to wrap text at a margin or column width. Naive "remove line breaks" tools delete both, destroying your paragraph structure. Our smart reflow keeps hard returns (blank lines, list items, headings, quotes) and removes only the soft ones.',
+  },
+  {
+    q: 'How do I keep my paragraphs and bullet lists when removing line breaks?',
+    a: 'Leave "Smart reflow" on (or use the PDF paste cleanup recipe). The reflow engine never joins across a blank line, a list item, a Markdown heading, a blockquote, a table row, or an indented code block, so your paragraphs, bullets and numbered lists stay intact while the soft wrapping inside each paragraph is removed.',
+  },
+  {
+    q: 'How do I rejoin words that were split with a hyphen at the end of a line?',
+    a: 'Turn on "Rejoin hyphen-split words". When a line ends in a word followed by a hyphen and the next line begins with a lowercase word — like "infor-" then "mation" — the tool joins them into "information" and drops the hyphen. Genuine compounds such as "well-known" and number ranges are left untouched because the hyphen is not at the end of a line.',
+  },
+  {
+    q: 'How do I remove double spaces and extra whitespace from text?',
+    a: 'Keep "Collapse extra spaces/tabs" on. Every run of two or more spaces or tabs inside a line becomes a single space, trailing whitespace is trimmed, and Unicode space variants like non-breaking spaces are normalized. Use the "Just collapse spaces" recipe if that is all you need.',
+  },
+  {
+    q: 'How do I remove blank lines without removing paragraph breaks?',
+    a: 'Set "Blank lines" to "Collapse runs to one". Runs of multiple blank lines are reduced to a single blank line, which still separates paragraphs cleanly. Choose "Remove all" only if you want a fully gap-free block of text.',
+  },
+  {
+    q: 'Is my text uploaded anywhere?',
+    a: 'No. All processing happens entirely in your browser with plain JavaScript. Nothing is uploaded, stored or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. The tool also works offline.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/whitespace-line-break-reflow-fixer#app`,
+  name: 'Whitespace & Line-Break Reflow Fixer — Remove Line Breaks Online',
+  url: `${Astro.site}tools/whitespace-line-break-reflow-fixer`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Remove line breaks online',
+    'Fix line breaks copied from a PDF',
+    'Smart reflow: remove soft breaks, keep hard paragraph breaks',
+    'Rejoin hyphenated words split across lines',
+    'Remove extra spaces, double spaces and tabs',
+    'Remove blank lines and normalize whitespace',
+    'Clean up forwarded email text and quote markers',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Remove Line Breaks Online — Whitespace & Line-Break Reflow Fixer"
+  description="Free line break remover: fix PDF & email line breaks, remove extra spaces, drop blank lines, and reflow hard-wrapped text into clean paragraphs — including rejoining hyphen-split words. 100% in your browser."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <a href="/tools" class="mb-4 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Remove Line Breaks — Clean Up Messy PDF &amp; Email Text
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Paste text mangled by copying out of a PDF, email or terminal and get
+        back clean, readable paragraphs. It collapses extra spaces, trims trailing
+        whitespace, drops stray blank lines, and <strong>smartly reflows</strong>
+        hard-wrapped lines — removing only the soft breaks and rejoining
+        hyphen-split words. Your text never leaves your browser.
+      </p>
+    </header>
+
+    <WhitespaceLineBreakReflowFixer />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">Fix line breaks copied from a PDF</h2>
+      <p class="muted">
+        PDFs store text as positioned lines rather than flowing paragraphs, so
+        copying out of one inserts a line break at the end of every visible line.
+        Paste that into Word or Google Docs and a single paragraph looks like a
+        column of fragments. This is the most common reason people search for how
+        to <strong>remove line breaks online</strong>. Paste the broken text above
+        (or tap the <em>PDF paste cleanup</em> recipe) and the reflow engine
+        removes the soft, margin-driven breaks while preserving the real paragraph
+        boundaries, giving you readable prose you can paste anywhere.
+      </p>
+
+      <h2 class="text-2xl font-bold">Remove extra spaces, tabs &amp; blank lines</h2>
+      <p class="muted">
+        Beyond line breaks, copied text is often littered with double spaces,
+        stray tabs, trailing whitespace and runs of empty lines. The fixer
+        collapses every run of multiple spaces or tabs to a single space, trims
+        whitespace from the end of each line, normalizes Unicode space variants
+        (non-breaking spaces, thin spaces, ideographic spaces) to plain spaces,
+        and strips invisible zero-width characters. Blank-line handling is up to
+        you: keep them as-is, collapse runs to a single separator, or remove them
+        entirely. For a pure whitespace pass with no reflow, use the
+        <em>Just collapse spaces</em> recipe.
+      </p>
+
+      <h2 class="text-2xl font-bold">Smart reflow: soft breaks vs hard paragraph breaks</h2>
+      <p class="muted">
+        The differentiator is knowing which line breaks to remove. A
+        <strong>soft return</strong> is a break inserted automatically to wrap
+        text at a margin or column width; a <strong>hard return</strong> is a real
+        paragraph, list or heading boundary you intended. A dumb "strip all
+        newlines" tool deletes both and destroys your structure. Our reflow scores
+        every line boundary using signals like terminal punctuation, the
+        capitalization of the next line, how "full" the current line is relative
+        to the document's wrap width, and whether the leftover space could have fit
+        the next word. It never joins across a blank line, a bullet or numbered
+        list item, a Markdown heading, a blockquote, a table row, or an indented
+        code block — so your lists and paragraphs survive intact.
+      </p>
+
+      <h2 class="text-2xl font-bold">Rejoin hyphenated words split across lines</h2>
+      <p class="muted">
+        Hyphenation at the page margin is responsible for a large share of PDF
+        copy corruption: a word like <em>information</em> gets split into
+        <code>infor-</code> at the end of one line and <code>mation</code> at the
+        start of the next. With "Rejoin hyphen-split words" on, the tool detects a
+        word-character followed by a hyphen at line end, sees a lowercase word
+        starting the next line, joins them and removes the hyphen. Genuine
+        compounds such as <code>well-known</code> and number ranges like
+        <code>2020-2021</code> are left untouched, because their hyphen is not at a
+        line break.
+      </p>
+
+      <h2 class="text-2xl font-bold">Clean up forwarded email text</h2>
+      <p class="muted">
+        Plain-text and forwarded email is hard-wrapped at 72 or 76 columns and
+        often prefixed with <code>&gt;</code> quote markers. Turn on "Strip email
+        quote markers" (or use the <em>Email cleanup</em> recipe) to remove the
+        leading <code>&gt;</code> and <code>|</code> gutters, then reflow the
+        narrow column back into a clean paragraph. A change in quote depth is
+        treated as a real boundary, so nested replies are not merged together.
+      </p>
+
+      <h2 class="text-2xl font-bold">100% private — runs in your browser</h2>
+      <p class="muted">
+        There is no server and no upload. Every transformation is deterministic
+        string processing done with plain JavaScript on your device, so you can
+        safely clean confidential documents. Your last-used options are remembered
+        locally for next time — but never your text. Open your browser's DevTools
+        Network tab while you work and you'll see zero requests, and the tool keeps
+        working with your connection turned off.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+  </style>
+</Base>

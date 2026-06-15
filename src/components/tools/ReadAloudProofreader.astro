@@ -1,0 +1,819 @@
+---
+// Interactive island for the Read-Aloud Proofreader.
+// Static HTML here; behavior is wired by the client client script, which imports the
+// pure engine and owns the Web Speech API (SpeechSynthesis). Styling reuses the
+// same utility classes + tokens as Cleaner.astro so it looks native in both
+// light and dark mode.
+---
+
+<section id="tool" aria-label="Read-aloud proofreader" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <!-- Unsupported-browser banner (shown by JS if speechSynthesis is missing). -->
+  <div id="unsupported" hidden class="card mb-4 border-l-4 p-4 text-sm" style="border-left-color: var(--color-warn);">
+    <p class="font-semibold">Your browser can't read text aloud here.</p>
+    <p class="mt-1 muted">
+      This browser doesn't support the Web Speech API (Firefox on Android is the usual culprit).
+      You can still use the pre-scan below to spot long sentences and repeated words, or try the
+      <a href="/" class="text-accent underline">other cleaning tools</a> in Chrome, Edge or Safari.
+    </p>
+  </div>
+
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Voice</span>
+        <select id="opt-voice" class="ctl max-w-[14rem] px-3" aria-label="Choose a voice">
+          <option value="">Loading voices…</option>
+        </select>
+      </label>
+
+      <!-- Privacy badge: local vs cloud voice (filled in by JS). -->
+      <span id="privacy" class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium" aria-live="polite"></span>
+
+      <details class="group relative w-full sm:w-auto">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Speed &amp; pitch <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 w-full space-y-3 p-3 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-72 sm:shadow-lg">
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label for="opt-rate" class="font-medium">Speed</label>
+              <span id="rate-val" class="muted">1.0×</span>
+            </div>
+            <input id="opt-rate" type="range" min="0.5" max="2" step="0.05" value="1" class="w-full" aria-label="Reading speed" />
+            <div class="mt-2 flex flex-wrap gap-1.5" id="speed-presets"></div>
+          </div>
+          <div>
+            <div class="mb-1 flex items-center justify-between">
+              <label for="opt-pitch" class="font-medium">Pitch</label>
+              <span id="pitch-val" class="muted">1.0</span>
+            </div>
+            <input id="opt-pitch" type="range" min="0" max="2" step="0.1" value="1" class="w-full" aria-label="Voice pitch" />
+          </div>
+        </div>
+      </details>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Text</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Proof</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input / read surface -->
+      <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your writing — then hear it</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+
+        <div class="relative">
+          <!-- Editable input -->
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to read aloud"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+
+          <!-- Read surface: shown while playing; karaoke highlight lives here. -->
+          <div id="reader" hidden
+            class="max-h-[22rem] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 text-[16px] leading-relaxed"
+            style="background: var(--c-paper);"
+            aria-label="Reading view — click a sentence to start there"></div>
+
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Your ear catches what your eyes skim. Try a flawed sample:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="dropped" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📝 Dropped word</button>
+              <button data-sample="runon" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🌀 Run-on</button>
+              <button data-sample="repeat" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🔁 Repeated word</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-2 flex items-center justify-between gap-2">
+          <p class="text-xs muted" id="in-stats">0 words · 0 sentences</p>
+          <button id="edit-btn" hidden class="inline-flex min-h-9 items-center rounded-md px-3 text-xs font-medium text-accent transition hover:bg-accent-soft">✏️ Edit text</button>
+        </div>
+      </div>
+
+      <!-- Proof rail: transport + stats + flags -->
+      <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Proof by ear</h2>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download fix-list as .md" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download fix-list">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy fix-list</button>
+          </div>
+        </div>
+
+        <!-- Transport controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <button id="play" class="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-accent px-5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>
+            <span id="play-icon">▶</span> <span id="play-label">Play</span>
+          </button>
+          <button id="prev" aria-label="Previous sentence" class="ctl grid h-11 w-11 place-items-center transition hover:bg-ink/5 disabled:opacity-40" disabled>⏮</button>
+          <button id="rehear" aria-label="Re-hear this sentence" title="Re-hear (R)" class="ctl grid h-11 w-11 place-items-center transition hover:bg-ink/5 disabled:opacity-40" disabled>↺</button>
+          <button id="next" aria-label="Next sentence" class="ctl grid h-11 w-11 place-items-center transition hover:bg-ink/5 disabled:opacity-40" disabled>⏭</button>
+          <button id="stop" aria-label="Stop" class="ctl grid h-11 w-11 place-items-center transition hover:bg-ink/5 disabled:opacity-40" disabled>⏹</button>
+          <button id="flag" title="Flag what I just heard (F)" class="ctl ml-auto inline-flex min-h-11 items-center gap-1.5 px-3 text-sm transition hover:border-accent disabled:opacity-40" disabled>🚩 Flag</button>
+        </div>
+
+        <!-- Progress -->
+        <div class="mt-3">
+          <div class="flex items-center justify-between text-xs muted">
+            <span id="progress-label">Press Play to start</span>
+            <span id="time-label"></span>
+          </div>
+          <div class="mt-1 h-2 w-full overflow-hidden rounded-full" style="background: color-mix(in srgb, var(--c-ink) 10%, transparent);">
+            <div id="progress-bar" class="h-full rounded-full transition-[width] duration-200" style="width: 0%; background: var(--color-accent);"></div>
+          </div>
+        </div>
+
+        <!-- Live stats (appear as soon as text is present) -->
+        <div id="stats-row" class="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3"></div>
+
+        <!-- Longest-sentence callout -->
+        <p id="longest" class="mt-3 hidden rounded-lg border border-ink/10 p-3 text-sm" style="background: var(--c-paper);"></p>
+
+        <!-- Listen-harder pre-scan flags + manual fix-list -->
+        <div class="mt-3">
+          <p class="text-xs font-semibold uppercase tracking-wide muted">Things to listen for</p>
+          <ul id="flags" class="mt-1.5 space-y-1.5 text-sm" aria-live="polite"></ul>
+        </div>
+      </div>
+    </div>
+
+    <p class="border-t border-ink/8 px-4 py-3 text-xs muted">
+      <strong>How to use:</strong> pick a voice → press Play → as you hear an off line, tap
+      <span class="font-semibold">🚩 Flag</span> (or press <kbd>F</kbd>) → fix the whole list at the end.
+      Space plays/pauses · ←/→ jump sentences · <kbd>R</kbd> re-hears.
+    </p>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 With a <span id="local-note" class="font-medium">local</span> voice this runs entirely on your device — nothing is uploaded. Works offline.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable transport bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="play-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>▶ Play</button>
+  <button id="flag-bar" aria-label="Flag" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold disabled:opacity-40" disabled>🚩</button>
+  <button id="stop-bar" aria-label="Stop" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold disabled:opacity-40" disabled>⏹</button>
+</div>
+
+<style>
+  /* Karaoke highlight never relies on color alone (WCAG 1.4.1):
+     spoken word = underline + bold; active sentence = soft background. */
+  #reader .rap-sentence { border-radius: 4px; cursor: pointer; }
+  #reader .rap-sentence:hover { background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+  #reader .rap-active { background: var(--c-accent-soft); }
+  #reader .rap-word {
+    background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    font-weight: 700;
+    border-radius: 3px;
+  }
+  #reader .rap-flagged {
+    text-decoration: underline wavy var(--color-warn);
+    text-underline-offset: 3px;
+  }
+  kbd {
+    border: 1px solid color-mix(in srgb, var(--c-ink) 25%, transparent);
+    border-radius: 4px;
+    padding: 0 4px;
+    font-size: 0.85em;
+    font-family: var(--font-mono);
+  }
+</style>
+
+<script>
+  import {
+    analyze,
+    preclean,
+    estimateTime,
+    buildFixList,
+    SPEED_PRESETS,
+    type ProofAnalysis,
+    type Flag,
+  } from '../../lib/tools/read-aloud-proofreader';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const reader = $<HTMLDivElement>('reader');
+
+  // --- sample texts (deliberately flawed, per spec §5.12)
+  const SAMPLES: Record<string, string> = {
+    dropped: `I went the store to buy milk but they were out so I came home empty handed. It was one those days where nothing quite goes to plan. By the time got back, dinner was already cold.`,
+    runon: `The project started well and everyone was excited about it and we had a clear plan and the deadlines seemed reasonable but then the requirements changed halfway through and the team got confused and morale dropped and in the end we shipped late and over budget which nobody was happy about.`,
+    repeat: `The the best way to proofread is to to read your work aloud. When you hear it you you notice things your eyes glide right past. Even a a single repeated word stands out the moment it is spoken.`,
+  };
+
+  // --- toast (mirrors Cleaner.astro)
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/[&<>"]/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  }
+
+  // --- Feature detection ----------------------------------------------------
+  const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
+  const ttsSupported = !!synth && typeof SpeechSynthesisUtterance !== 'undefined';
+  if (!ttsSupported) $('unsupported').hidden = false;
+
+  // ==========================================================================
+  // State
+  // ==========================================================================
+  let current: ProofAnalysis = analyze('');
+  // The engine measures every offset against the *precleaned* text (invisible
+  // chars stripped). Render and slice against this same cleaned string so the
+  // highlight coordinate space matches the engine's — otherwise spans drift.
+  let source = '';
+  let voices: SpeechSynthesisVoice[] = [];
+  let playState: 'idle' | 'playing' | 'paused' = 'idle';
+  let activeChunk = -1; // index of the chunk currently/last spoken
+  const manualFlags = new Set<number>(); // chunk indices the user flagged by ear
+  let keepAliveTimer = 0;
+  let wakeLock: any = null;
+  let boundarySeen = false; // did we get word-level boundary events?
+
+  // ==========================================================================
+  // Voices
+  // ==========================================================================
+  function loadVoices() {
+    if (!synth) return;
+    voices = synth.getVoices();
+    const sel = $<HTMLSelectElement>('opt-voice');
+    if (!voices.length) return; // wait for voiceschanged
+    // Sort: local English voices first, then other local, then cloud.
+    const sorted = [...voices].sort((a, b) => {
+      const score = (v: SpeechSynthesisVoice) =>
+        (v.localService ? 0 : 2) + (v.lang.startsWith('en') ? 0 : 1);
+      return score(a) - score(b) || a.name.localeCompare(b.name);
+    });
+    const prev = sel.value;
+    sel.innerHTML = '';
+    for (const v of sorted) {
+      const opt = document.createElement('option');
+      opt.value = v.name;
+      opt.textContent = `${v.name} (${v.lang})${v.localService ? ' · on-device' : ' · cloud'}`;
+      sel.appendChild(opt);
+    }
+    // Restore saved/previous choice or default to the first (best) voice.
+    const saved = (() => { try { return localStorage.getItem('rap_voice') || ''; } catch { return ''; } })();
+    sel.value = [prev, saved, sorted[0]?.name].find((n) => n && sorted.some((v) => v.name === n)) || '';
+    updatePrivacyBadge();
+  }
+
+  function selectedVoice(): SpeechSynthesisVoice | undefined {
+    const name = $<HTMLSelectElement>('opt-voice').value;
+    return voices.find((v) => v.name === name);
+  }
+
+  function updatePrivacyBadge() {
+    const v = selectedVoice();
+    const badge = $<HTMLSpanElement>('privacy');
+    if (!v) { badge.textContent = ''; return; }
+    if (v.localService) {
+      badge.textContent = '🔒 On-device voice';
+      badge.style.background = 'color-mix(in srgb, var(--color-ok) 18%, transparent)';
+      badge.style.color = 'var(--color-ok)';
+      $('local-note').textContent = 'local';
+    } else {
+      badge.textContent = '☁ Cloud voice — text leaves your browser';
+      badge.style.background = 'color-mix(in srgb, var(--color-warn) 18%, transparent)';
+      badge.style.color = 'var(--color-warn)';
+      $('local-note').textContent = 'cloud';
+    }
+  }
+
+  if (synth) {
+    loadVoices();
+    synth.addEventListener?.('voiceschanged', loadVoices);
+    // Some browsers populate lazily; nudge once.
+    setTimeout(loadVoices, 250);
+  }
+
+  // ==========================================================================
+  // Speed presets + sliders
+  // ==========================================================================
+  function buildSpeedPresets() {
+    const wrap = $<HTMLDivElement>('speed-presets');
+    wrap.innerHTML = '';
+    for (const p of SPEED_PRESETS) {
+      const b = document.createElement('button');
+      b.className = 'ctl flex-1 px-2 py-1 text-xs transition hover:border-accent';
+      b.innerHTML = `<span class="font-semibold">${p.label}</span><br><span class="muted">${p.rate}× · ${p.note}</span>`;
+      b.addEventListener('click', () => {
+        $<HTMLInputElement>('opt-rate').value = String(p.rate);
+        syncRate();
+        savePrefs();
+      });
+      wrap.appendChild(b);
+    }
+  }
+  function syncRate() {
+    $('rate-val').textContent = `${parseFloat($<HTMLInputElement>('opt-rate').value).toFixed(2)}×`;
+    updateTimeLabel();
+  }
+  function syncPitch() {
+    $('pitch-val').textContent = parseFloat($<HTMLInputElement>('opt-pitch').value).toFixed(1);
+  }
+  $('opt-rate').addEventListener('input', () => { syncRate(); savePrefs(); });
+  $('opt-pitch').addEventListener('input', () => { syncPitch(); savePrefs(); });
+
+  function rate() { return parseFloat($<HTMLInputElement>('opt-rate').value) || 1; }
+  function pitch() { return parseFloat($<HTMLInputElement>('opt-pitch').value) || 1; }
+
+  // ==========================================================================
+  // Analysis + render (debounced live update)
+  // ==========================================================================
+  function tileHtml(name: string, value: string | number): string {
+    return `<div class="rounded-lg border border-ink/10 p-2" style="background: var(--c-paper);">
+      <div class="text-[10px] font-semibold uppercase tracking-wide muted">${name}</div>
+      <div class="text-base font-bold">${value}</div>
+    </div>`;
+  }
+
+  function updateTimeLabel() {
+    const t = $('time-label');
+    t.textContent = current.stats.words ? `~${estimateTime(current.stats, rate())} at ${rate().toFixed(2)}×` : '';
+  }
+
+  function renderFlags() {
+    const ul = $<HTMLUListElement>('flags');
+    const items: string[] = [];
+
+    // Manually flagged sentences first (by ear).
+    for (const ci of [...manualFlags].sort((a, b) => a - b)) {
+      const c = current.chunks[ci];
+      if (!c) continue;
+      items.push(`<li>
+        <div class="ctl flex items-start gap-2 px-2 py-1.5 text-xs" style="border-color: var(--color-warn);">
+          <span title="Flagged by ear">🚩</span>
+          <button data-jump="${ci}" class="flex-1 text-left line-clamp-2 hover:text-accent">${escapeHtml(c.text.slice(0, 120))}${c.text.length > 120 ? '…' : ''}</button>
+          <button data-unflag="${ci}" aria-label="Remove flag" class="muted hover:text-accent">✕</button>
+        </div>
+      </li>`);
+    }
+
+    // Pre-scan flags.
+    for (const f of current.flags) {
+      items.push(`<li>
+        <button data-jump="${f.chunk}" class="ctl flex w-full items-start gap-2 px-2 py-1.5 text-left text-xs transition hover:border-accent">
+          <span>${f.kind === 'longSentence' ? '📏' : f.kind === 'doubledWord' ? '🔁' : '␣'}</span>
+          <span class="flex-1"><span class="font-semibold">${escapeHtml(f.label)}</span><br><span class="muted">${escapeHtml(f.why)}</span></span>
+        </button>
+      </li>`);
+    }
+
+    if (!items.length) {
+      ul.innerHTML = current.stats.words
+        ? '<li class="muted">Nothing flagged yet — press Play and tap 🚩 when something sounds off.</li>'
+        : '<li class="muted">—</li>';
+    } else {
+      ul.innerHTML = items.join('');
+    }
+  }
+
+  function run() {
+    const src = input.value;
+    $('empty').hidden = src.length > 0;
+    source = preclean(src);
+    current = analyze(src);
+    const { stats } = current;
+
+    $('in-stats').textContent =
+      `${stats.words} word${stats.words === 1 ? '' : 's'} · ${stats.sentences} sentence${stats.sentences === 1 ? '' : 's'}`;
+
+    // Live stats tiles
+    $('stats-row').innerHTML = stats.words
+      ? [
+          tileHtml('Words', stats.words),
+          tileHtml('Sentences', stats.sentences),
+          tileHtml('Listen score', current.awkwardScore),
+        ].join('')
+      : '';
+
+    // Longest-sentence callout (the #1 thing reading aloud surfaces)
+    const longest = $<HTMLParagraphElement>('longest');
+    if (stats.longestSentenceWords >= 25 && stats.longestSentenceChunk >= 0) {
+      longest.hidden = false;
+      longest.classList.remove('hidden');
+      longest.innerHTML = `📏 Longest sentence: <strong>${stats.longestSentenceWords} words</strong>. Listen hardest there — that's where flow usually breaks. <button data-jump="${stats.longestSentenceChunk}" class="text-accent underline">Find it</button>`;
+    } else {
+      longest.classList.add('hidden');
+    }
+
+    renderFlags();
+    updateTimeLabel();
+
+    const hasText = stats.words > 0;
+    setEnabled('play', hasText && ttsSupported);
+    setEnabled('play-bar', hasText && ttsSupported);
+    const hasFlags = current.flags.length > 0 || manualFlags.size > 0;
+    setEnabled('copy', hasFlags);
+    setEnabled('download', hasFlags);
+
+    saveDraft(src);
+  }
+
+  function setEnabled(id: string, on: boolean) {
+    const el = document.getElementById(id) as HTMLButtonElement | null;
+    if (el) el.disabled = !on;
+  }
+
+  // --- debounced live update (requestAnimationFrame)
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  $('opt-voice').addEventListener('change', () => { updatePrivacyBadge(); savePrefs(); });
+
+  // ==========================================================================
+  // Reading view (karaoke render)
+  // ==========================================================================
+  function renderReader() {
+    // Render the precleaned source so character offsets line up with the
+    // engine's chunk/flag offsets (which are measured post-preclean).
+    const src = source;
+    let html = '';
+    let cursor = 0;
+    current.chunks.forEach((c, i) => {
+      if (c.start > cursor) html += escapeHtml(src.slice(cursor, c.start));
+      const flagged = manualFlags.has(i) ? ' rap-flagged' : '';
+      html += `<span class="rap-sentence${flagged}" data-ci="${i}">${escapeHtml(src.slice(c.start, c.end))}</span>`;
+      cursor = c.end;
+    });
+    if (cursor < src.length) html += escapeHtml(src.slice(cursor));
+    reader.innerHTML = html;
+  }
+
+  function showReader(on: boolean) {
+    reader.hidden = !on;
+    input.hidden = on;
+    $('edit-btn').hidden = !on;
+    if (on) renderReader();
+  }
+
+  // Highlight the active sentence (always) and, when boundary events fire, the
+  // active word inside it. Auto-scroll to keep it in view.
+  function highlightChunk(i: number, wordStart = -1, wordEnd = -1) {
+    const span = reader.querySelector<HTMLElement>(`[data-ci="${i}"]`);
+    reader.querySelectorAll('.rap-active').forEach((e) => e.classList.remove('rap-active'));
+    if (!span) return;
+    span.classList.add('rap-active');
+
+    if (wordStart >= 0 && wordEnd > wordStart) {
+      // Re-render this sentence with a word wrapper. Cheap: one sentence only.
+      const c = current.chunks[i];
+      const before = escapeHtml(source.slice(c.start, c.start + wordStart));
+      const word = escapeHtml(source.slice(c.start + wordStart, c.start + wordEnd));
+      const after = escapeHtml(source.slice(c.start + wordEnd, c.end));
+      span.innerHTML = `${before}<span class="rap-word">${word}</span>${after}`;
+    }
+
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      span.scrollIntoView({ block: 'center' });
+    }
+  }
+
+  // ==========================================================================
+  // Speech engine (chunked playback to defeat the Chrome cutoff bug)
+  // ==========================================================================
+  function speakFrom(startChunk: number) {
+    if (!synth || !current.chunks.length) return;
+    synth.cancel();
+    activeChunk = startChunk;
+    playState = 'playing';
+    showReader(true);
+    requestWakeLock();
+    startKeepAlive();
+    setTransport();
+    speakChunk();
+  }
+
+  function speakChunk() {
+    if (!synth) return;
+    if (activeChunk >= current.chunks.length) { finish(); return; }
+    const c = current.chunks[activeChunk];
+    const u = new SpeechSynthesisUtterance(c.text);
+    const v = selectedVoice();
+    if (v) { u.voice = v; u.lang = v.lang; }
+    u.rate = rate();
+    u.pitch = pitch();
+
+    highlightChunk(activeChunk);
+    updateProgress();
+
+    // Word-level highlight via boundary events (Chromium/Safari; absent on
+    // many Linux/Android engines — we degrade to sentence-level silently).
+    u.onboundary = (e: SpeechSynthesisEvent) => {
+      boundarySeen = true;
+      if (e.name === 'word' || e.charLength) {
+        const len = (e as any).charLength || guessWordLen(c.text, e.charIndex);
+        highlightChunk(activeChunk, e.charIndex, e.charIndex + len);
+      }
+    };
+
+    u.onend = () => {
+      // Advance only if we are still in playing state (not stopped/paused).
+      if (playState !== 'playing') return;
+      activeChunk++;
+      speakChunk();
+    };
+    u.onerror = () => {
+      if (playState === 'playing') { activeChunk++; speakChunk(); }
+    };
+
+    synth.speak(u);
+  }
+
+  /** Estimate a spoken word's length when charLength isn't provided. */
+  function guessWordLen(text: string, idx: number): number {
+    const m = /^[\p{L}\p{N}'’-]+/u.exec(text.slice(idx));
+    return m ? m[0].length : 1;
+  }
+
+  function finish() {
+    playState = 'idle';
+    activeChunk = -1;
+    stopKeepAlive();
+    releaseWakeLock();
+    reader.querySelectorAll('.rap-active').forEach((e) => e.classList.remove('rap-active'));
+    setTransport();
+    $('progress-label').textContent = `Heard it all — ${current.flags.length + manualFlags.size} spot${current.flags.length + manualFlags.size === 1 ? '' : 's'} flagged`;
+    $('progress-bar').style.width = '100%';
+    toast('Done — review your fix-list');
+  }
+
+  function play() {
+    if (!ttsSupported || !current.stats.words) return;
+    if (playState === 'playing') { pause(); return; }
+    if (playState === 'paused') { synth!.resume(); playState = 'playing'; startKeepAlive(); setTransport(); return; }
+    speakFrom(activeChunk >= 0 ? activeChunk : 0);
+  }
+  function pause() {
+    if (!synth || playState !== 'playing') return;
+    synth.pause();
+    playState = 'paused';
+    stopKeepAlive();
+    setTransport();
+  }
+  function stop() {
+    if (!synth) return;
+    playState = 'idle';
+    activeChunk = -1;
+    synth.cancel();
+    stopKeepAlive();
+    releaseWakeLock();
+    showReader(false);
+    $('progress-bar').style.width = '0%';
+    $('progress-label').textContent = 'Press Play to start';
+    setTransport();
+  }
+  function jump(delta: number) {
+    if (!current.chunks.length) return;
+    const target = Math.max(0, Math.min(current.chunks.length - 1, (activeChunk < 0 ? 0 : activeChunk) + delta));
+    speakFrom(target);
+  }
+  function rehear() {
+    if (activeChunk < 0) return;
+    speakFrom(activeChunk);
+  }
+
+  function updateProgress() {
+    const n = current.chunks.length;
+    const pos = activeChunk + 1;
+    $('progress-label').textContent = `Sentence ${pos} of ${n}`;
+    $('progress-bar').style.width = `${n ? (pos / n) * 100 : 0}%`;
+  }
+
+  function setTransport() {
+    const playing = playState === 'playing';
+    const active = playState !== 'idle';
+    $('play-icon').textContent = playing ? '⏸' : '▶';
+    $('play-label').textContent = playing ? 'Pause' : (playState === 'paused' ? 'Resume' : 'Play');
+    ($('play-bar') as HTMLButtonElement).textContent = playing ? '⏸ Pause' : '▶ Play';
+    for (const id of ['prev', 'next', 'rehear', 'stop', 'flag', 'flag-bar', 'stop-bar']) setEnabled(id, active);
+  }
+
+  // ==========================================================================
+  // Keep-alive + wake lock (long-read reliability, spec §5.14 / §7)
+  // ==========================================================================
+  function startKeepAlive() {
+    // Chromium desktop stalls long queues; a periodic pause/resume tick keeps
+    // it alive. Guard against Android where pause() ends the utterance.
+    stopKeepAlive();
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    if (isAndroid) return;
+    keepAliveTimer = window.setInterval(() => {
+      if (synth && playState === 'playing') { synth.pause(); synth.resume(); }
+    }, 9000);
+  }
+  function stopKeepAlive() { if (keepAliveTimer) { clearInterval(keepAliveTimer); keepAliveTimer = 0; } }
+
+  async function requestWakeLock() {
+    try {
+      if ('wakeLock' in navigator) wakeLock = await (navigator as any).wakeLock.request('screen');
+    } catch { /* non-fatal */ }
+  }
+  function releaseWakeLock() { try { wakeLock?.release?.(); wakeLock = null; } catch {} }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && playState === 'playing') requestWakeLock();
+  });
+
+  // ==========================================================================
+  // Flagging by ear (the differentiator)
+  // ==========================================================================
+  function flagCurrent() {
+    if (activeChunk < 0) { toast('Press Play first, then flag what you hear'); return; }
+    if (manualFlags.has(activeChunk)) manualFlags.delete(activeChunk);
+    else { manualFlags.add(activeChunk); toast('Flagged for the fix-list'); }
+    const span = reader.querySelector<HTMLElement>(`[data-ci="${activeChunk}"]`);
+    span?.classList.toggle('rap-flagged', manualFlags.has(activeChunk));
+    renderFlags();
+    setEnabled('copy', current.flags.length > 0 || manualFlags.size > 0);
+    setEnabled('download', current.flags.length > 0 || manualFlags.size > 0);
+  }
+
+  // ==========================================================================
+  // Wiring: transport buttons
+  // ==========================================================================
+  $('play').addEventListener('click', play);
+  $('play-bar').addEventListener('click', play);
+  $('prev').addEventListener('click', () => jump(-1));
+  $('next').addEventListener('click', () => jump(1));
+  $('rehear').addEventListener('click', rehear);
+  $('stop').addEventListener('click', stop);
+  $('stop-bar').addEventListener('click', stop);
+  $('flag').addEventListener('click', flagCurrent);
+  $('flag-bar').addEventListener('click', flagCurrent);
+  $('edit-btn').addEventListener('click', () => { stop(); input.focus(); });
+
+  // Click-to-start-here + jump-to from the flag list / longest callout.
+  reader.addEventListener('click', (e) => {
+    const span = (e.target as HTMLElement).closest('[data-ci]') as HTMLElement | null;
+    if (span) speakFrom(Number(span.dataset.ci));
+  });
+  $('tool').addEventListener('click', (e) => {
+    const jumpBtn = (e.target as HTMLElement).closest('[data-jump]') as HTMLElement | null;
+    if (jumpBtn) {
+      const ci = Number(jumpBtn.dataset.jump);
+      showReader(true);
+      highlightChunk(ci);
+      setPane('input');
+      return;
+    }
+    const unflag = (e.target as HTMLElement).closest('[data-unflag]') as HTMLElement | null;
+    if (unflag) {
+      manualFlags.delete(Number(unflag.dataset.unflag));
+      renderFlags();
+      if (!reader.hidden) renderReader();
+    }
+  });
+
+  // ==========================================================================
+  // Samples + shared actions
+  // ==========================================================================
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      input.value = SAMPLES[b.dataset.sample!];
+      manualFlags.clear();
+      run();
+      setPane('input');
+    }));
+
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); manualFlags.clear(); run(); toast('Pasted'); }
+    catch { input.focus(); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    const txt = buildFixList(current, [...manualFlags]);
+    await navigator.clipboard.writeText(txt);
+    const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+    b.textContent = '✓ Copied'; toast('Fix-list copied');
+    setTimeout(() => (b.textContent = prev), 1300);
+  }
+  function doReset() {
+    stop();
+    input.value = '';
+    manualFlags.clear();
+    showReader(false);
+    run();
+    input.focus();
+    setPane('input');
+    toast('Cleared');
+  }
+  $('paste').addEventListener('click', doPaste);
+  $('reset').addEventListener('click', doReset);
+  $('copy').addEventListener('click', doCopy);
+
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    const blob = new Blob([buildFixList(current, [...manualFlags])], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'proof-fix-list.md'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded proof-fix-list.md');
+  });
+
+  // ==========================================================================
+  // Mobile pane switcher
+  // ==========================================================================
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // ==========================================================================
+  // Keyboard-first transport (spec §5.11)
+  // ==========================================================================
+  document.addEventListener('keydown', (e) => {
+    // Cmd/Ctrl+Enter re-analyzes (mirrors the suite convention).
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); toast('Re-scanned'); return; }
+    // Don't hijack typing in the editable textarea.
+    const typing = document.activeElement === input;
+    if (typing) return;
+    if (!ttsSupported) return;
+    switch (e.key) {
+      case ' ': e.preventDefault(); play(); break;
+      case 'ArrowRight': e.preventDefault(); jump(1); break;
+      case 'ArrowLeft': e.preventDefault(); jump(-1); break;
+      case 'ArrowUp': e.preventDefault(); nudgeRate(0.05); break;
+      case 'ArrowDown': e.preventDefault(); nudgeRate(-0.05); break;
+      case 'f': case 'F': flagCurrent(); break;
+      case 'r': case 'R': rehear(); break;
+    }
+  });
+  function nudgeRate(d: number) {
+    const r = $<HTMLInputElement>('opt-rate');
+    r.value = String(Math.max(0.5, Math.min(2, parseFloat(r.value) + d)));
+    syncRate(); savePrefs();
+  }
+
+  // Stop speech if the user navigates away (avoids ghost audio).
+  window.addEventListener('beforeunload', () => synth?.cancel());
+
+  // ==========================================================================
+  // Persistence
+  // ==========================================================================
+  function saveDraft(text: string) { try { localStorage.setItem('rap_draft', text); } catch {} }
+  function savePrefs() {
+    try {
+      localStorage.setItem('rap_prefs', JSON.stringify({
+        rate: $<HTMLInputElement>('opt-rate').value,
+        pitch: $<HTMLInputElement>('opt-pitch').value,
+      }));
+      localStorage.setItem('rap_voice', $<HTMLSelectElement>('opt-voice').value);
+    } catch {}
+  }
+  function loadPrefs() {
+    try {
+      const p = JSON.parse(localStorage.getItem('rap_prefs') || '{}');
+      if (p.rate) $<HTMLInputElement>('opt-rate').value = p.rate;
+      if (p.pitch) $<HTMLInputElement>('opt-pitch').value = p.pitch;
+      const draft = localStorage.getItem('rap_draft');
+      if (draft) input.value = draft;
+    } catch {}
+  }
+
+  // ==========================================================================
+  // Init
+  // ==========================================================================
+  buildSpeedPresets();
+  loadPrefs();
+  syncRate();
+  syncPitch();
+  setPane('input');
+  run();
+</script>

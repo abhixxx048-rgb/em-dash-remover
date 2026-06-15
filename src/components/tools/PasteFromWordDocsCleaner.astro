@@ -1,0 +1,627 @@
+---
+// Paste-from-Word/Docs Cleaner — the interactive island.
+// Static HTML below; behavior wired up by the client client script, which imports
+// the pure engine and runs the browser-only DOMParser allow-list locally.
+---
+
+<section id="tool" aria-label="Paste-from-Word/Docs cleaner" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar: presets + per-rule toggles + clear -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <div role="group" aria-label="Cleanup preset" class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
+        <button data-preset="keep" class="min-h-9 rounded-md px-3 font-medium">Keep formatting</button>
+        <button data-preset="plain" class="min-h-9 rounded-md px-3 font-medium muted">Plain text</button>
+        <button data-preset="markdown" class="min-h-9 rounded-md px-3 font-medium muted">Markdown</button>
+      </div>
+
+      <details class="group relative w-full sm:w-auto">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Keep / repair <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 w-full space-y-1 p-2 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-64 sm:p-3 sm:shadow-lg">
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-bold" checked class="h-5 w-5" /> Keep bold / italic</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-links" checked class="h-5 w-5" /> Keep links</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-lists" checked class="h-5 w-5" /> Keep lists</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-headings" checked class="h-5 w-5" /> Keep headings</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-tables" checked class="h-5 w-5" /> Keep tables</label>
+          <hr class="my-1 border-ink/10" />
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-pdf" checked class="h-5 w-5" /> Repair PDF line breaks</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-pages" checked class="h-5 w-5" /> Drop page numbers</label>
+        </div>
+      </details>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Result</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input: a real paste-target so we can read the rich text/html payload -->
+      <div class="p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste here — Ctrl/Cmd+V</h2>
+          <span id="source-badge" class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium text-accent" style="background: var(--c-accent-soft);" hidden></span>
+        </div>
+        <div class="relative">
+          <div
+            id="input"
+            role="textbox"
+            contenteditable="true"
+            aria-multiline="true"
+            aria-label="Paste your text from Word, Google Docs, or a PDF"
+            class="min-h-[19rem] w-full resize-y overflow-auto rounded-lg border border-ink/15 bg-transparent p-3 text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></div>
+          <!-- Empty state with three "Try an example" loaders -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste straight from Word, Docs, or a PDF — we strip the junk and keep your real paragraphs. Or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="word" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📄 Word paste</button>
+              <button data-sample="docs" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📝 Google Docs</button>
+              <button data-sample="pdf" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📕 PDF copy</button>
+            </div>
+          </div>
+        </div>
+        <div class="mt-2 flex items-center justify-between gap-2">
+          <p class="text-xs muted" id="in-stats">Nothing pasted yet</p>
+          <button id="view-source" class="text-xs font-medium text-accent hover:underline" hidden>View raw clipboard HTML</button>
+        </div>
+        <!-- Raw-HTML inspector (radical transparency) -->
+        <pre id="raw-html" hidden class="mt-2 max-h-40 overflow-auto rounded-lg border border-ink/15 p-2 text-xs" style="background: var(--c-paper);"></pre>
+      </div>
+
+      <!-- Output -->
+      <div class="p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between gap-2">
+          <div class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
+            <button id="fmt-html" data-fmt="html" class="min-h-9 rounded-md px-3 font-medium">HTML</button>
+            <button id="fmt-text" data-fmt="text" class="min-h-9 rounded-md px-3 font-medium muted">Plain text</button>
+            <button id="fmt-md" data-fmt="markdown" class="min-h-9 rounded-md px-3 font-medium muted">Markdown</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download cleaned output" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <textarea id="output" rows="14" readonly aria-label="Cleaned output"
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+        <p class="mt-2 text-xs muted" id="out-stats">0 words · 0 chars · 0 paragraphs</p>
+      </div>
+    </div>
+
+    <!-- "What we removed" inventory + status -->
+    <div class="border-t border-ink/8 px-4 py-4">
+      <div class="flex items-center justify-between gap-2">
+        <span class="text-xs font-semibold uppercase tracking-wide muted">What we removed</span>
+        <span id="removed-total" class="text-sm font-semibold" data-v="0">—</span>
+      </div>
+      <ul id="inventory" class="mt-2 flex flex-wrap gap-1.5 text-xs" aria-live="polite">
+        <li class="muted">Paste something to see what gets cleaned.</li>
+      </ul>
+      <!-- Cross-sell handoff: this tool deliberately leaves quotes/dashes alone. -->
+      <p id="handoff" class="mt-3 text-xs" hidden>
+        <span class="muted">We kept your curly quotes and dashes on purpose. </span>
+        <a href="/" class="font-medium text-accent hover:underline">Run the full AI-text cleaner →</a>
+      </p>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Nothing is uploaded.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy cleaned</button>
+</div>
+
+<script>
+  import {
+    DEFAULT_OPTIONS, PRESETS, ALLOWED_ATTR,
+    type CleanPasteOptions, type OutputFormat, type PresetName, type PasteSource,
+    detectSource, sourceLabel,
+    preSanitizeHtml, normalizeGoogleDocs, tidyHtml, countInlineStyles,
+    repairPdfText, cleanPlainText,
+    htmlToText, htmlToMarkdown,
+    blankCounts, totalCount, inventoryRows, textStats, residualTypography,
+    type CleanCounts,
+  } from '../../lib/tools/paste-from-word-docs-cleaner';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLDivElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+
+  // The allow-list, expressed as a Set for O(1) membership in the DOM walk.
+  const ALLOWED = new Set([
+    'p', 'br', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'ul', 'ol', 'li', 'strong', 'em', 'b', 'i', 'u', 'a',
+    'blockquote', 'code', 'pre', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
+  ]);
+
+  // --- in-memory state: the raw clipboard HTML, the cleaned HTML, the source.
+  let rawHtml = '';
+  let cleanHtml = '';
+  let source: PasteSource = 'unknown';
+  let format: OutputFormat = 'html';
+
+  /* ----------------------------------------------------------------- *
+   * Sample pastes (solve the empty-state; no private content needed). *
+   * Stored as raw clipboard-style HTML / text so the pipeline is real.*
+   * ----------------------------------------------------------------- */
+  const SAMPLES: Record<string, { html: string; text: string }> = {
+    word: {
+      html: `<!--StartFragment--><p class="MsoNormal" style="margin:0in;mso-pagination:none;font-family:Calibri"><span style="font-size:11.0pt;mso-fareast-font-family:Calibri">Our <b style="mso-bidi-font-weight:normal">Q3 strategy</b> is on track.<o:p></o:p></span></p><p class="MsoListParagraph" style="mso-list:l0 level1 lfo1"><!--[if !supportLists]--><span style="font-family:Symbol">·<span style="font:7.0pt 'Times New Roman'">&nbsp;&nbsp; </span></span><!--[endif]-->Revenue grew 12%.</p><p class="MsoNormal"><span style="mso-fareast-font-family:Calibri"><a href="https://example.com/report" style="color:#0563C1;mso-style-textdecoration:underline">See the full report</a>.<o:p></o:p></span></p><!--EndFragment-->`,
+      text: 'Our Q3 strategy is on track.\n· Revenue grew 12%.\nSee the full report.',
+    },
+    docs: {
+      html: `<meta charset="utf-8"><b style="font-weight:normal" id="docs-internal-guid-1a2b3c"><p dir="ltr" style="line-height:1.38;margin-top:0pt;margin-bottom:0pt"><span style="font-size:11pt;font-family:Arial;color:#000000;font-weight:400">Welcome to the </span><span style="font-size:11pt;font-family:Arial;font-weight:700">new docs</span><span style="font-size:11pt;font-family:Arial;font-weight:400"> — please </span><span style="font-size:11pt;font-family:Arial;font-style:italic;font-weight:400">read carefully</span><span style="font-size:11pt;font-family:Arial;font-weight:400">.</span></p></b>`,
+      text: 'Welcome to the new docs — please read carefully.',
+    },
+    pdf: {
+      html: '',
+      text: 'The quarterly report high-\nlights three trends. First, demand for\ncloud services continued to accel-\nerate across every region we mea-\nsured.\n\n3\n\nSecond, operating margins impro-\nved year over year.',
+    },
+  };
+
+  /* ----------------------------------------------------------------- *
+   * Options I/O + persistence (never persist pasted content).         *
+   * ----------------------------------------------------------------- */
+  const OPT_IDS = ['opt-bold', 'opt-links', 'opt-lists', 'opt-headings', 'opt-tables', 'opt-pdf', 'opt-pages'];
+
+  function readOptions(): CleanPasteOptions {
+    return {
+      ...DEFAULT_OPTIONS,
+      keepBold: $<HTMLInputElement>('opt-bold').checked,
+      keepLinks: $<HTMLInputElement>('opt-links').checked,
+      keepLists: $<HTMLInputElement>('opt-lists').checked,
+      keepHeadings: $<HTMLInputElement>('opt-headings').checked,
+      keepTables: $<HTMLInputElement>('opt-tables').checked,
+      repairPdf: $<HTMLInputElement>('opt-pdf').checked,
+      dropPageNumbers: $<HTMLInputElement>('opt-pages').checked,
+    };
+  }
+
+  function savePrefs() {
+    const s: Record<string, boolean | string> = { fmt: format };
+    for (const id of OPT_IDS) s[id] = $<HTMLInputElement>(id).checked;
+    try { localStorage.setItem('pwdc-prefs', JSON.stringify(s)); } catch {}
+  }
+  function loadPrefs() {
+    try {
+      const s = JSON.parse(localStorage.getItem('pwdc-prefs') || '{}');
+      for (const id of OPT_IDS) if (id in s) $<HTMLInputElement>(id).checked = s[id];
+      if (s.fmt) format = s.fmt as OutputFormat;
+    } catch {}
+  }
+
+  /* ----------------------------------------------------------------- *
+   * Toast + count-up (lifted from Cleaner.astro).                     *
+   * ----------------------------------------------------------------- */
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  function animateCount(el: HTMLElement, to: number, dur = 500) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(to); el.dataset.v = String(to); return; }
+    const from = parseInt(el.dataset.v || '0', 10);
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  /* ----------------------------------------------------------------- *
+   * The DOM allow-list sanitizer (browser-only — lives here, not in   *
+   * the pure lib). Walks a DETACHED, inert parsed document and:       *
+   *  - drops disallowed tags but KEEPS their text (unwrap),           *
+   *  - removes every attribute except the allow-listed ones,          *
+   *  - honors the per-rule "keep" toggles by demoting/flattening.     *
+   * The parsed nodes are never attached to the live page, so scripts  *
+   * never run (XSS-safe, matching the DOMPurify guarantee in spec §7).*
+   * ----------------------------------------------------------------- */
+  function sanitize(html: string, opts: CleanPasteOptions): string {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+    // Hard-drop dangerous / noisy nodes outright (content discarded).
+    doc.querySelectorAll('script,style,meta,link,head,img,svg,iframe,object,xml,title')
+      .forEach((n) => n.remove());
+
+    // Decide the effective allow-list from the toggles.
+    const allow = new Set(ALLOWED);
+    if (!opts.keepBold) ['strong', 'b', 'em', 'i', 'u'].forEach((t) => allow.delete(t));
+    if (!opts.keepLinks) allow.delete('a');
+    if (!opts.keepLists) ['ul', 'ol', 'li'].forEach((t) => allow.delete(t));
+    if (!opts.keepTables) ['table', 'thead', 'tbody', 'tr', 'td', 'th'].forEach((t) => allow.delete(t));
+
+    const headings = new Set(['h1', 'h2', 'h3', 'h4', 'h5', 'h6']);
+
+    // Depth-first post-order walk so we mutate children before parents.
+    const walk = (node: Node) => {
+      // Snapshot children (we mutate the live list).
+      Array.from(node.childNodes).forEach(walk);
+      if (node.nodeType !== 1) return;
+      const el = node as Element;
+      const tag = el.tagName.toLowerCase();
+
+      // Headings demoted to <p> when the user turned headings off.
+      if (headings.has(tag) && !opts.keepHeadings) {
+        unwrapInto(el, 'p');
+        return;
+      }
+
+      if (allow.has(tag)) {
+        // Strip every attribute except the allow-listed ones (href only).
+        for (const attr of Array.from(el.attributes)) {
+          if (!(ALLOWED_ATTR as readonly string[]).includes(attr.name.toLowerCase())) {
+            el.removeAttribute(attr.name);
+          } else if (attr.name.toLowerCase() === 'href' && /^\s*javascript:/i.test(attr.value)) {
+            el.removeAttribute(attr.name); // never keep a javascript: URL
+          }
+        }
+        return;
+      }
+
+      // Not allowed: unwrap (keep text), so <span>/<font> soup collapses.
+      unwrap(el);
+    };
+    walk(doc.body);
+
+    return doc.body.innerHTML;
+  }
+
+  /** Replace an element with its children (keep content, drop the tag). */
+  function unwrap(el: Element) {
+    const parent = el.parentNode;
+    if (!parent) { el.remove(); return; }
+    while (el.firstChild) parent.insertBefore(el.firstChild, el);
+    parent.removeChild(el);
+  }
+
+  /** Re-tag an element to `newTag`, preserving its children. */
+  function unwrapInto(el: Element, newTag: string) {
+    const repl = el.ownerDocument!.createElement(newTag);
+    while (el.firstChild) repl.appendChild(el.firstChild);
+    el.parentNode?.replaceChild(repl, el);
+  }
+
+  /* ----------------------------------------------------------------- *
+   * The full pipeline: raw payload -> clean HTML + counts.            *
+   * ----------------------------------------------------------------- */
+  function process(html: string, text: string) {
+    const opts = readOptions();
+    source = detectSource(html, text);
+    const counts: CleanCounts = blankCounts();
+
+    if (html && html.trim()) {
+      // --- HTML path (Word / Docs / generic) ---------------------------------
+      rawHtml = html;
+      counts.inlineStyles = countInlineStyles(html);
+
+      // 1) pre-sanitize the junk outside normal elements (pure).
+      const pre = preSanitizeHtml(html);
+      counts.msoBlocks = pre.msoBlocks;
+      // 2) promote Docs inline weight/style to semantic tags (pure).
+      const docs = normalizeGoogleDocs(pre.html);
+      counts.docsWrapper = docs.docsWrapper;
+      // 3) DOM allow-list (browser-only).
+      const sanitized = sanitize(docs.html, opts);
+      // 4) final tidy (pure).
+      const tidy = tidyHtml(sanitized);
+      counts.emptyTags = tidy.emptyTags;
+      cleanHtml = tidy.html;
+    } else {
+      // --- Plain-text / PDF path --------------------------------------------
+      rawHtml = '';
+      const r = cleanPlainText(text, opts);
+      counts.hyphenJoins = r.counts.hyphenJoins;
+      counts.lineBreakJoins = r.counts.lineBreakJoins;
+      counts.pageNumbers = r.counts.pageNumbers;
+      // Represent the plain text as simple paragraphs of HTML so all three
+      // output formats work uniformly.
+      cleanHtml = r.text
+        .split(/\n{2,}/)
+        .map((p) => '<p>' + escapeHtml(p).replace(/\n/g, '<br>') + '</p>')
+        .join('');
+    }
+
+    counts.total = totalCount(counts);
+    render(counts);
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /** Derive the active output text from the cleaned HTML for the chosen format. */
+  function outputForFormat(): string {
+    if (format === 'html') return prettyHtml(cleanHtml);
+    if (format === 'markdown') return htmlToMarkdown(cleanHtml);
+    return htmlToText(cleanHtml);
+  }
+
+  /** Light HTML pretty-print: a newline after each block close so the HTML
+   *  view is readable in the textarea (cosmetic only). */
+  function prettyHtml(html: string): string {
+    return html
+      .replace(/></g, '>\n<')
+      .replace(/\n<(\/?(?:strong|em|b|i|u|a|code)\b)/gi, '<$1')
+      .trim();
+  }
+
+  /* ----------------------------------------------------------------- *
+   * Render the UI from the pipeline result.                          *
+   * ----------------------------------------------------------------- */
+  function render(counts: CleanCounts) {
+    const text = outputForFormat();
+    output.value = text;
+
+    const hasContent = cleanHtml.trim().length > 0;
+    $<HTMLButtonElement>('copy').disabled = !hasContent;
+    ($('copy-bar') as HTMLButtonElement).disabled = !hasContent;
+    $<HTMLButtonElement>('download').toggleAttribute('disabled', !hasContent);
+
+    // Source badge (paired with text, never color-only).
+    const badge = $<HTMLSpanElement>('source-badge');
+    if (hasContent && source !== 'unknown') {
+      badge.textContent = 'Detected: ' + sourceLabel(source);
+      badge.hidden = false;
+    } else {
+      badge.hidden = true;
+    }
+
+    // Output stats.
+    const st = textStats(htmlToText(cleanHtml));
+    $<HTMLParagraphElement>('out-stats').textContent =
+      `${st.words} word${st.words === 1 ? '' : 's'} · ${st.chars} chars · ${st.paragraphs} paragraph${st.paragraphs === 1 ? '' : 's'}`;
+
+    // Removal inventory.
+    const totalEl = $<HTMLSpanElement>('removed-total');
+    const list = $<HTMLUListElement>('inventory');
+    list.innerHTML = '';
+    if (!hasContent) {
+      list.innerHTML = '<li class="muted">Paste something to see what gets cleaned.</li>';
+      totalEl.textContent = '—'; totalEl.dataset.v = '0';
+    } else {
+      const rows = inventoryRows(counts);
+      animateCount(totalEl, counts.total);
+      if (rows.length === 0) {
+        list.innerHTML = '<li class="rounded-full px-2 py-0.5" style="background: color-mix(in srgb, var(--color-ok) 18%, transparent); color: var(--color-ok);">✓ Looks clean already — no Word/Docs junk found</li>';
+      } else {
+        for (const r of rows) {
+          const li = document.createElement('li');
+          li.className = 'rounded-full px-2 py-0.5 text-accent';
+          li.style.background = 'var(--c-accent-soft)';
+          li.textContent = `${r.count} ${r.label}`;
+          list.appendChild(li);
+        }
+      }
+    }
+
+    // Cross-sell handoff: only when residual quotes/dashes remain.
+    const resid = residualTypography(htmlToText(cleanHtml));
+    $<HTMLParagraphElement>('handoff').hidden = !(hasContent && (resid.emDashes + resid.curlyQuotes > 0));
+
+    // Input stats + empty state.
+    $<HTMLDivElement>('empty').hidden = hasContent || (input.textContent || '').trim().length > 0;
+    $<HTMLButtonElement>('view-source').hidden = !rawHtml;
+    $<HTMLParagraphElement>('in-stats').textContent = hasContent
+      ? `Cleaned from ${source === 'pdf' || source === 'plain' ? 'plain text' : 'rich HTML'}`
+      : 'Nothing pasted yet';
+
+    // Keep the raw-HTML inspector in sync if it's open.
+    const pre = $<HTMLPreElement>('raw-html');
+    if (!pre.hidden) pre.textContent = rawHtml || '(no text/html in this paste)';
+  }
+
+  /* ----------------------------------------------------------------- *
+   * Paste interception — the headline feature (spec §4.1 / §5.1).     *
+   * Read the RICH text/html payload, not just the plain text.         *
+   * ----------------------------------------------------------------- */
+  input.addEventListener('paste', (e: ClipboardEvent) => {
+    const cb = e.clipboardData;
+    if (!cb) return; // let the browser handle it (no API)
+    e.preventDefault();
+    const html = cb.getData('text/html');
+    const text = cb.getData('text/plain');
+    // Show the (escaped) plain text in the editable so the user sees something.
+    input.textContent = text || '(pasted rich content)';
+    process(html, text);
+    setPane('output');
+    toast('Cleaned ✓');
+  });
+
+  // Also re-clean when the user types/edits the paste-target directly.
+  let raf = 0;
+  input.addEventListener('input', () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      // Manual edits have no rich payload: treat as plain text.
+      const text = input.textContent || '';
+      if (!text.trim() && !rawHtml) { reset(); return; }
+      process('', text);
+    });
+  });
+
+  /* ----------------------------------------------------------------- *
+   * Samples, format switch, options, actions.                         *
+   * ----------------------------------------------------------------- */
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const s = SAMPLES[b.dataset.sample!];
+      input.textContent = s.text;
+      process(s.html, s.text);
+      setPane('output');
+    }));
+
+  function setFormat(f: OutputFormat) {
+    format = f;
+    document.querySelectorAll<HTMLButtonElement>('[data-fmt]').forEach((btn) => {
+      const active = btn.dataset.fmt === f;
+      btn.classList.toggle('muted', !active);
+      btn.style.background = active ? 'var(--c-accent-soft)' : '';
+    });
+    output.value = outputForFormat();
+    savePrefs();
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-fmt]').forEach((btn) =>
+    btn.addEventListener('click', () => setFormat(btn.dataset.fmt as OutputFormat)));
+
+  function applyPreset(name: PresetName) {
+    const p = PRESETS[name];
+    const o = p.opts;
+    if (o.keepBold !== undefined) $<HTMLInputElement>('opt-bold').checked = o.keepBold;
+    if (o.keepLinks !== undefined) $<HTMLInputElement>('opt-links').checked = o.keepLinks;
+    if (o.keepLists !== undefined) $<HTMLInputElement>('opt-lists').checked = o.keepLists;
+    if (o.keepHeadings !== undefined) $<HTMLInputElement>('opt-headings').checked = o.keepHeadings;
+    if (o.keepTables !== undefined) $<HTMLInputElement>('opt-tables').checked = o.keepTables;
+    document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((btn) => {
+      const active = btn.dataset.preset === name;
+      btn.classList.toggle('muted', !active);
+      btn.style.background = active ? 'var(--c-accent-soft)' : '';
+    });
+    setFormat(p.format);
+    reprocess();
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((btn) =>
+    btn.addEventListener('click', () => applyPreset(btn.dataset.preset as PresetName)));
+
+  // Re-run the pipeline from the last raw payload (after a toggle/preset change).
+  let lastText = '';
+  function reprocess() {
+    if (!rawHtml && !lastText && !(input.textContent || '').trim()) { savePrefs(); return; }
+    process(rawHtml, rawHtml ? '' : (lastText || input.textContent || ''));
+    savePrefs();
+  }
+  OPT_IDS.forEach((id) => $(id).addEventListener('change', reprocess));
+
+  // Remember the plain-text fallback so toggles can re-run the PDF path.
+  input.addEventListener('paste', (e) => { lastText = e.clipboardData?.getData('text/plain') || ''; });
+
+  /* ----------------------------------------------------------------- *
+   * Raw-HTML inspector toggle.                                        *
+   * ----------------------------------------------------------------- */
+  $<HTMLButtonElement>('view-source').addEventListener('click', () => {
+    const pre = $<HTMLPreElement>('raw-html');
+    const showing = pre.hidden;
+    pre.hidden = !showing;
+    $<HTMLButtonElement>('view-source').textContent = showing ? 'Hide raw clipboard HTML' : 'View raw clipboard HTML';
+    if (showing) pre.textContent = rawHtml || '(no text/html in this paste)';
+  });
+
+  /* ----------------------------------------------------------------- *
+   * Copy / download / clear.                                          *
+   * ----------------------------------------------------------------- */
+  async function doCopy() {
+    if (!cleanHtml.trim()) return;
+    const text = output.value;
+    try {
+      // "Copy rich" for HTML format: write clean HTML to the clipboard so the
+      // user can paste formatted-but-clean content into the next app.
+      if (format === 'html' && 'ClipboardItem' in window) {
+        await navigator.clipboard.write([
+          new ClipboardItem({
+            'text/html': new Blob([cleanHtml], { type: 'text/html' }),
+            'text/plain': new Blob([text], { type: 'text/plain' }),
+          }),
+        ]);
+      } else {
+        await navigator.clipboard.writeText(text);
+      }
+      const b = $<HTMLButtonElement>('copy');
+      const prev = b.textContent;
+      b.textContent = '✓ Copied'; toast('Copied to clipboard');
+      setTimeout(() => (b.textContent = prev), 1300);
+    } catch {
+      toast('Copy failed — select and press Ctrl/Cmd+C');
+    }
+  }
+
+  function doDownload() {
+    if (!cleanHtml.trim()) return;
+    const ext = format === 'html' ? 'html' : format === 'markdown' ? 'md' : 'txt';
+    const mime = format === 'html' ? 'text/html' : format === 'markdown' ? 'text/markdown' : 'text/plain';
+    const body = format === 'html'
+      ? `<!doctype html>\n<meta charset="utf-8">\n${cleanHtml}\n`
+      : output.value;
+    const blob = new Blob([body], { type: mime });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `cleaned.${ext}`; a.click();
+    URL.revokeObjectURL(url);
+    toast(`Downloaded cleaned.${ext}`);
+  }
+
+  function reset() {
+    input.textContent = '';
+    rawHtml = ''; cleanHtml = ''; lastText = ''; source = 'unknown';
+    output.value = '';
+    render(blankCounts());
+    input.focus();
+    setPane('input');
+  }
+
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('download').addEventListener('click', doDownload);
+  $('reset').addEventListener('click', () => { reset(); toast('Cleared'); });
+  $('clear-bar').addEventListener('click', () => { reset(); toast('Cleared'); });
+
+  /* ----------------------------------------------------------------- *
+   * Mobile pane switcher (lifted from Cleaner.astro).                 *
+   * ----------------------------------------------------------------- */
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  /* ----------------------------------------------------------------- *
+   * Keyboard: Cmd/Ctrl+Enter re-clean, Esc clear, Cmd/Ctrl+Shift+M MD.*
+   * ----------------------------------------------------------------- */
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); reprocess(); toast('Re-cleaned'); }
+    else if (e.key === 'Escape' && (document.activeElement === input || cleanHtml)) { reset(); toast('Cleared'); }
+    else if ((e.metaKey || e.ctrlKey) && e.shiftKey && (e.key === 'm' || e.key === 'M')) {
+      e.preventDefault();
+      setFormat(format === 'markdown' ? 'text' : 'markdown');
+      toast(format === 'markdown' ? 'Markdown output' : 'Plain-text output');
+    }
+  });
+
+  /* ----------------------------------------------------------------- *
+   * Boot.                                                             *
+   * ----------------------------------------------------------------- */
+  loadPrefs();
+  setFormat(format);
+  setPane('input');
+  render(blankCounts());
+</script>

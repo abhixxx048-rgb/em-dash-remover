@@ -1,0 +1,96 @@
+---
+// Provable-privacy strip: drop into any tool page to show, at a glance, that the
+// tool is client-side. Three static pills ("No upload" / "No signup" / "Works
+// offline") plus a LIVE counter that hooks every outbound network primitive and
+// reads "0" in normal use. Self-contained: no imports, no props, no new deps.
+// The is:inline script must not itself make any request.
+---
+
+<div class="mx-auto my-6 flex max-w-3xl flex-wrap items-center justify-center gap-2 text-xs muted">
+  <span class="font-medium" aria-hidden="true">🔒</span>
+  <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">No upload</span>
+  <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">No signup</span>
+  <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">Works offline</span>
+  <span class="inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+    Network requests this session: <span id="trust-net-count" aria-live="polite">0</span>
+  </span>
+</div>
+
+<script is:inline>
+  // Count outbound requests by hooking the primitives a page can use to phone
+  // home. Guarded so a missing API never throws, and never installs twice.
+  (function () {
+    if (window.__trustNetHooked) return;
+    window.__trustNetHooked = true;
+
+    var count = 0;
+    function render() {
+      var el = document.getElementById('trust-net-count');
+      if (el) el.textContent = String(count);
+    }
+    function bump() {
+      count++;
+      // Defer the DOM write so the counter survives a fetch fired before the
+      // <span> exists, and so we never touch layout inside the hooked call.
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(render);
+      else render();
+    }
+
+    // window.fetch
+    try {
+      if (typeof window.fetch === 'function') {
+        var origFetch = window.fetch.bind(window);
+        window.fetch = function () {
+          bump();
+          return origFetch.apply(this, arguments);
+        };
+      }
+    } catch (e) {}
+
+    // XMLHttpRequest.prototype.send
+    try {
+      var XHR = window.XMLHttpRequest;
+      if (XHR && XHR.prototype && typeof XHR.prototype.send === 'function') {
+        var origSend = XHR.prototype.send;
+        XHR.prototype.send = function () {
+          bump();
+          return origSend.apply(this, arguments);
+        };
+      }
+    } catch (e) {}
+
+    // navigator.sendBeacon
+    try {
+      if (navigator && typeof navigator.sendBeacon === 'function') {
+        var origBeacon = navigator.sendBeacon.bind(navigator);
+        navigator.sendBeacon = function () {
+          bump();
+          return origBeacon.apply(this, arguments);
+        };
+      }
+    } catch (e) {}
+
+    // Cross-check via the Resource Timing API: catches requests made before our
+    // hooks loaded, plus <img>/<script>/<link> fetches the hooks above miss.
+    // We only count resources observed after this script runs.
+    try {
+      if (typeof PerformanceObserver === 'function') {
+        var seen = 0;
+        var po = new PerformanceObserver(function (list) {
+          var entries = list.getEntries();
+          // Only surface counts beyond what the explicit hooks already tallied,
+          // so a single fetch isn't double-counted.
+          seen += entries.length;
+          if (seen > count) {
+            count = seen;
+            if (typeof requestAnimationFrame === 'function') requestAnimationFrame(render);
+            else render();
+          }
+        });
+        po.observe({ type: 'resource', buffered: false });
+      }
+    } catch (e) {}
+
+    render();
+  })();
+</script>

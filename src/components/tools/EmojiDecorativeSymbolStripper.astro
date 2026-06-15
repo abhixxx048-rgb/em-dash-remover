@@ -1,0 +1,384 @@
+---
+// Interactive island for the Emoji & Decorative-Symbol Stripper.
+// Static HTML here; all behavior is wired by the client client script below, which
+// imports the pure engine. Styling mirrors Cleaner.astro so it feels native.
+---
+
+<section id="tool" aria-label="Emoji and decorative symbol stripper" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar: presets + options -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <div class="flex min-w-0 flex-wrap items-center gap-2" role="group" aria-label="Presets">
+        <span class="font-medium">Preset</span>
+        <button data-preset="ai-bullets" class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" aria-pressed="true">AI bullet cleanup</button>
+        <button data-preset="emoji-only" class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" aria-pressed="false">Emoji only</button>
+        <button data-preset="aggressive" class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" aria-pressed="false">Strip everything</button>
+      </div>
+
+      <details class="group relative w-full sm:w-auto">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Options <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 w-full space-y-1 p-2 text-sm sm:absolute sm:right-0 sm:top-full sm:z-20 sm:w-72 sm:p-3 sm:shadow-lg">
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-emoji" checked class="h-5 w-5" /> Remove emoji <span class="muted">(🚀✅👍)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-deco" checked class="h-5 w-5" /> Remove decorative bullets <span class="muted">(✦▶❖●)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-bullets-only" class="h-5 w-5" /> List bullets only <span class="muted">(line start)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5">
+            <span>Replace bullet with</span>
+            <select id="opt-replace" class="ctl ml-auto px-2 text-sm">
+              <option value="">nothing</option>
+              <option value="- ">-</option>
+              <option value="* ">*</option>
+              <option value="• ">•</option>
+            </select>
+          </label>
+          <div class="my-1 border-t border-ink/10"></div>
+          <p class="px-2 pt-1 text-xs font-semibold uppercase tracking-wide muted">Keep (don't strip)</p>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-keep-currency" checked class="h-5 w-5" /> Currency <span class="muted">($ € £ ¥)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-keep-math" checked class="h-5 w-5" /> Math &amp; arrows <span class="muted">(° ± × →)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-keep-legal" checked class="h-5 w-5" /> Legal <span class="muted">(© ® ™ §)</span></label>
+        </div>
+      </details>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Result</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to strip emoji and symbols from"
+            placeholder="Paste your AI draft — we'll pull the emoji and ornamental bullets, and keep your real symbols (©, °, $)."
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste AI text — or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="chatgpt" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 ChatGPT answer</button>
+              <button data-sample="linkedin" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💼 LinkedIn post</button>
+              <button data-sample="email" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✉️ Support email</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats">0 chars</p>
+      </div>
+
+      <!-- Output -->
+      <div class="p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Cleaned text</h2>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download cleaned text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <textarea id="output" rows="14" readonly aria-label="Cleaned text"
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+      </div>
+    </div>
+
+    <!-- Summary: counts + flavor + inventory -->
+    <div class="space-y-3 border-t border-ink/8 px-4 py-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <ul class="flex flex-wrap gap-1.5 text-xs" aria-live="polite" id="pills">
+          <li class="rounded-full px-2 py-0.5 muted" style="background: var(--c-accent-soft);"><span id="c-emoji" data-v="0">0</span> emoji</li>
+          <li class="rounded-full px-2 py-0.5 muted" style="background: var(--c-accent-soft);"><span id="c-deco" data-v="0">0</span> decorative</li>
+          <li class="rounded-full px-2 py-0.5 muted" style="background: var(--c-accent-soft);"><span id="c-bullets" data-v="0">0</span> bullets</li>
+        </ul>
+        <p id="flavor" class="text-sm font-semibold" aria-live="polite">Paste text to scan.</p>
+      </div>
+
+      <!-- Inventory table (shows its work) -->
+      <details id="inv-wrap" class="group" hidden>
+        <summary class="cursor-pointer list-none text-sm font-medium text-accent marker:hidden">
+          <span class="inline-flex items-center gap-1.5">▾ <span id="inv-summary">What we removed</span></span>
+        </summary>
+        <div class="mt-2 overflow-x-auto rounded-lg border border-ink/10">
+          <table class="w-full border-collapse text-left text-sm">
+            <thead>
+              <tr class="muted">
+                <th scope="col" class="px-3 py-2 font-medium">Glyph</th>
+                <th scope="col" class="px-3 py-2 font-medium">Unicode</th>
+                <th scope="col" class="px-3 py-2 font-medium">Name</th>
+                <th scope="col" class="px-3 py-2 text-right font-medium">Count</th>
+              </tr>
+            </thead>
+            <tbody id="inv-body"></tbody>
+          </table>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+  </p>
+
+  <!-- Education panel: why this is a tell (on-brand, quality not bypass). -->
+  <details class="card mx-auto mt-4 max-w-3xl p-4">
+    <summary class="cursor-pointer list-none font-semibold marker:hidden">
+      <span class="inline-flex items-center gap-1.5 text-sm">💡 Why is AI text full of emoji bullets?</span>
+    </summary>
+    <p class="mt-2 text-sm muted">
+      Emoji-as-bullets (✅ 🔹 🚀) and checkmark headers are among the most visible
+      signs of pasted ChatGPT or Claude output. Removing them makes your writing
+      read as your own — and, as a bonus, makes it cleaner for screen readers,
+      which otherwise announce "white heavy check mark" before every line. This is
+      about keeping a professional, human voice, not about beating a detector.
+    </p>
+  </details>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<script>
+  import {
+    strip, inventory, flavorLabel, DEFAULT_OPTIONS, PRESETS,
+    type StripOptions, type PresetName, type BulletReplacement,
+  } from '../../lib/tools/emoji-decorative-symbol-stripper';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+
+  // Realistic empty-state samples (full of AI decoration, plus real symbols to
+  // prove the safe-keep behavior).
+  const SAMPLES: Record<string, string> = {
+    chatgpt: `Here's a quick breakdown of the plan 🚀\n\n✅ Define the goal clearly\n🔹 Break it into milestones\n✦ Assign an owner to each task\n▶ Review progress weekly\n\nUltimately, this keeps the team aligned and the budget under $5k. 🎯`,
+    linkedin: `🔥 Three lessons that changed my career 👇\n\n1️⃣ Consistency beats intensity ✨\n2️⃣ Feedback is a gift 🎁\n3️⃣ Ship before it's perfect 🚀\n\nAgree? Drop a 💬 below!`,
+    email: `Hi there! 👋\n\nThanks for reaching out ✅ Here's what we found:\n\n• Your © license is active\n• Renewal is €49/year\n• Support hours: 9am → 5pm\n\nLet me know if that helps! 🙌`,
+  };
+
+  // --- option IDs (for persistence + change wiring) ------------------------
+  const OPT_IDS = ['opt-emoji', 'opt-deco', 'opt-bullets-only', 'opt-replace', 'opt-keep-currency', 'opt-keep-math', 'opt-keep-legal'];
+
+  function readOptions(): StripOptions {
+    return {
+      ...DEFAULT_OPTIONS,
+      emoji: $<HTMLInputElement>('opt-emoji').checked,
+      decorative: $<HTMLInputElement>('opt-deco').checked,
+      bulletsOnly: $<HTMLInputElement>('opt-bullets-only').checked,
+      bulletReplacement: $<HTMLSelectElement>('opt-replace').value as BulletReplacement,
+      keepCurrency: $<HTMLInputElement>('opt-keep-currency').checked,
+      keepMath: $<HTMLInputElement>('opt-keep-math').checked,
+      keepLegal: $<HTMLInputElement>('opt-keep-legal').checked,
+    };
+  }
+
+  // --- persistence (toggles only, never the user's text) -------------------
+  function saveOpts() {
+    const s: Record<string, string | boolean> = {};
+    for (const id of OPT_IDS) {
+      const el = $(id) as HTMLInputElement | HTMLSelectElement;
+      s[id] = el.type === 'checkbox' ? (el as HTMLInputElement).checked : el.value;
+    }
+    try { localStorage.setItem('emoji-strip-opts', JSON.stringify(s)); } catch {}
+  }
+  function loadOpts() {
+    try {
+      const s = JSON.parse(localStorage.getItem('emoji-strip-opts') || '{}');
+      for (const id of OPT_IDS) {
+        if (!(id in s)) continue;
+        const el = $(id) as HTMLInputElement | HTMLSelectElement;
+        if (el.type === 'checkbox') (el as HTMLInputElement).checked = !!s[id];
+        else el.value = String(s[id]);
+      }
+    } catch {}
+  }
+
+  // --- toast ---------------------------------------------------------------
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up ------------------------------------------------------------
+  function animateCount(el: HTMLElement, to: number, dur = 500) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(to); el.dataset.v = String(to); return; }
+    const from = parseInt(el.dataset.v || '0', 10);
+    if (from === to) { el.textContent = String(to); return; }
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // --- main run ------------------------------------------------------------
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const chars = src.length;
+    $<HTMLParagraphElement>('in-stats').textContent = `${chars} char${chars === 1 ? '' : 's'}`;
+
+    const opts = readOptions();
+    const { text, counts } = strip(src, opts);
+    output.value = text;
+
+    const hasOut = text.length > 0;
+    $<HTMLButtonElement>('copy').disabled = !hasOut;
+    ($('copy-bar') as HTMLButtonElement).disabled = !hasOut;
+
+    animateCount($<HTMLSpanElement>('c-emoji'), counts.emoji);
+    animateCount($<HTMLSpanElement>('c-deco'), counts.decorative);
+    animateCount($<HTMLSpanElement>('c-bullets'), counts.bullets);
+
+    // Flavor / "how AI-flavored" label.
+    const flavor = $<HTMLParagraphElement>('flavor');
+    if (!src.trim()) flavor.textContent = 'Paste text to scan.';
+    else if (counts.total === 0) flavor.textContent = 'No emoji or decorative symbols found — your text is already clean.';
+    else flavor.textContent = flavorLabel(counts);
+
+    // Inventory table.
+    const inv = src.trim() ? inventory(src, opts) : [];
+    const wrap = $<HTMLDetailsElement>('inv-wrap');
+    const body = $<HTMLTableSectionElement>('inv-body');
+    body.innerHTML = '';
+    if (inv.length === 0) {
+      wrap.hidden = true;
+    } else {
+      wrap.hidden = false;
+      $<HTMLSpanElement>('inv-summary').textContent = `What we removed (${inv.length} distinct)`;
+      for (const it of inv) {
+        const tr = document.createElement('tr');
+        tr.className = 'border-t border-ink/10';
+        const g = document.createElement('td');
+        g.className = 'px-3 py-2 text-lg';
+        g.textContent = it.glyph;
+        g.setAttribute('aria-label', it.name);
+        g.title = it.name;
+        const cp = document.createElement('td');
+        cp.className = 'px-3 py-2 font-mono text-xs muted';
+        cp.textContent = it.codepoint;
+        const nm = document.createElement('td');
+        nm.className = 'px-3 py-2 text-xs muted';
+        nm.textContent = it.name;
+        const ct = document.createElement('td');
+        ct.className = 'px-3 py-2 text-right tabular-nums';
+        ct.textContent = '×' + it.count;
+        tr.append(g, cp, nm, ct);
+        body.appendChild(tr);
+      }
+    }
+  }
+
+  // --- debounced via rAF ---------------------------------------------------
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  OPT_IDS.forEach((id) => $(id).addEventListener('change', () => { saveOpts(); run(); }));
+
+  // --- presets -------------------------------------------------------------
+  function applyPreset(name: PresetName) {
+    const p = PRESETS[name];
+    if ('emoji' in p) $<HTMLInputElement>('opt-emoji').checked = !!p.emoji;
+    if ('decorative' in p) $<HTMLInputElement>('opt-deco').checked = !!p.decorative;
+    if ('bulletsOnly' in p) $<HTMLInputElement>('opt-bullets-only').checked = !!p.bulletsOnly;
+    if ('keepCurrency' in p) $<HTMLInputElement>('opt-keep-currency').checked = !!p.keepCurrency;
+    if ('keepMath' in p) $<HTMLInputElement>('opt-keep-math').checked = !!p.keepMath;
+    if ('keepLegal' in p) $<HTMLInputElement>('opt-keep-legal').checked = !!p.keepLegal;
+    document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) => {
+      const active = b.dataset.preset === name;
+      b.setAttribute('aria-pressed', String(active));
+      b.style.background = active ? 'var(--c-accent-soft)' : '';
+      b.style.color = active ? 'var(--color-accent)' : '';
+      b.style.borderColor = active ? 'var(--color-accent)' : '';
+    });
+    saveOpts(); run();
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-preset]').forEach((b) =>
+    b.addEventListener('click', () => applyPreset(b.dataset.preset as PresetName)));
+
+  // --- samples -------------------------------------------------------------
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!]; run(); setPane('output'); }));
+
+  // --- mobile pane switcher ------------------------------------------------
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- shared actions ------------------------------------------------------
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!output.value) return;
+    try {
+      await navigator.clipboard.writeText(output.value);
+      const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+      b.textContent = '✓ Copied'; toast('Copied to clipboard');
+      setTimeout(() => (b.textContent = prev), 1300);
+    } catch { toast('Copy failed — select and copy manually'); }
+  }
+  function doReset() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // --- download ------------------------------------------------------------
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    const blob = new Blob([output.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'cleaned.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded cleaned.txt');
+  });
+
+  // --- keyboard ------------------------------------------------------------
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); toast('Stripped'); }
+    if (e.key === 'Escape' && document.activeElement === input) { e.preventDefault(); doReset(); }
+  });
+
+  // --- init ----------------------------------------------------------------
+  loadOpts(); setPane('input'); run();
+</script>

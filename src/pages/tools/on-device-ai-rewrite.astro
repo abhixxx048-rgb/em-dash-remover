@@ -1,0 +1,183 @@
+---
+import Base from '../../layouts/Base.astro';
+import OnDeviceAiRewrite from '../../components/tools/OnDeviceAiRewrite.astro';
+
+const faqs = [
+  {
+    q: 'Does my text get sent anywhere?',
+    a: 'No. When on-device AI is available, the rewrite runs locally in your browser using Chrome\'s built-in Rewriter API (Gemini Nano) — your text never leaves your device. You can verify it yourself: open DevTools, switch to the Network tab, and run a rewrite; you will see zero requests. The only thing that ever touches the network is Chrome\'s one-time download of the model itself. There is no cloud fallback.',
+  },
+  {
+    q: 'Which browsers and versions support on-device rewriting?',
+    a: 'The Rewriter and Writer APIs are part of a joint Chrome origin trial spanning roughly Chrome 137–148, so support depends on your Chrome version, operating system and hardware. If your browser does not support it (most non-Chrome browsers, and mobile Chrome today), the tool falls back to a 100% local deterministic cleanup and tells you clearly via the capability badge.',
+  },
+  {
+    q: 'Why is there a one-time download?',
+    a: 'The on-device model (Gemini Nano) is large and is downloaded once by Chrome the first time you use a built-in AI feature. After that, rewrites are instant and work offline. We show a friendly progress bar during this one-time download rather than a silent spinner.',
+  },
+  {
+    q: 'What if my device cannot run the on-device model?',
+    a: 'The hardware bar is fairly high — broadly a capable GPU or 16+ GB RAM with several gigabytes of free disk for the model. If your device cannot run it, the tool degrades gracefully to a deterministic cleanup pass (em dashes, curly quotes, ellipses, invisible characters and a couple of hedging AI tells), clearly labelled as cleanup rather than an AI rewrite.',
+  },
+  {
+    q: 'Is this an AI-detector bypass tool?',
+    a: 'No. This is about writing quality and keeping your human voice, not gaming any detector. It cleans robotic AI tells and lets you adjust tone and length so your writing reads naturally. We never position it as a way to evade detection.',
+  },
+  {
+    q: 'How is this different from QuillBot or Wordtune?',
+    a: 'Those tools are cloud-based: your text is uploaded to their servers, there are daily or word limits on the free tier, and they usually require an account. This tool runs the rewrite on your own device, has no upload, no signup and no usage caps, and is free. The wedge is provable on-device privacy.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/on-device-ai-rewrite#app`,
+  name: 'On-Device AI Rewrite — Private, Browser-Based Tone & Length Rewriting',
+  url: `${Astro.site}tools/on-device-ai-rewrite`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript. On-device AI requires Chrome with the built-in Rewriter API.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Rewrite text tone and length on-device with Chrome\'s built-in Rewriter API',
+    'Private AI text rewriter — no text is sent to any server',
+    'Tone control: more formal, as-is, more casual',
+    'Length control: shorter, as-is, longer',
+    'One-click presets: polish, tighten, soften, expand, humanize',
+    'Side-by-side diff and a local voice-match score',
+    'Deterministic cleanup fallback when on-device AI is unavailable',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="On-Device AI Rewriter — Private, Browser-Based Tone & Length Rewriting"
+  description="Free on-device AI rewriter: rephrase tone and length with Chrome's built-in Rewriter API (Gemini Nano). Private — your text never leaves your browser. No upload, no signup, with a deterministic fallback."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <a href="/tools" class="mb-4 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        On your device · free · no signup · no upload
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        On-Device AI Rewrite — private tone &amp; length rewriting.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Rephrase your text — more formal or more casual, shorter or longer —
+        using Chrome's <strong>built-in Rewriter API (Gemini Nano)</strong>, which
+        runs entirely on your own device. No upload, no server, no signup. When
+        on-device AI isn't available, we fall back to a deterministic cleanup so
+        the tool still works for everyone. Clean AI writing for real quality —
+        keep your human voice.
+      </p>
+    </header>
+
+    <OnDeviceAiRewrite />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">Rewrite tone and length on your device — no upload</h2>
+      <p class="muted">
+        An <strong>on-device AI rewriter</strong> does the rephrasing on your own
+        computer instead of a remote server. Pick a tone (more formal, as-is or
+        more casual) and a length (shorter, as-is or longer), or tap a preset, and
+        the model rewrites your text locally. Because nothing is uploaded, you can
+        safely rephrase confidential emails, client notes, legal or medical text,
+        or anything you simply would rather not paste into a cloud tool. The
+        result streams into the right-hand pane as it is generated, and a
+        side-by-side <strong>diff</strong> view shows exactly what changed so you
+        can confirm the model did not invent content.
+      </p>
+
+      <h2 class="text-2xl font-bold">How it works (Chrome's built-in Rewriter API + Gemini Nano)</h2>
+      <p class="muted">
+        This tool uses Chrome's built-in <strong>Rewriter API</strong>, powered by
+        the on-device <strong>Gemini Nano</strong> model. On load it checks
+        availability with <code>Rewriter.availability()</code> and shows a
+        capability badge so you know what to expect before you click. When you
+        rewrite, it opens a session, streams the output, and cleans up the session
+        afterwards. The model runs on your GPU or CPU, so once it is downloaded the
+        feature also works offline. We hand the model a small, fixed instruction to
+        preserve your voice and strip robotic AI tells — never to "beat a detector."
+      </p>
+
+      <h2 class="text-2xl font-bold">100% client-side — verify it yourself</h2>
+      <p class="muted">
+        Privacy here is provable, not a promise. Open your browser's DevTools,
+        switch to the <strong>Network</strong> tab, and run a rewrite: you will see
+        zero network requests while the text is processed. The only time anything
+        touches the network is Chrome's one-time download of the Gemini Nano model.
+        There is deliberately <em>no</em> cloud fallback — when on-device AI is not
+        available we use a local, rule-based cleanup instead of secretly sending
+        your text somewhere.
+      </p>
+
+      <h2 class="text-2xl font-bold">Presets: polish, tighten, soften, expand, humanize</h2>
+      <p class="muted">
+        You think in goals, not API options, so the presets set tone and length
+        for you. <strong>Polish</strong> makes text formal at the same length;
+        <strong>Tighten</strong> makes it formal and shorter; <strong>Soften</strong>
+        warms it up; <strong>Expand</strong> adds detail; and <strong>Humanize</strong>
+        first runs our deterministic de-AI-tell cleanup (em dashes, curly quotes,
+        hedging filler) and then a casual rewrite to restore a natural voice. A
+        local <strong>voice-match</strong> meter scores how much of your original
+        style survived, so you can avoid over-rewriting.
+      </p>
+
+      <h2 class="text-2xl font-bold">When AI isn't available — deterministic fallback</h2>
+      <p class="muted">
+        On-device AI is still rolling out, so many visitors — non-Chrome browsers,
+        mobile, or hardware that cannot run the model — will not have it. Instead of
+        failing silently, the tool detects this up front and applies a deterministic
+        cleanup pass: it replaces em and en dashes, converts curly quotes to
+        straight, expands ellipsis characters, strips invisible and watermark
+        characters, and trims a couple of the most common hedging phrases. This
+        fallback is clearly labelled as cleanup rather than an AI rewrite, so the
+        page is useful to everyone on day one.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+  </style>
+</Base>

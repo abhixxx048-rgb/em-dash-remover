@@ -1,0 +1,456 @@
+---
+// Interactive island: drop / pick many .txt & .md files, clean each one with
+// the shared engine, show a per-file report, and download cleaned files (one by
+// one, or as a single combined report). Static HTML here; behaviour is wired up
+// by the client client script below, which imports the pure batch engine.
+//
+// .docx / .zip are recognised but surfaced as "coming soon" (no JSZip/mammoth
+// bundled) so users are never left wondering what happened to a file.
+---
+
+<section id="tool" aria-label="Bulk multi-file cleaner" class="mx-auto max-w-4xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Options toolbar (shared across the whole batch) -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Em dash →</span>
+        <select id="opt-dash" aria-label="Em dash replacement style" class="ctl px-3">
+          <option value="smart">Smart (context-aware)</option>
+          <option value="comma">Comma</option>
+          <option value="period">Period</option>
+          <option value="colon">Colon</option>
+          <option value="parentheses">Parentheses</option>
+          <option value="space">Space</option>
+          <option value="remove">Remove</option>
+        </select>
+      </label>
+
+      <details class="group relative w-full sm:w-auto">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Cleanup options <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 w-full space-y-1 p-2 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-64 sm:p-3 sm:shadow-lg">
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-en" checked class="h-5 w-5" /> En dashes</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-quotes" checked class="h-5 w-5" /> Smart → straight quotes</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-ellipsis" checked class="h-5 w-5" /> Ellipsis character → ...</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-invis" checked class="h-5 w-5" /> Invisible / watermark chars</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-ws" checked class="h-5 w-5" /> Collapse extra whitespace</label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-md" class="h-5 w-5" /> Strip markdown (**, ##)</label>
+        </div>
+      </details>
+
+      <button id="add-files" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:border-accent hover:text-accent">＋ Add files</button>
+      <button id="clear-all" class="ctl inline-flex items-center justify-center px-3 transition hover:bg-ink/5" hidden>↺ Clear all</button>
+    </div>
+
+    <!-- Drop zone + body -->
+    <div class="bg-surface p-4" style="background: var(--c-surface);">
+      <!-- The whole zone is the file-picker trigger + drag target. -->
+      <div
+        id="dropzone"
+        role="button"
+        tabindex="0"
+        aria-label="Drop .txt or .md files here, or activate to choose files"
+        class="flex flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-ink/20 px-4 py-10 text-center transition hover:border-accent focus-visible:border-accent"
+      >
+        <div class="text-3xl" aria-hidden="true">📂</div>
+        <p class="font-medium">Drop your files here<span class="muted"> — or click to choose</span></p>
+        <p class="text-xs muted"><code>.txt</code> · <code>.md</code> &nbsp; (<code>.docx</code> · <code>.zip</code> coming soon)</p>
+        <div class="mt-1 flex flex-wrap justify-center gap-2">
+          <button type="button" data-sample="batch" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✨ Try with samples</button>
+        </div>
+      </div>
+
+      <!-- Hidden native input (multi-select). accept is a hint only. -->
+      <input id="file-input" type="file" multiple accept=".txt,.md,.markdown,.text,.mdx,text/plain,text/markdown" class="sr-only" aria-hidden="true" tabindex="-1" />
+
+      <!-- Aggregate summary strip (filled after a run) -->
+      <div id="summary" hidden class="mt-4 rounded-xl border border-ink/10 px-4 py-3" style="background: var(--c-paper);">
+        <p class="text-sm font-semibold"><span id="summary-headline">—</span></p>
+        <p id="summary-insight" class="mt-0.5 text-xs muted" aria-live="polite"></p>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <button id="download-all" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40">⬇ Download all cleaned</button>
+          <button id="copy-report" class="inline-flex min-h-11 items-center rounded-md px-4 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Copy report</button>
+          <button id="download-report" class="inline-flex min-h-11 items-center rounded-md px-4 text-sm font-medium text-accent transition hover:bg-accent-soft">⬇ Report (.csv)</button>
+        </div>
+      </div>
+
+      <!-- Per-file report list -->
+      <ul id="file-list" class="mt-4 space-y-2" aria-live="polite"></ul>
+    </div>
+
+    <!-- Footer privacy line -->
+    <div class="border-t border-ink/8 px-4 py-3">
+      <p class="text-xs muted">
+        🔒 Every file is read and cleaned in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Full-page drag overlay: forgiving drop target, no pixel-perfect aiming. -->
+<div id="drag-overlay" hidden
+  class="pointer-events-none fixed inset-0 z-40 flex items-center justify-center p-8"
+  style="background: color-mix(in srgb, var(--c-accent-soft) 70%, transparent); backdrop-filter: blur(2px);">
+  <div class="rounded-2xl border-2 border-dashed border-accent px-8 py-10 text-center text-lg font-semibold text-accent" style="background: var(--c-surface);">
+    📂 Drop your files to clean them
+  </div>
+</div>
+
+<script>
+  import {
+    cleanBatch, summarize, statusMeta, formatBytes, reportToCsv,
+    isTextExtension, isComingSoonExtension, extensionOf,
+    DEFAULT_OPTIONS,
+    type CleanOptions, type DashStyle,
+    type InputFile, type FileReport, type BatchOptions,
+  } from '../../lib/tools/bulk-multi-file-cleaner';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+  const dropzone = $<HTMLDivElement>('dropzone');
+  const fileInput = $<HTMLInputElement>('file-input');
+  const listEl = $<HTMLUListElement>('file-list');
+  const summaryEl = $<HTMLDivElement>('summary');
+  const overlay = $<HTMLDivElement>('drag-overlay');
+
+  // Staged files (raw text + meta) and their last computed reports.
+  let staged: InputFile[] = [];
+  let reports: FileReport[] = [];
+
+  // --- options ------------------------------------------------------------
+  function readOptions(): CleanOptions {
+    return {
+      ...DEFAULT_OPTIONS,
+      dashStyle: $<HTMLSelectElement>('opt-dash').value as DashStyle,
+      enDashes: $<HTMLInputElement>('opt-en').checked,
+      smartQuotes: $<HTMLInputElement>('opt-quotes').checked,
+      ellipsis: $<HTMLInputElement>('opt-ellipsis').checked,
+      invisibles: $<HTMLInputElement>('opt-invis').checked,
+      whitespace: $<HTMLInputElement>('opt-ws').checked,
+      markdown: $<HTMLInputElement>('opt-md').checked,
+    };
+  }
+  function batchOptions(): BatchOptions {
+    return { clean: readOptions(), suffix: '-clean' };
+  }
+
+  // --- option persistence (never the files, only the rules) ---------------
+  const OPT_IDS = ['opt-dash', 'opt-en', 'opt-quotes', 'opt-ellipsis', 'opt-invis', 'opt-ws', 'opt-md'];
+  function saveOpts() {
+    const s: Record<string, string | boolean> = {};
+    s['opt-dash'] = $<HTMLSelectElement>('opt-dash').value;
+    for (const id of OPT_IDS.slice(1)) s[id] = $<HTMLInputElement>(id).checked;
+    try { localStorage.setItem('bulk-opts', JSON.stringify(s)); } catch {}
+  }
+  function loadOpts() {
+    try {
+      const s = JSON.parse(localStorage.getItem('bulk-opts') || '{}');
+      if (s['opt-dash']) $<HTMLSelectElement>('opt-dash').value = s['opt-dash'];
+      for (const id of OPT_IDS.slice(1)) if (id in s) $<HTMLInputElement>(id).checked = s[id];
+    } catch {}
+  }
+
+  // --- toast --------------------------------------------------------------
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- escape for safe HTML interpolation ---------------------------------
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
+  }
+
+  // --- file download helper ----------------------------------------------
+  function downloadBlob(blob: Blob, name: string) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // --- render report rows -------------------------------------------------
+  // Status colours are paired with an icon + text label so meaning never
+  // depends on colour alone (WCAG 1.4.1).
+  function statusColor(status: FileReport['status']): string {
+    switch (status) {
+      case 'cleaned': return 'var(--color-ok)';
+      case 'unchanged': return 'var(--c-muted)';
+      case 'skipped': return 'var(--color-warn)';
+      case 'coming-soon': return 'var(--color-warn)';
+      case 'error': return 'var(--color-bad)';
+    }
+  }
+
+  function chip(label: string, n: number): string {
+    if (n <= 0) return '';
+    return `<span class="rounded-full px-2 py-0.5 text-[11px]" style="background: var(--c-accent-soft); color: var(--color-accent);">${esc(label)}: ${n}</span>`;
+  }
+
+  function render() {
+    const hasFiles = reports.length > 0;
+    $<HTMLButtonElement>('clear-all').hidden = !hasFiles;
+    summaryEl.hidden = !hasFiles;
+
+    if (!hasFiles) {
+      listEl.innerHTML = '';
+      return;
+    }
+
+    // --- aggregate summary ---
+    const sum = summarize(reports);
+    const parts: string[] = [];
+    if (sum.cleaned) parts.push(`Cleaned ${sum.cleaned} file${sum.cleaned === 1 ? '' : 's'}`);
+    if (sum.unchanged) parts.push(`${sum.unchanged} already clean`);
+    if (sum.comingSoon) parts.push(`${sum.comingSoon} coming soon`);
+    if (sum.skipped) parts.push(`${sum.skipped} skipped`);
+    if (sum.errored) parts.push(`${sum.errored} error${sum.errored === 1 ? '' : 's'}`);
+    $<HTMLSpanElement>('summary-headline').textContent =
+      parts.join(' · ') + ` — ${sum.totalChanges} change${sum.totalChanges === 1 ? '' : 's'} total`;
+
+    // insight strip: name the two biggest artifact buckets
+    const c = sum.counts;
+    const buckets: Array<[string, number]> = [
+      ['em dashes', c.emDashes], ['en dashes', c.enDashes],
+      ['smart quotes', c.smartQuotes], ['ellipses', c.ellipses],
+      ['invisible characters', c.invisibles], ['non-breaking spaces', c.nbsp],
+    ];
+    const top = buckets.filter(([, n]) => n > 0).sort((a, b) => b[1] - a[1]).slice(0, 2);
+    $<HTMLParagraphElement>('summary-insight').textContent = top.length
+      ? 'Removed ' + top.map(([label, n]) => `${n} ${label}`).join(' and ') + ` across ${sum.total} file${sum.total === 1 ? '' : 's'}.`
+      : 'No AI tells found in this batch — everything already reads clean.';
+
+    $<HTMLButtonElement>('download-all').disabled = sum.cleaned + sum.unchanged === 0;
+
+    // --- per-file rows ---
+    listEl.innerHTML = reports.map((r, i) => {
+      const meta = statusMeta(r.status);
+      const color = statusColor(r.status);
+      const canDownload = r.status === 'cleaned' || r.status === 'unchanged';
+      const chips = canDownload ? [
+        chip('em', r.counts.emDashes), chip('en', r.counts.enDashes),
+        chip('quotes', r.counts.smartQuotes), chip('…', r.counts.ellipses),
+        chip('invisible', r.counts.invisibles), chip('NBSP', r.counts.nbsp),
+        chip('markdown', r.counts.markdown),
+      ].filter(Boolean).join(' ') : '';
+      const note = r.reason ? `<span class="text-xs muted">${esc(r.reason)}</span>` : '';
+      return `
+        <li class="rounded-xl border border-ink/10 p-3" style="background: var(--c-paper);">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full text-sm font-bold" style="color: ${color};" aria-hidden="true">${meta.icon}</span>
+            <span class="min-w-0 flex-1 truncate font-medium" title="${esc(r.name)}">${esc(r.name)}</span>
+            <span class="text-xs font-semibold" style="color: ${color};">${esc(meta.label)}</span>
+            <span class="text-xs muted">${esc(formatBytes(r.size))}</span>
+            ${canDownload
+              ? `<button type="button" data-dl="${i}" class="ctl inline-flex items-center px-3 text-xs transition hover:border-accent hover:text-accent" aria-label="Download cleaned ${esc(r.name)}">⬇</button>`
+              : ''}
+            <button type="button" data-rm="${i}" class="ctl inline-flex items-center px-3 text-xs transition hover:bg-ink/5" aria-label="Remove ${esc(r.name)}">✕</button>
+          </div>
+          ${(chips || note) ? `<div class="mt-2 flex flex-wrap items-center gap-1.5 pl-9">${chips} ${note}</div>` : ''}
+        </li>`;
+    }).join('');
+
+    // wire row buttons
+    listEl.querySelectorAll<HTMLButtonElement>('[data-dl]').forEach((b) =>
+      b.addEventListener('click', () => downloadOne(Number(b.dataset.dl))));
+    listEl.querySelectorAll<HTMLButtonElement>('[data-rm]').forEach((b) =>
+      b.addEventListener('click', () => removeRow(Number(b.dataset.rm))));
+  }
+
+  // --- the run: clean every staged file (debounced via rAF) ---------------
+  let raf = 0;
+  function schedule() { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); }
+  function run() {
+    reports = cleanBatch(staged, batchOptions());
+    render();
+  }
+
+  // --- intake -------------------------------------------------------------
+  // Read a File into an InputFile via FileReader, then re-run the batch. Binary
+  // "coming soon" types are staged with empty text so they still appear as rows.
+  function ingest(files: File[]) {
+    if (!files.length) return;
+    let pending = 0;
+    const startCount = staged.length;
+    for (const file of files) {
+      const ext = extensionOf(file.name);
+      if (isComingSoonExtension(ext)) {
+        // Don't read the bytes — we can't process them yet. Stage a placeholder.
+        staged.push({ name: file.name, size: file.size, text: '' });
+        continue;
+      }
+      if (!isTextExtension(ext)) {
+        // Stage so the user sees a "skipped — unsupported" row, not silence.
+        staged.push({ name: file.name, size: file.size, text: '' });
+        continue;
+      }
+      pending++;
+      const reader = new FileReader();
+      reader.onload = () => {
+        staged.push({ name: file.name, size: file.size, text: String(reader.result ?? '') });
+        if (--pending === 0) finishIngest(startCount, files.length);
+      };
+      reader.onerror = () => {
+        staged.push({ name: file.name, size: file.size, text: '' });
+        if (--pending === 0) finishIngest(startCount, files.length);
+      };
+      reader.readAsText(file);
+    }
+    // If only placeholder (non-text) files were added, nothing is pending.
+    if (pending === 0) finishIngest(startCount, files.length);
+  }
+
+  function finishIngest(startCount: number, added: number) {
+    schedule();
+    toast(`Added ${added} file${added === 1 ? '' : 's'}`);
+  }
+
+  // --- downloads ----------------------------------------------------------
+  function downloadOne(i: number) {
+    const r = reports[i];
+    if (!r) return;
+    const text = r.text || (staged[i]?.text ?? '');
+    downloadBlob(new Blob([text], { type: 'text/plain' }), r.outName);
+    toast(`Downloaded ${r.outName}`);
+  }
+  function downloadAll() {
+    // No-dep MVP: trigger an individual download per cleaned file (a real ZIP
+    // needs JSZip, which we have not bundled). Browsers may prompt to allow
+    // multiple downloads — that's expected and stated in the UI copy.
+    const out = reports.filter((r) => r.status === 'cleaned' || r.status === 'unchanged');
+    if (!out.length) { toast('Nothing to download yet'); return; }
+    out.forEach((r, k) => {
+      const text = r.text || (staged[reports.indexOf(r)]?.text ?? '');
+      // stagger slightly so browsers don't coalesce/drop the anchor clicks
+      setTimeout(() => downloadBlob(new Blob([text], { type: 'text/plain' }), r.outName), k * 120);
+    });
+    toast(`Downloading ${out.length} cleaned file${out.length === 1 ? '' : 's'}`);
+  }
+
+  function copyReport() {
+    const csv = reportToCsv(reports);
+    navigator.clipboard.writeText(csv)
+      .then(() => toast('Report copied to clipboard'))
+      .catch(() => toast('Could not copy — try Download report'));
+  }
+  function downloadReport() {
+    const stamp = new Date().toISOString().slice(0, 10);
+    downloadBlob(new Blob([reportToCsv(reports)], { type: 'text/csv' }), `cleanup-report-${stamp}.csv`);
+    toast('Report downloaded');
+  }
+
+  // --- row + batch editing ------------------------------------------------
+  function removeRow(i: number) {
+    staged.splice(i, 1);
+    run();
+    toast('Removed');
+  }
+  function clearAll() {
+    staged = [];
+    reports = [];
+    fileInput.value = '';
+    render();
+    toast('Cleared');
+  }
+
+  // --- sample data (so a first-timer sees the payoff instantly) -----------
+  const SAMPLES: InputFile[] = [
+    {
+      name: 'blog-post.md',
+      size: 0,
+      text: `# Why this matters\n\nLet's be honest — most teams get this wrong. It's not just about speed, it's about clarity. We've leveraged a robust, multifaceted approach to unlock our full potential — and it's a testament to everyone's work. Moreover, it's worth noting that our seamless rollout paved the way for success.`,
+    },
+    {
+      name: 'product-description.txt',
+      size: 0,
+      text: `Introducing our flagship device — engineered to delve into the details that matter. In today's fast-paced world, you need a tool that's both elegant and powerful… and this one delivers. The future belongs to those who harness focus.`,
+    },
+    {
+      name: 'notes.md',
+      size: 0,
+      text: `The Industrial Revolution stands as a testament to human ingenuity. It reshaped society — transforming economies, redefining labor, and revolutionizing daily life. Ultimately, it's important to note that this transformative era laid the cornerstone for the modern world.`,
+    },
+  ];
+  function loadSamples() {
+    staged = SAMPLES.map((s) => ({ ...s, size: new Blob([s.text]).size }));
+    run();
+    toast('Loaded 3 sample files');
+  }
+
+  // --- drag + drop (zone + full-page overlay) -----------------------------
+  function filesFromDrop(dt: DataTransfer | null): File[] {
+    if (!dt) return [];
+    return Array.from(dt.files);
+  }
+
+  let dragDepth = 0;
+  window.addEventListener('dragenter', (e) => {
+    if (!e.dataTransfer || !Array.from(e.dataTransfer.types).includes('Files')) return;
+    e.preventDefault();
+    dragDepth++;
+    overlay.hidden = false;
+  });
+  window.addEventListener('dragover', (e) => {
+    if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) e.preventDefault();
+  });
+  window.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    if (--dragDepth <= 0) { dragDepth = 0; overlay.hidden = true; }
+  });
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dragDepth = 0;
+    overlay.hidden = true;
+    const files = filesFromDrop(e.dataTransfer);
+    if (files.length) ingest(files);
+  });
+
+  // --- picker wiring ------------------------------------------------------
+  function openPicker() { fileInput.click(); }
+  dropzone.addEventListener('click', openPicker);
+  dropzone.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPicker(); }
+  });
+  $('add-files').addEventListener('click', openPicker);
+  fileInput.addEventListener('change', () => {
+    ingest(Array.from(fileInput.files ?? []));
+    fileInput.value = ''; // allow re-picking the same file
+  });
+
+  // sample button(s)
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', loadSamples));
+
+  // option changes re-run + persist
+  OPT_IDS.forEach((id) => $(id).addEventListener('change', () => { saveOpts(); if (staged.length) run(); }));
+
+  // action buttons
+  $('download-all').addEventListener('click', downloadAll);
+  $('copy-report').addEventListener('click', copyReport);
+  $('download-report').addEventListener('click', downloadReport);
+  $('clear-all').addEventListener('click', clearAll);
+
+  // keyboard: Cmd/Ctrl+O = open picker, Cmd/Ctrl+Enter = re-run,
+  // Cmd/Ctrl+S = download all cleaned.
+  document.addEventListener('keydown', (e) => {
+    if (!(e.metaKey || e.ctrlKey)) return;
+    if (e.key.toLowerCase() === 'o') { e.preventDefault(); openPicker(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (staged.length) run(); }
+    else if (e.key.toLowerCase() === 's') { e.preventDefault(); if (reports.length) downloadAll(); }
+  });
+
+  loadOpts();
+  render();
+</script>

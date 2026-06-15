@@ -1,0 +1,116 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// The tool hub. Hub-and-spoke internal linking: every tool page links back here,
+// and this page links out to all of them (see RESEARCH.md SEO strategy).
+const tiers = [
+  {
+    name: 'Clean & convert',
+    blurb: 'Fast, everyday text cleanup and conversion — each runs entirely in your browser.',
+    tools: [
+      { href: '/tools/invisible-watermark-character-inspector', icon: '👻', title: 'Invisible Character Inspector', desc: 'See and strip hidden zero-width, watermark and bidi characters.' },
+      { href: '/tools/word-reading-time-counter', icon: '🔢', title: 'Word & Reading-Time Counter', desc: 'Live word, character, sentence counts, reading time and platform limits.' },
+      { href: '/tools/before-after-diff-viewer', icon: '🔬', title: 'Before/After Diff Viewer', desc: 'Compare original vs cleaned text with per-change accept/reject.' },
+      { href: '/tools/readability-grade-level-scorer', icon: '📊', title: 'Readability Scorer', desc: 'Flesch, Flesch-Kincaid, Gunning Fog grade levels and hard sentences.' },
+      { href: '/tools/emoji-decorative-symbol-stripper', icon: '🚫', title: 'Emoji & Symbol Stripper', desc: 'Remove emoji and decorative bullets while keeping meaningful symbols.' },
+      { href: '/tools/case-converter', icon: '🔠', title: 'Case Converter', desc: 'UPPER, lower, Sentence, Title (AP/Chicago) and developer cases.' },
+      { href: '/tools/whitespace-line-break-reflow-fixer', icon: '↹', title: 'Whitespace & Reflow Fixer', desc: 'Collapse spaces and unwrap hard-wrapped PDF/email text into paragraphs.' },
+      { href: '/tools/paste-from-word-docs-cleaner', icon: '📋', title: 'Paste-from-Word Cleaner', desc: 'Strip Word/Docs formatting soup, keep real paragraphs.' },
+      { href: '/tools/straight-to-curly-quotes-converter', icon: '“”', title: 'Straight-to-Curly Quotes', desc: 'Add correct curly quotes, apostrophes and proper dashes for publishing.' },
+      { href: '/tools/sentence-splitter', icon: '✂️', title: 'Sentence Splitter', desc: 'One sentence per line with a cadence chart for auditing rhythm.' },
+    ],
+  },
+  {
+    name: 'Analyze & improve',
+    blurb: 'Understand what makes writing read like AI — and fix it for quality, not detector-bypass.',
+    tools: [
+      { href: '/tools/human-voice-ai-tell-report', icon: '🫀', title: 'Human-Voice / AI-Tell Report', desc: 'Flag cadence, clichés and patterns that make a draft read like AI.' },
+      { href: '/tools/homoglyph-confusables-detector', icon: '🕵️', title: 'Homoglyph Detector', desc: 'Find Cyrillic/Greek look-alike characters hiding in Latin text.' },
+      { href: '/tools/passive-voice-weasel-word-highlighter', icon: '🎯', title: 'Passive-Voice Highlighter', desc: 'Highlight passive voice, weak adverbs and weasel words.' },
+      { href: '/tools/read-aloud-proofreader', icon: '🔊', title: 'Read-Aloud Proofreader', desc: 'Hear your text read aloud to catch run-ons and missing words.' },
+      { href: '/tools/local-voice-style-memory', icon: '🧠', title: 'Voice / Style Memory', desc: 'Build a private style profile and flag where a draft stops sounding like you.' },
+    ],
+  },
+  {
+    name: 'Power tools & apps',
+    blurb: 'Bigger workflows and companion apps. Still 100% on your device.',
+    tools: [
+      { href: '/tools/bulk-multi-file-cleaner', icon: '🗂️', title: 'Bulk / Multi-File Cleaner', desc: 'Drop multiple files, clean each in-browser, download the results.' },
+      { href: '/tools/on-device-ai-rewrite', icon: '✨', title: 'On-Device AI Rewrite', desc: 'One-click tone/length rewrite via your browser’s built-in AI.' },
+      { href: '/tools/webgpu-webllm-rewrite', icon: '⚡', title: 'WebGPU Rewrite', desc: 'Experimental on-device rewrite that never uploads your text.' },
+      { href: '/tools/browser-extension', icon: '🧩', title: 'Browser Extension', desc: 'Clean em dashes and AI tells in place, anywhere you type.' },
+      { href: '/tools/obsidian-plugin', icon: '🔮', title: 'Obsidian Plugin', desc: 'Clean AI-chat pastes automatically inside your Obsidian vault.' },
+    ],
+  },
+];
+
+const total = tiers.reduce((n, t) => n + t.tools.length, 0);
+
+const collectionSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Free AI Text Cleanup Tools',
+  url: new URL('/tools', Astro.site).href,
+  isPartOf: { '@id': `${Astro.site}#website` },
+  hasPart: tiers.flatMap((t) =>
+    t.tools.map((tool) => ({
+      '@type': 'WebApplication',
+      name: tool.title,
+      url: new URL(tool.href, Astro.site).href,
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Web Browser',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+    }))
+  ),
+};
+---
+
+<Base
+  title="Free AI Text Cleanup Tools — No Signup, 100% In-Browser"
+  description={`${total} free tools to clean, convert and improve AI and human writing — remove invisible characters, count words, check readability, strip emoji and more. Every tool runs entirely in your browser.`}
+>
+  <main class="halo">
+    <header class="mx-auto max-w-3xl px-4 pt-12 pb-8 text-center">
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        {total} tools · 100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">All Text Tools</h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        A growing toolkit for cleaning, converting and improving your writing.
+        Every tool runs entirely on your device — your text never leaves your browser.
+      </p>
+      <p class="mt-4 text-sm">
+        <a href="/" class="font-medium text-accent hover:underline">← Back to the Em Dash Remover</a>
+      </p>
+    </header>
+
+    {tiers.map((tier) => (
+      <section class="mx-auto mt-6 max-w-5xl px-4">
+        <div class="mb-4">
+          <h2 class="text-xl font-bold">{tier.name}</h2>
+          <p class="mt-1 text-sm muted">{tier.blurb}</p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {tier.tools.map((tool) => (
+            <a href={tool.href} class="card group flex gap-3 p-4 transition hover:border-accent" style="text-decoration: none;">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg" style="background: var(--c-accent-soft);">{tool.icon}</span>
+              <span class="min-w-0">
+                <span class="block font-semibold group-hover:text-accent">{tool.title}</span>
+                <span class="mt-0.5 block text-sm muted">{tool.desc}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <section class="mx-auto mt-16 max-w-3xl px-4 text-center">
+      <p class="text-sm muted">
+        🔒 Every tool here is 100% client-side. Open your browser’s DevTools → Network
+        while you use any of them and you’ll see zero requests. They even work offline.
+      </p>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+  </main>
+</Base>

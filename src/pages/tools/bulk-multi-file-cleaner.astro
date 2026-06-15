@@ -1,0 +1,190 @@
+---
+import Base from '../../layouts/Base.astro';
+import BulkMultiFileCleaner from '../../components/tools/BulkMultiFileCleaner.astro';
+
+const faqs = [
+  {
+    q: 'Are my files uploaded anywhere?',
+    a: 'No. Every file is read and cleaned entirely in your browser with plain JavaScript and the FileReader API — nothing is uploaded, stored or logged. Open your browser DevTools Network tab while you use it and you will see zero requests. The tool also works fully offline, which is the whole point for confidential drafts.',
+  },
+  {
+    q: 'How many files can I clean at once?',
+    a: 'As many as your browser can hold in memory. Select a whole folder of files in the picker, or drag a multi-file selection onto the page, and each one is cleaned with the same grammar-aware rules and gets its own row in the report. Very large individual files are skipped with a clear note so one giant file never stalls the batch.',
+  },
+  {
+    q: 'Which file formats are supported?',
+    a: 'Right now: plain text (.txt) and Markdown (.md, .markdown, .mdx). Word .docx and .zip archives are recognised and shown as "coming soon" rather than silently dropped — repacking a valid .docx in the browser needs an extra library we have not bundled yet, so we feature-detect and tell you instead of producing a broken file.',
+  },
+  {
+    q: 'Why does Smart mode sometimes use a semicolon instead of a comma?',
+    a: 'Because an em dash often joins two complete clauses, and replacing it with a comma there creates a comma splice — a grammar error every blind find-and-replace tool produces. Smart mode reads the words on each side of the dash and picks a comma, semicolon, colon, period or parentheses so the sentence stays correct across every file in the batch.',
+  },
+  {
+    q: 'Does it strip my Markdown formatting?',
+    a: 'Only if you turn on the "Strip markdown" option. It is off by default precisely so cleaning a folder of .md files does not destroy your intentional headings, bold and code. Leave it off to keep your Markdown; turn it on when you are flattening AI output into plain prose.',
+  },
+  {
+    q: 'What happens to an empty or unreadable file?',
+    a: 'It fails only itself. An empty file is marked "already clean", an unsupported type is "skipped" with the reason shown, and a file that cannot be read is flagged as an error — while every other file in the batch still cleans and downloads normally.',
+  },
+  {
+    q: 'Can I download everything at once?',
+    a: 'Yes. "Download all cleaned" saves every cleaned and already-clean file, keeping the original names with a -clean suffix. You can also download any single file from its row, and export a CSV report of exactly what was normalized to show a client or teammate.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/bulk-multi-file-cleaner#app`,
+  name: 'Bulk Text Cleaner — Clean Multiple Files at Once',
+  url: `${Astro.site}tools/bulk-multi-file-cleaner`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Bulk text cleaner for multiple files',
+    'Clean multiple .txt and .md files at once',
+    'Remove em dashes from many files in one pass',
+    'Batch remove invisible / watermark characters',
+    'Grammar-aware em dash replacement across a whole folder',
+    'Per-file cleanup report with counts',
+    'Download cleaned files individually',
+    '100% in your browser — files never uploaded',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Bulk Text Cleaner — Clean Multiple Files at Once, Privately"
+  description="Free bulk text cleaner: drop multiple .txt and .md files and remove em dashes, smart quotes and invisible characters from every one with grammar-aware rules. Per-file report, individual downloads, 100% in your browser."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <a href="/tools" class="mb-4 inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Bulk Text Cleaner — Clean Many Files at Once, Privately
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Drop a whole folder of <code>.txt</code> and <code>.md</code> files and
+        clean every one with the same <strong>grammar-aware</strong> rules as the
+        single-paste tool — em dashes, smart quotes, invisible characters and
+        more. You get a per-file report and can download each cleaned file. Your
+        files never leave your browser.
+      </p>
+    </header>
+
+    <BulkMultiFileCleaner />
+
+    <!-- Value props -->
+    <section class="mx-auto mt-16 max-w-5xl px-4">
+      <div class="grid gap-6 sm:grid-cols-3">
+        <div class="card p-5">
+          <h2 class="font-semibold">A folder in, a clean folder out</h2>
+          <p class="mt-1.5 text-sm muted">Pick many files at once instead of re-pasting one at a time. Every file is cleaned with identical rules and gets its own download.</p>
+        </div>
+        <div class="card p-5">
+          <h2 class="font-semibold">Your files never leave your browser</h2>
+          <p class="mt-1.5 text-sm muted">Read and cleaned on-device with FileReader — no upload, no server, no logging. Check the Network tab. Safe for confidential manuscripts and client work.</p>
+        </div>
+        <div class="card p-5">
+          <h2 class="font-semibold">Grammar-aware, not blind replace</h2>
+          <p class="mt-1.5 text-sm muted">Smart mode picks a comma, semicolon, colon or parentheses per sentence — so a batch of files never comes back full of comma splices.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">Clean multiple text files at once</h2>
+      <p class="muted">
+        Most AI text cleaners are paste-box only: one document at a time, copy,
+        clean, paste back, repeat. If you just had ChatGPT or Claude draft twenty
+        blog posts, product descriptions or chapters, that is twenty round trips.
+        This <strong>bulk text cleaner</strong> takes the whole set at once —
+        select a folder in the picker or drag many files onto the page — and runs
+        the same de-AI cleaning engine over each file locally, so the output
+        matches the single-paste tool exactly.
+      </p>
+
+      <h2 class="text-2xl font-bold">What it cleans in every file</h2>
+      <p class="muted">
+        Each file passes through the same rules: it removes em dashes with a
+        grammar-aware replacement, normalizes en dashes, converts curly
+        &ldquo;smart&rdquo; quotes and apostrophes to straight ones, expands the
+        ellipsis character (…) to three dots, strips non-breaking spaces and
+        invisible zero-width &ldquo;watermark&rdquo; characters, and can optionally
+        remove leftover Markdown. The per-file report shows a count of each artifact
+        so you can <strong>batch remove invisible characters</strong> and other AI
+        formatting and see exactly how much was cleaned.
+      </p>
+
+      <h2 class="text-2xl font-bold">100% in your browser — files never uploaded</h2>
+      <p class="muted">
+        Dropping a folder of client manuscripts or confidential drafts onto a
+        website is exactly the moment people fear an upload. Here there is none.
+        Every file is read with the browser&rsquo;s FileReader API and cleaned with
+        plain JavaScript — there is no <code>fetch</code>, no server and no LLM in
+        the loop. Open DevTools, watch the Network tab, then turn off your
+        Wi-Fi: it keeps working. For legal, medical, HR and academic users, that
+        provable, offline guarantee is the deciding feature, not decoration.
+      </p>
+
+      <h2 class="text-2xl font-bold">Download cleaned files and a cleanup report</h2>
+      <p class="muted">
+        When the batch finishes you can download any single file from its row, or
+        hit <strong>Download all cleaned</strong> to save the whole set at once —
+        original names preserved with a <code>-clean</code> suffix so you always
+        know which file is which. You can also copy or download a CSV report of
+        exactly what was normalized in each file, which is handy when an editor or
+        VA needs to show a client what changed. Word <code>.docx</code> and
+        <code>.zip</code> support is on the roadmap; those files are recognised and
+        flagged &ldquo;coming soon&rdquo; rather than mangled.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+  </style>
+</Base>

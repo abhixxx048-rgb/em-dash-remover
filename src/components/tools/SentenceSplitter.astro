@@ -1,0 +1,512 @@
+---
+// Interactive island for the Sentence Splitter.
+// Static HTML here; behavior is wired by the client client script, which imports the
+// pure engine. Styling reuses the same utility classes + tokens as Cleaner.astro
+// so it looks native in both light and dark mode.
+---
+
+<section id="tool" aria-label="Sentence splitter" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Output</span>
+        <select id="opt-mode" class="ctl px-3" aria-label="Output mode">
+          <option value="plain">Plain (one per line)</option>
+          <option value="numbered">Numbered (1. 2. 3.)</option>
+          <option value="markdown">Markdown list (-)</option>
+          <option value="csv">CSV (sentence,words)</option>
+        </select>
+      </label>
+
+      <label class="ctl flex cursor-pointer items-center gap-2 px-3">
+        <input type="checkbox" id="opt-paras" checked class="h-5 w-5" />
+        <span>Keep paragraphs</span>
+      </label>
+
+      <details class="group relative w-full sm:w-auto">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Abbreviations <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 w-full space-y-2 p-3 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-72 sm:shadow-lg">
+          <label for="opt-abbr" class="block font-medium">Treat these as abbreviations too</label>
+          <input id="opt-abbr" type="text" placeholder="Fig., Eq., Approx."
+            class="w-full rounded-lg border border-ink/15 bg-transparent px-3 py-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+            aria-label="Custom abbreviations, comma separated" />
+          <p class="text-xs muted">Comma-separated. Saved in your browser. Titles like Dr. and decimals like 3.14 are already handled.</p>
+        </div>
+      </details>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Sentences</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to split into sentences"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste text to split it one sentence per line — Dr. and 3.14 stay intact. Or try:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="tricky" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🧪 Tricky (Dr., e.g., 3.14)</button>
+              <button data-sample="uniform" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 Uniform (AI-like)</button>
+              <button data-sample="varied" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✍️ Varied</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats">0 words · 0 chars</p>
+      </div>
+
+      <!-- Output -->
+      <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between gap-2">
+          <div class="flex items-baseline gap-2">
+            <span id="count-num" class="text-2xl font-bold leading-none" data-v="0">0</span>
+            <span class="text-xs font-semibold uppercase tracking-wide muted">sentences</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="rejoin" aria-label="Rejoin sentences into a paragraph" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Rejoin into a paragraph">↩</button>
+            <button id="download" aria-label="Download sentences as a file" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+
+        <!-- Cadence lines: each sentence as a row with a length bar + word badge.
+             Falls back to a read-only textarea for raw copy/select-all. -->
+        <div id="lines" class="max-h-[24rem] w-full overflow-auto rounded-lg border border-ink/15 p-2 text-[15px] leading-relaxed" style="background: var(--c-paper);" role="list" aria-label="Sentences, one per line">
+          <p class="muted p-2 text-sm">Your sentences will appear here, one per line, with a length bar so you can see your rhythm.</p>
+        </div>
+
+        <!-- Hidden mirror for accurate copy/download of the chosen output mode. -->
+        <textarea id="output" class="sr-only" readonly aria-hidden="true" tabindex="-1"></textarea>
+
+        <!-- No-boundaries gentle note -->
+        <p id="note" class="mt-2 text-xs" style="color: var(--color-warn);" hidden></p>
+      </div>
+    </div>
+
+    <!-- Cadence stats strip -->
+    <div class="grid items-center gap-5 border-t border-ink/8 px-4 py-4 sm:grid-cols-[auto_1fr]">
+      <!-- Monotony meter -->
+      <div class="flex items-center gap-4">
+        <div class="relative h-20 w-20 shrink-0">
+          <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+            <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+            <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+              stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+              style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="mono-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span class="text-[9px] muted">uniformity</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide muted">Cadence</p>
+          <p id="mono-label" class="text-sm font-semibold">Paste text to audit</p>
+          <p id="mono-hint" class="mt-0.5 text-xs muted">Uniform sentence lengths read robotic. Vary them.</p>
+        </div>
+      </div>
+      <!-- Numeric stats (never color-only) -->
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wide muted">By the numbers</span>
+        <ul id="stats" class="mt-1.5 flex flex-wrap gap-1.5 text-xs" aria-live="polite">
+          <li class="muted">Paste text to see your stats.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<style>
+  /* Length-band tints for cadence bars. Never color-only — every row also shows
+     a numeric word badge and an aria-label naming the band. */
+  .cad-row { display: grid; grid-template-columns: 1fr auto; gap: 0.5rem; align-items: center; }
+  .cad-bar-wrap { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
+  .cad-bar { height: 0.55rem; border-radius: 999px; flex: none; min-width: 4px; }
+  .cad-short { background: var(--color-ok); }
+  .cad-medium { background: var(--color-accent); }
+  .cad-long { background: var(--color-warn); }
+  .cad-veryLong { background: var(--color-bad); }
+  .cad-badge { font-size: 11px; font-variant-numeric: tabular-nums; }
+  .cad-pulse { animation: cadPulse 1.1s ease; border-radius: 6px; }
+  @keyframes cadPulse {
+    0%, 100% { outline: 2px solid transparent; }
+    30% { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .cad-pulse { animation: none; } }
+</style>
+
+<script>
+  import {
+    split,
+    render,
+    rejoin,
+    bandLabel,
+    DEFAULT_OPTIONS,
+    type SplitOptions,
+    type OutputMode,
+    type SplitResult,
+  } from '../../lib/tools/sentence-splitter';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+
+  // --- sample texts for the empty state
+  const SAMPLES: Record<string, string> = {
+    tricky: `Dr. Smith met with the team at 9 a.m. on Tuesday. The budget is about $1,000.50, give or take. He said, "Is the report ready?" and waited. We use tools like Slack, Notion, etc. for this. Pi is roughly 3.14, which surprised no one. J. R. R. Tolkien wrote it. Visit https://example.com/docs for more, e.g. the setup guide.`,
+    uniform: `The new feature is ready for review. It improves the loading speed by a lot. Users have asked for this change often. The team worked hard on the update. We tested it across many devices. The results look very promising so far. It should ship by the end of the week. We are excited to share it with you.`,
+    varied: `Stop. You are overthinking this. The truth is that good writing, the kind that actually holds a reader's attention from the first line to the last, rarely comes from a single tidy formula — it comes from rhythm, from the way a long, winding sentence gives way to something short. Like this. Read your draft aloud. If every line sounds the same length, you have a problem, and now you can see it.`,
+  };
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- animated count-up for the sentence headline & monotony score
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to);
+      el.dataset.v = String(to);
+      return;
+    }
+    const from = parseInt(el.dataset.v || '0', 10);
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick);
+      else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  const RING = 213.6;
+
+  function escapeHtml(s: string): string {
+    return s.replace(/[&<>"]/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  }
+
+  function readOptions(): SplitOptions {
+    const raw = $<HTMLInputElement>('opt-abbr').value;
+    const custom = raw.split(',').map((s) => s.trim()).filter(Boolean);
+    return {
+      ...DEFAULT_OPTIONS,
+      preserveParagraphs: $<HTMLInputElement>('opt-paras').checked,
+      customAbbreviations: custom,
+    };
+  }
+
+  function currentMode(): OutputMode {
+    return $<HTMLSelectElement>('opt-mode').value as OutputMode;
+  }
+
+  // Max words used to scale a bar to ~100% width.
+  function barWidth(words: number, max: number): number {
+    if (max <= 0) return 4;
+    return Math.max(6, Math.round((words / max) * 100));
+  }
+
+  let lastResult: SplitResult | null = null;
+  let rejoined = false; // toggle state for the rejoin view
+
+  // --- render the cadence lines
+  function renderLines(result: SplitResult) {
+    const el = $<HTMLDivElement>('lines');
+    const real = result.sentences.filter((s) => !s.isBreak);
+    if (real.length === 0) {
+      el.innerHTML = '<p class="muted p-2 text-sm">Your sentences will appear here, one per line, with a length bar so you can see your rhythm.</p>';
+      return;
+    }
+    const maxWords = Math.max(...real.map((s) => s.words), 1);
+    let html = '';
+    let n = 0;
+    for (const s of result.sentences) {
+      if (s.isBreak) {
+        html += '<div class="h-2" aria-hidden="true"></div>';
+        continue;
+      }
+      n++;
+      const w = barWidth(s.words, maxWords);
+      const label = bandLabel(s.band);
+      html += `<div class="cad-row rounded-md px-2 py-1 hover:bg-ink/5" data-idx="${n - 1}" role="listitem" aria-label="Sentence ${n}: ${s.words} word${s.words === 1 ? '' : 's'}, ${label}">
+        <div class="min-w-0 break-words">${escapeHtml(s.text)}</div>
+        <div class="cad-bar-wrap justify-self-end">
+          <span class="cad-bar cad-${s.band}" style="width: ${Math.round(w * 0.6)}px" title="${s.words} words, ${label}"></span>
+          <span class="cad-badge muted">${s.words}</span>
+        </div>
+      </div>`;
+    }
+    el.innerHTML = html;
+  }
+
+  function statChip(text: string, jumpIdx?: number): string {
+    const cls = 'rounded-full px-2 py-0.5';
+    if (jumpIdx !== undefined) {
+      return `<li><button data-jump="${jumpIdx}" class="${cls} text-accent transition hover:underline" style="background: var(--c-accent-soft);">${text}</button></li>`;
+    }
+    return `<li class="${cls} muted" style="background: color-mix(in srgb, var(--c-ink) 6%, transparent);">${text}</li>`;
+  }
+
+  function run() {
+    const src = input.value;
+    rejoined = false;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    // input header stats
+    const chars = src.length;
+    const words = src.trim() ? src.trim().split(/\s+/).filter(Boolean).length : 0;
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${words} word${words === 1 ? '' : 's'} · ${chars} char${chars === 1 ? '' : 's'}`;
+
+    const result = split(src, readOptions());
+    lastResult = result;
+    const { stats } = result;
+
+    const countEl = $<HTMLSpanElement>('count-num');
+    const copyBtn = $<HTMLButtonElement>('copy');
+    const copyBar = $<HTMLButtonElement>('copy-bar');
+    const monoNum = $<HTMLSpanElement>('mono-num');
+    const ring = document.getElementById('ring') as unknown as SVGCircleElement;
+
+    if (!src.trim()) {
+      countEl.textContent = '0';
+      countEl.dataset.v = '0';
+      renderLines(result);
+      output.value = '';
+      copyBtn.disabled = true;
+      copyBar.disabled = true;
+      monoNum.textContent = '—';
+      monoNum.dataset.v = '0';
+      ring.style.strokeDashoffset = String(RING);
+      ring.style.stroke = 'var(--color-ok)';
+      $<HTMLParagraphElement>('mono-label').textContent = 'Paste text to audit';
+      $<HTMLUListElement>('stats').innerHTML = '<li class="muted">Paste text to see your stats.</li>';
+      $<HTMLParagraphElement>('note').hidden = true;
+      return;
+    }
+
+    animateCount(countEl, stats.sentences);
+    renderLines(result);
+    output.value = render(result, currentMode());
+    copyBtn.disabled = output.value.length === 0;
+    copyBar.disabled = output.value.length === 0;
+
+    // Monotony meter
+    animateCount(monoNum, stats.monotony);
+    ring.style.strokeDashoffset = String(RING * (1 - stats.monotony / 100));
+    const color = stats.monotony < 35 ? 'var(--color-ok)' : stats.monotony < 65 ? 'var(--color-warn)' : 'var(--color-bad)';
+    ring.style.stroke = color;
+    $<HTMLParagraphElement>('mono-label').textContent = stats.monotonyLabel;
+
+    // Stats strip — numeric, with click-to-jump for longest/shortest.
+    const chips: string[] = [];
+    chips.push(statChip(`${stats.words} words`));
+    chips.push(statChip(`avg ${stats.avgWords} words/sentence`));
+    if (stats.longest) chips.push(statChip(`longest: ${stats.longest.words} ↗`, stats.longest.index));
+    if (stats.shortest) chips.push(statChip(`shortest: ${stats.shortest.words} ↗`, stats.shortest.index));
+    chips.push(statChip(`${stats.pctShort}% short · ${stats.pctMedium}% med · ${stats.pctLong}% long`));
+    $<HTMLUListElement>('stats').innerHTML = chips.join('');
+
+    // No-boundaries gentle note
+    const note = $<HTMLParagraphElement>('note');
+    if (result.noBoundaries) {
+      note.textContent = 'No sentence endings detected — treated as one sentence.';
+      note.hidden = false;
+    } else {
+      note.hidden = true;
+    }
+  }
+
+  // --- debounced live update
+  let raf = 0;
+  const schedule = () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(run);
+  };
+  input.addEventListener('input', schedule);
+  $('opt-mode').addEventListener('change', () => { savePrefs(); run(); });
+  $('opt-paras').addEventListener('change', () => { savePrefs(); run(); });
+  let abbrTimer = 0;
+  $('opt-abbr').addEventListener('input', () => {
+    clearTimeout(abbrTimer);
+    abbrTimer = window.setTimeout(() => { savePrefs(); run(); }, 250);
+  });
+
+  // --- click-to-jump: scroll the matching line into view and pulse it
+  $('stats').addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-jump]') as HTMLButtonElement | null;
+    if (!btn) return;
+    const idx = btn.dataset.jump;
+    const row = document.querySelector<HTMLElement>(`#lines [data-idx="${idx}"]`);
+    if (!row) return;
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.classList.remove('cad-pulse');
+    void row.offsetWidth; // reflow to restart the animation
+    row.classList.add('cad-pulse');
+  });
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      input.value = SAMPLES[b.dataset.sample!];
+      run();
+      setPane('output');
+    }));
+
+  // --- shared actions
+  async function doPaste() {
+    try {
+      input.value = await navigator.clipboard.readText();
+      run();
+      setPane('output');
+      toast('Pasted');
+    } catch {
+      input.focus();
+      setPane('input');
+      toast('Press Ctrl/Cmd+V to paste');
+    }
+  }
+  async function doCopy() {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value);
+    const b = $<HTMLButtonElement>('copy');
+    const prev = b.textContent;
+    b.textContent = '✓ Copied';
+    toast('Copied to clipboard');
+    setTimeout(() => (b.textContent = prev), 1300);
+  }
+  function doReset() {
+    input.value = '';
+    run();
+    input.focus();
+    setPane('input');
+    toast('Cleared');
+  }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // --- rejoin: replace the input with the flowing-paragraph version
+  $<HTMLButtonElement>('rejoin').addEventListener('click', () => {
+    if (!lastResult) return;
+    const joined = rejoin(lastResult);
+    if (!joined) return;
+    input.value = joined;
+    run();
+    setPane('input');
+    toast('Rejoined into paragraphs');
+  });
+
+  // --- download (extension matches output mode)
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    if (!output.value) return;
+    const mode = currentMode();
+    const ext = mode === 'csv' ? 'csv' : 'txt';
+    const type = mode === 'csv' ? 'text/csv' : 'text/plain';
+    const blob = new Blob([output.value], { type });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sentences.${ext}`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast(`Downloaded sentences.${ext}`);
+  });
+
+  // --- keyboard: Cmd/Ctrl+Enter re-splits, Esc clears
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      run();
+      toast('Re-split');
+    } else if (e.key === 'Escape' && document.activeElement === input) {
+      e.preventDefault();
+      doReset();
+    }
+  });
+
+  // --- persistence (prefs + last draft)
+  function savePrefs() {
+    try {
+      localStorage.setItem('ss_prefs', JSON.stringify({
+        mode: $<HTMLSelectElement>('opt-mode').value,
+        paras: $<HTMLInputElement>('opt-paras').checked,
+        abbr: $<HTMLInputElement>('opt-abbr').value,
+      }));
+    } catch {}
+  }
+  function loadPrefs() {
+    try {
+      const p = JSON.parse(localStorage.getItem('ss_prefs') || '{}');
+      if (p.mode) $<HTMLSelectElement>('opt-mode').value = p.mode;
+      if (typeof p.paras === 'boolean') $<HTMLInputElement>('opt-paras').checked = p.paras;
+      if (typeof p.abbr === 'string') $<HTMLInputElement>('opt-abbr').value = p.abbr;
+    } catch {}
+  }
+
+  loadPrefs();
+  setPane('input');
+  run();
+</script>

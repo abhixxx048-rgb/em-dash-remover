@@ -1,0 +1,34 @@
+---
+import { relatedFor } from '../lib/tools-registry';
+
+interface Props {
+  currentSlug: string;
+}
+
+const { currentSlug } = Astro.props;
+const related = relatedFor(currentSlug, 4);
+---
+
+{related.length > 0 && (
+  <section class="mx-auto mt-16 max-w-5xl px-4">
+    <h2 class="text-2xl font-bold">Related tools</h2>
+    <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {related.map((tool) => (
+        <a
+          href={tool.href}
+          class="card group flex gap-3 p-4 transition hover:border-accent"
+          style="text-decoration: none;"
+          data-track="related_tool_clicked"
+          data-from={currentSlug}
+          data-to={tool.slug}
+        >
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-lg" style="background: var(--c-accent-soft);">{tool.icon}</span>
+          <span class="min-w-0">
+            <span class="block font-semibold group-hover:text-accent">{tool.title}</span>
+            <span class="mt-0.5 block text-sm muted">{tool.desc}</span>
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+)}

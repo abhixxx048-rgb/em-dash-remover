@@ -1,0 +1,586 @@
+---
+// The one interactive island for On-Device AI Rewrite.
+// Static HTML; behavior wired up by the client script, which imports the pure
+// helpers + the deterministic cleaner fallback + jsdiff for the before/after
+// view. The real rewrite uses Chrome's built-in Rewriter API (Gemini Nano)
+// when present, and degrades gracefully to deterministic cleanup otherwise.
+---
+
+<section id="tool" aria-label="On-device AI rewrite" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Header: capability badge + privacy line -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <span id="cap-badge" role="status" aria-live="polite"
+        class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold"
+        style="background: var(--c-accent-soft);">
+        <span id="cap-icon" aria-hidden="true">○</span>
+        <span id="cap-text">Checking on-device AI…</span>
+      </span>
+      <span class="muted hidden text-xs sm:inline">🔒 Runs on your device — no text is sent to any server.</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Tone</span>
+        <select id="opt-tone" class="ctl px-3" title="More formal tightens contractions and slang; same meaning.">
+          <option value="more-formal">More formal</option>
+          <option value="as-is" selected>As-is</option>
+          <option value="more-casual">More casual</option>
+        </select>
+      </label>
+
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Length</span>
+        <select id="opt-length" class="ctl px-3" title="Shorter condenses; longer expands with more detail.">
+          <option value="shorter">Shorter</option>
+          <option value="as-is" selected>As-is</option>
+          <option value="longer">Longer</option>
+        </select>
+      </label>
+
+      <label class="flex min-w-0 items-center gap-2">
+        <span class="font-medium">Format</span>
+        <select id="opt-format" class="ctl px-3" title="Plain text strips markdown; markdown keeps it.">
+          <option value="as-is">As-is</option>
+          <option value="plain-text" selected>Plain text</option>
+          <option value="markdown">Markdown</option>
+        </select>
+      </label>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Presets -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 sm:px-4">
+      <span class="text-xs font-semibold uppercase tracking-wide muted">Presets</span>
+      <div id="presets" class="flex flex-wrap gap-2" role="group" aria-label="Rewrite presets"></div>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Original</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Rewrite</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to rewrite"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste your text — or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="email" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✉️ AI email</button>
+              <button data-sample="essay" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📝 Essay</button>
+              <button data-sample="cover" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💼 Cover letter</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats">0 words · 0 chars</p>
+
+        <!-- Optional guidance (per-call context) -->
+        <details class="mt-2">
+          <summary class="cursor-pointer list-none text-xs font-medium text-accent marker:hidden">▸ Add guidance (optional)</summary>
+          <input id="guidance" type="text" placeholder="e.g. This is a customer-support reply; keep it warm"
+            aria-label="Rewrite guidance"
+            class="mt-2 w-full rounded-lg border border-ink/15 bg-transparent p-2 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" />
+        </details>
+      </div>
+
+      <!-- Output -->
+      <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <div class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
+            <button id="view-clean" class="min-h-9 rounded-md px-3 font-medium">Rewrite</button>
+            <button id="view-diff" class="min-h-9 rounded-md px-3 font-medium muted">Diff</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download rewrite as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <textarea id="output" rows="14" readonly aria-label="Rewritten text" aria-live="polite"
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+        <div id="diff" hidden
+          class="h-[calc(14*1.625em+1.5rem)] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed"
+          style="background: var(--c-paper);"></div>
+        <p class="mt-2 text-xs muted" id="out-stats">0 words · 0 chars</p>
+
+        <!-- One-time model download progress (hidden until needed) -->
+        <div id="dl-card" hidden class="mt-2 rounded-lg border border-ink/15 p-3 text-xs">
+          <p class="muted">Chrome is downloading the on-device AI model once. After this, rewrites are instant and offline.</p>
+          <div class="mt-2 h-2 w-full overflow-hidden rounded-full" style="background: color-mix(in srgb, var(--c-ink) 12%, transparent);">
+            <div id="dl-bar" class="h-full rounded-full transition-[width]" style="width:0%; background: var(--color-accent);"></div>
+          </div>
+          <p id="dl-pct" class="mt-1 muted">0%</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action bar + voice-match meter -->
+    <div class="grid items-center gap-5 border-t border-ink/8 px-4 py-4 sm:grid-cols-[auto_1fr]">
+      <div class="flex items-center gap-4">
+        <div class="relative h-20 w-20 shrink-0">
+          <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+            <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+            <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+              stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+              style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span class="text-[9px] muted">/ 100</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide muted">Voice match</p>
+          <p id="vm-label" class="text-sm font-semibold">Rewrite to preserve your voice</p>
+          <p id="delta" class="mt-0.5 text-xs muted" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 sm:items-end">
+        <div class="flex flex-wrap gap-2">
+          <button id="rewrite" class="inline-flex min-h-11 items-center rounded-lg bg-accent px-5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40">✨ Rewrite</button>
+          <button id="stop" hidden class="inline-flex min-h-11 items-center rounded-lg border border-ink/15 px-4 text-sm font-semibold transition hover:bg-ink/5">⏹ Stop</button>
+          <button id="reroll" hidden class="inline-flex min-h-11 items-center rounded-lg border border-ink/15 px-4 text-sm font-medium transition hover:bg-ink/5">🎲 Try again</button>
+        </div>
+        <span class="text-xs muted">Tip: press Ctrl/Cmd + Enter to rewrite.</span>
+        <!-- "Why this changed" education chips (deterministic fallback notes) -->
+        <ul id="notes" class="flex flex-wrap justify-end gap-1.5 text-xs" aria-live="polite"></ul>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 On-device path runs entirely in your browser — open DevTools → Network and you'll see zero requests during a rewrite.
+    The only network use is Chrome's one-time model download. No cloud fallback, ever.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="rewrite-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white">✨ Rewrite</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<script>
+  import {
+    DEFAULT_OPTIONS,
+    PRESETS,
+    SAMPLES,
+    SHARED_CONTEXT,
+    TONE_LABELS,
+    LENGTH_LABELS,
+    capabilityBadge,
+    deterministicRewrite,
+    stats,
+    voiceMatch,
+    type Capability,
+    type RewriteOptions,
+    type Tone,
+    type Length,
+    type Format,
+  } from '../../lib/tools/on-device-ai-rewrite';
+  import { diffWords } from 'diff';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+  const diffEl = $<HTMLDivElement>('diff');
+
+  // ----- minimal typing for the Chrome built-in Rewriter API (not yet in lib.dom)
+  interface RewriterMonitor { addEventListener(type: 'downloadprogress', cb: (e: { loaded: number }) => void): void; }
+  interface RewriterSession {
+    rewriteStreaming(text: string, opts?: { context?: string; signal?: AbortSignal }): AsyncIterable<string>;
+    rewrite(text: string, opts?: { context?: string; signal?: AbortSignal }): Promise<string>;
+    destroy(): void;
+  }
+  interface RewriterStatic {
+    availability(): Promise<'available' | 'downloadable' | 'unavailable' | 'downloading'>;
+    create(opts: Record<string, unknown>): Promise<RewriterSession>;
+  }
+  const Rewriter = (self as unknown as { Rewriter?: RewriterStatic }).Rewriter;
+
+  // ----- toast (shared helper pattern)
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2400);
+  }
+
+  // ----- count-up (shared helper pattern)
+  const RING = 213.6;
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(to); el.dataset.v = String(to); return; }
+    const from = parseInt(el.dataset.v || '0', 10);
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // ----- options
+  function readOptions(): RewriteOptions {
+    return {
+      ...DEFAULT_OPTIONS,
+      tone: $<HTMLSelectElement>('opt-tone').value as Tone,
+      length: $<HTMLSelectElement>('opt-length').value as Length,
+      format: $<HTMLSelectElement>('opt-format').value as Format,
+    };
+  }
+
+  // ----- persistence (settings + last text)
+  const OPT_IDS = ['opt-tone', 'opt-length', 'opt-format'];
+  function saveState() {
+    try {
+      localStorage.setItem('odr-opts', JSON.stringify({
+        tone: $<HTMLSelectElement>('opt-tone').value,
+        length: $<HTMLSelectElement>('opt-length').value,
+        format: $<HTMLSelectElement>('opt-format').value,
+        text: input.value,
+      }));
+    } catch {}
+  }
+  function loadState() {
+    try {
+      const s = JSON.parse(localStorage.getItem('odr-opts') || '{}');
+      if (s.tone) $<HTMLSelectElement>('opt-tone').value = s.tone;
+      if (s.length) $<HTMLSelectElement>('opt-length').value = s.length;
+      if (s.format) $<HTMLSelectElement>('opt-format').value = s.format;
+      if (typeof s.text === 'string') input.value = s.text;
+    } catch {}
+  }
+
+  // ----- presets (built from the pure module so labels/options stay in sync)
+  let pendingCleanFirst = false;
+  const presetsEl = $<HTMLDivElement>('presets');
+  for (const p of PRESETS) {
+    const b = document.createElement('button');
+    b.className = 'ctl inline-flex items-center px-3 text-sm transition hover:border-accent hover:text-accent';
+    b.textContent = p.label;
+    b.title = p.hint;
+    b.addEventListener('click', () => {
+      $<HTMLSelectElement>('opt-tone').value = p.options.tone;
+      $<HTMLSelectElement>('opt-length').value = p.options.length;
+      $<HTMLSelectElement>('opt-format').value = p.options.format;
+      pendingCleanFirst = !!p.cleanFirst;
+      saveState();
+      doRewrite();
+    });
+    presetsEl.appendChild(b);
+  }
+
+  // ----- capability badge
+  let capability: Capability = 'checking';
+  function paintBadge(cap: Capability) {
+    capability = cap;
+    const b = capabilityBadge(cap);
+    $('cap-icon').textContent = b.icon;
+    $('cap-text').textContent = b.text;
+    const chip = $<HTMLSpanElement>('cap-badge');
+    const color = b.tone === 'ok' ? 'var(--color-ok)' : b.tone === 'warn' ? 'var(--color-warn)' : 'var(--c-muted)';
+    chip.style.color = color;
+    chip.style.background = b.tone === 'muted'
+      ? 'color-mix(in srgb, var(--c-ink) 8%, transparent)'
+      : `color-mix(in srgb, ${color} 16%, transparent)`;
+  }
+
+  async function detectCapability() {
+    paintBadge('checking');
+    if (!Rewriter) { paintBadge('unavailable'); return; }
+    try {
+      const status = await Rewriter.availability();
+      if (status === 'available') paintBadge('available');
+      else if (status === 'downloadable' || status === 'downloading') paintBadge('downloadable');
+      else paintBadge('unavailable');
+    } catch { paintBadge('unavailable'); }
+  }
+
+  // ----- stats + voice-match
+  function paintStats() {
+    const si = stats(input.value);
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${si.words} word${si.words === 1 ? '' : 's'} · ${si.chars} chars` + (si.words ? ` · ${si.readingMin} min read` : '');
+    const so = stats(output.value);
+    $<HTMLParagraphElement>('out-stats').textContent =
+      `${so.words} word${so.words === 1 ? '' : 's'} · ${so.chars} chars` + (so.words ? ` · ${so.readingMin} min read` : '');
+    // Live word delta (e.g. "−38 words").
+    if (output.value && input.value) {
+      const d = so.words - si.words;
+      $<HTMLParagraphElement>('delta').textContent = d === 0 ? 'Same word count' : `${d > 0 ? '+' : '−'}${Math.abs(d)} words`;
+    } else {
+      $<HTMLParagraphElement>('delta').textContent = '';
+    }
+  }
+
+  function paintVoiceMatch() {
+    const vm = voiceMatch(input.value, output.value);
+    const num = $<HTMLSpanElement>('score-num');
+    const ring = document.getElementById('ring') as unknown as SVGCircleElement;
+    if (!output.value.trim() || !input.value.trim()) {
+      num.textContent = '—'; num.dataset.v = '0';
+      ring.style.strokeDashoffset = String(RING);
+      $<HTMLParagraphElement>('vm-label').textContent = 'Rewrite to preserve your voice';
+      return;
+    }
+    animateCount(num, vm.score);
+    ring.style.strokeDashoffset = String(RING * (1 - vm.score / 100));
+    const color = vm.score >= 75 ? 'var(--color-ok)' : vm.score >= 45 ? 'var(--color-warn)' : 'var(--color-bad)';
+    ring.style.stroke = color;
+    $<HTMLParagraphElement>('vm-label').textContent = vm.label;
+  }
+
+  // ----- diff
+  function renderDiff() {
+    diffEl.innerHTML = '';
+    for (const part of diffWords(input.value, output.value)) {
+      const span = document.createElement('span');
+      if (part.added) span.className = 'diff-ins';
+      else if (part.removed) span.className = 'diff-del';
+      span.textContent = part.value;
+      diffEl.appendChild(span);
+    }
+  }
+
+  // ----- notes chips ("why this changed")
+  function paintNotes(notes: string[]) {
+    const el = $<HTMLUListElement>('notes');
+    el.innerHTML = '';
+    for (const n of notes) {
+      const li = document.createElement('li');
+      li.className = 'rounded-full px-2 py-0.5';
+      li.style.background = 'var(--c-accent-soft)';
+      li.style.color = 'var(--color-accent)';
+      li.textContent = n;
+      el.appendChild(li);
+    }
+  }
+
+  // ----- output helpers
+  function setOutput(text: string) {
+    output.value = text;
+    const has = text.trim().length > 0;
+    $<HTMLButtonElement>('copy').disabled = !has;
+    ($('copy-bar') as HTMLButtonElement).disabled = !has;
+    $<HTMLButtonElement>('reroll').hidden = !has;
+    renderDiff();
+    paintStats();
+    paintVoiceMatch();
+  }
+
+  // ----- the rewrite flow
+  let controller: AbortController | null = null;
+  let busy = false;
+
+  function setBusy(on: boolean) {
+    busy = on;
+    $<HTMLButtonElement>('rewrite').disabled = on;
+    ($('rewrite-bar') as HTMLButtonElement).disabled = on;
+    $<HTMLButtonElement>('stop').hidden = !on;
+    OPT_IDS.forEach((id) => ($(id) as HTMLSelectElement).disabled = on);
+  }
+
+  async function doRewrite() {
+    if (busy) return;
+    let src = input.value.trim();
+    if (!src) { input.focus(); setPane('input'); toast('Type or paste some text first'); return; }
+
+    // "Humanize" / fallback: run a deterministic de-AI-tell pass first.
+    const cleanFirst = pendingCleanFirst;
+    pendingCleanFirst = false;
+    const pre = cleanFirst ? deterministicRewrite(src) : { text: src, notes: [] as string[] };
+    src = pre.text;
+
+    // No on-device model? Deterministic cleanup IS the result. Label it honestly.
+    if (capability !== 'available' && capability !== 'downloadable') {
+      const det = deterministicRewrite(src);
+      setOutput(det.text);
+      paintNotes([...new Set([...pre.notes, ...det.notes])]);
+      setPane('output');
+      toast('Deterministic cleanup applied (on-device AI unavailable)');
+      saveState();
+      return;
+    }
+
+    const opts = readOptions();
+    const guidance = $<HTMLInputElement>('guidance').value.trim();
+    controller = new AbortController();
+    setBusy(true);
+    setView(false);
+    setPane('output');
+    setOutput('');
+    paintNotes(cleanFirst ? pre.notes : []);
+
+    try {
+      const session = await Rewriter!.create({
+        tone: opts.tone,
+        length: opts.length,
+        format: opts.format,
+        sharedContext: SHARED_CONTEXT,
+        expectedInputLanguages: ['en'],
+        signal: controller.signal,
+        monitor(m: RewriterMonitor) {
+          $('dl-card').hidden = false;
+          m.addEventListener('downloadprogress', (e) => {
+            const pct = Math.round((e.loaded || 0) * 100);
+            ($('dl-bar') as HTMLDivElement).style.width = pct + '%';
+            $<HTMLParagraphElement>('dl-pct').textContent = pct + '%';
+            if (pct >= 100) setTimeout(() => ($('dl-card').hidden = true), 600);
+          });
+        },
+      });
+      // Once a session exists the model is present; reflect that in the badge.
+      paintBadge('available');
+
+      // Stream chunks as they arrive for instant feedback (Section 4 feature 6).
+      let acc = '';
+      const stream = session.rewriteStreaming(src, { context: guidance, signal: controller.signal });
+      for await (const chunk of stream) {
+        acc += chunk;
+        // Update text live; defer the heavier diff/score work to the end.
+        output.value = acc;
+        paintStats();
+      }
+      session.destroy();
+      setOutput(acc);
+      toast(`Rewrite complete · ${stats(acc).words} words`);
+    } catch (err) {
+      // Aborted? Keep the partial output the user already saw (Section 5 #15).
+      if ((err as DOMException)?.name === 'AbortError') {
+        if (output.value.trim()) { setOutput(output.value); toast('Stopped — kept the partial rewrite'); }
+        else toast('Cancelled');
+      } else {
+        // create() rejected (hardware/storage shortfall) → deterministic fallback.
+        paintBadge('unavailable');
+        const det = deterministicRewrite(src);
+        setOutput(det.text);
+        paintNotes([...new Set([...pre.notes, ...det.notes])]);
+        toast('On-device AI failed — applied deterministic cleanup');
+      }
+    } finally {
+      $('dl-card').hidden = true;
+      controller = null;
+      setBusy(false);
+      saveState();
+    }
+  }
+
+  function doStop() { controller?.abort(); }
+
+  // ----- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // ----- view toggle
+  function setView(diff: boolean) {
+    output.hidden = diff; diffEl.hidden = !diff;
+    $<HTMLButtonElement>('view-clean').classList.toggle('muted', diff);
+    $<HTMLButtonElement>('view-diff').classList.toggle('muted', !diff);
+    $<HTMLButtonElement>('view-clean').style.background = diff ? '' : 'var(--c-accent-soft)';
+    $<HTMLButtonElement>('view-diff').style.background = diff ? 'var(--c-accent-soft)' : '';
+  }
+  $<HTMLButtonElement>('view-clean').addEventListener('click', () => setView(false));
+  $<HTMLButtonElement>('view-diff').addEventListener('click', () => setView(true));
+
+  // ----- shared actions
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); onInput(); setPane('input'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!output.value) return;
+    await navigator.clipboard.writeText(output.value);
+    const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+    b.textContent = '✓ Copied'; toast('Copied to clipboard');
+    setTimeout(() => (b.textContent = prev), 1300);
+  }
+  function doReset() {
+    input.value = ''; setOutput(''); paintNotes([]); onInput();
+    input.focus(); setPane('input'); saveState(); toast('Cleared');
+  }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('rewrite').addEventListener('click', () => doRewrite());
+  $('rewrite-bar').addEventListener('click', () => doRewrite());
+  $('stop').addEventListener('click', doStop);
+  $('reroll').addEventListener('click', () => doRewrite()); // local model varies per run
+
+  // download
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    if (!output.value) { toast('Nothing to download yet'); return; }
+    const md = $<HTMLSelectElement>('opt-format').value === 'markdown';
+    const blob = new Blob([output.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = md ? 'rewrite.md' : 'rewrite.txt'; a.click();
+    URL.revokeObjectURL(url); toast(`Downloaded ${a.download}`);
+  });
+
+  // samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!]; onInput(); setPane('input'); }));
+
+  // ----- live, debounced input handling (rAF) — updates the empty state & stats
+  let raf = 0;
+  function onInput() {
+    $<HTMLDivElement>('empty').hidden = input.value.length > 0;
+    paintStats();
+    paintVoiceMatch();
+    saveState();
+  }
+  input.addEventListener('input', () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(onInput); });
+  OPT_IDS.forEach((id) => $(id).addEventListener('change', saveState));
+
+  // ----- keyboard shortcuts (Section 5 feature 10)
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); doRewrite(); }
+    else if (e.key === 'Escape' && busy) { e.preventDefault(); doStop(); }
+  });
+
+  // ----- boot
+  loadState();
+  setView(false);
+  setPane('input');
+  onInput();
+  detectCapability();
+</script>

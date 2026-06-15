@@ -1,0 +1,568 @@
+---
+// Interactive island for the Human-Voice / AI-Tell Report.
+// Static HTML here; behavior is wired by the client client script, which imports the
+// pure engine. Styling reuses the same utility classes + tokens as Cleaner.astro
+// so it looks native in both light and dark mode. Non-destructive: the report is
+// fully derived from the input — the only mutation path is an explicit word swap.
+---
+
+<section id="tool" aria-label="Human-voice / AI-tell report" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <span class="font-medium">Highlight layers</span>
+      <label class="ctl flex cursor-pointer items-center gap-2 px-3"><input type="checkbox" id="cat-cadence" checked class="h-5 w-5" /> Cadence</label>
+      <label class="ctl flex cursor-pointer items-center gap-2 px-3"><input type="checkbox" id="cat-structure" checked class="h-5 w-5" /> Structure</label>
+      <label class="ctl flex cursor-pointer items-center gap-2 px-3"><input type="checkbox" id="cat-hedging" checked class="h-5 w-5" /> Hedging</label>
+      <label class="ctl flex cursor-pointer items-center gap-2 px-3"><input type="checkbox" id="cat-vocabulary" checked class="h-5 w-5" /> Vocabulary</label>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Write</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Report</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste or type your draft</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to analyze for AI tells"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste a draft — or try a sample. We check cadence, structure, hedging &amp; AI vocabulary.</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="heavy" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 Heavy AI</button>
+              <button data-sample="subtle" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🌗 Subtle</button>
+              <button data-sample="human" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🟢 Clean human</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats">0 words · 0 sentences</p>
+      </div>
+
+      <!-- Output / report rail -->
+      <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Human-voice read</h2>
+          <div class="flex items-center gap-1.5">
+            <button id="snapshot" aria-label="Snapshot a baseline to compare your edits" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft" title="Snapshot baseline">📸 Baseline</button>
+            <button id="download" aria-label="Download report as Markdown" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download report (.md)">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy report</button>
+          </div>
+        </div>
+
+        <!-- Headline gauge -->
+        <div class="flex items-center gap-4">
+          <div class="relative h-20 w-20 shrink-0">
+            <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+              <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+              <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+                stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+                style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+              <span class="text-[9px] muted">/ 100</span>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wide muted">AI-tell density</p>
+            <p id="band" class="text-sm font-semibold">Paste text to scan</p>
+            <p id="delta" class="mt-0.5 text-xs font-medium" aria-live="polite"></p>
+          </div>
+        </div>
+
+        <!-- Plain-language verdict (screen-reader announced) -->
+        <p id="verdict" class="mt-3 rounded-lg border border-ink/10 p-3 text-sm" style="background: var(--c-paper);" aria-live="polite">
+          Paste a draft to see why it might read like AI — and how to fix it in your own voice.
+        </p>
+
+        <!-- Burstiness chart -->
+        <div class="mt-3">
+          <p class="text-xs font-semibold uppercase tracking-wide muted">
+            Sentence cadence <span id="burst-cv" class="muted normal-case"></span>
+          </p>
+          <div id="chart" class="mt-1.5 flex h-16 items-end gap-px overflow-x-auto rounded-lg border border-ink/10 p-1.5" style="background: var(--c-paper);" aria-hidden="true"></div>
+          <p id="burst-note" class="mt-1 text-xs muted"></p>
+        </div>
+
+        <!-- Findings punch-list -->
+        <div class="mt-3">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+            <span class="font-semibold uppercase tracking-wide muted">Findings</span>
+            <span id="count-cadence" class="inline-flex items-center gap-1"><span class="cat-dot cat-cadence"></span>Cadence 0</span>
+            <span id="count-structure" class="inline-flex items-center gap-1"><span class="cat-dot cat-structure"></span>Structure 0</span>
+            <span id="count-hedging" class="inline-flex items-center gap-1"><span class="cat-dot cat-hedging"></span>Hedging 0</span>
+            <span id="count-vocabulary" class="inline-flex items-center gap-1"><span class="cat-dot cat-vocabulary"></span>Vocabulary 0</span>
+          </div>
+          <ol id="findings" class="mt-2 space-y-1.5 text-sm" aria-live="polite">
+            <li class="muted">Findings will appear here, grouped and jump-to-able.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlight surface + legend -->
+    <div class="border-t border-ink/8 px-4 py-4">
+      <div class="mb-2 flex flex-wrap items-center gap-3 text-xs">
+        <span class="font-semibold uppercase tracking-wide muted">Highlighted draft</span>
+        <span class="inline-flex items-center gap-1"><span class="cat-dot cat-cadence"></span>cadence</span>
+        <span class="inline-flex items-center gap-1"><span class="cat-dot cat-structure"></span>structure</span>
+        <span class="inline-flex items-center gap-1"><span class="cat-dot cat-hedging"></span>hedging</span>
+        <span class="inline-flex items-center gap-1"><span class="cat-dot cat-vocabulary"></span>vocabulary</span>
+        <span class="muted">Click a vocabulary highlight for human swaps.</span>
+      </div>
+      <div id="highlight" class="max-h-72 w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 text-[15px] leading-relaxed" style="background: var(--c-paper);">
+        <span class="muted">Your draft will appear here with each AI tell flagged in place.</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded. A guide for quality, not a detector.
+  </p>
+</section>
+
+<!-- Vocabulary-swap popover -->
+<div id="swap-pop" hidden role="dialog" aria-label="Human swaps"
+  class="fixed z-50 w-56 rounded-lg border border-ink/15 p-2 text-sm shadow-lg"
+  style="background: var(--c-surface);">
+  <p class="mb-1 px-1 text-xs font-semibold muted">Swap <span id="swap-word"></span> for:</p>
+  <div id="swap-opts" class="flex flex-col gap-1"></div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy report</button>
+</div>
+
+<style>
+  /* Category accents — each highlight carries BOTH a tinted background AND a
+     distinct underline style, so the signal never relies on color alone
+     (WCAG 1.4.1). The legend dots reuse the same colors. */
+  .cat-dot { display: inline-block; height: 0.75rem; width: 1rem; border-radius: 3px; vertical-align: middle; }
+  .cat-cadence    { background: rgb(109 94 252 / 0.30); }
+  .cat-structure  { background: rgb(244 63 94 / 0.26); }
+  .cat-hedging    { background: rgb(245 158 11 / 0.28); }
+  .cat-vocabulary { background: rgb(16 185 129 / 0.26); }
+
+  .hl { border-radius: 3px; cursor: pointer; padding: 0 1px; }
+  .hl-cadence    { background: rgb(109 94 252 / 0.20); text-decoration: underline dotted rgb(109 94 252 / 0.9); }
+  .hl-structure  { background: rgb(244 63 94 / 0.18); text-decoration: underline wavy rgb(190 30 50 / 0.8); }
+  .hl-hedging    { background: rgb(245 158 11 / 0.20); text-decoration: underline dashed rgb(180 110 4 / 0.8); }
+  .hl-vocabulary { background: rgb(16 185 129 / 0.18); text-decoration: underline solid rgb(5 95 70 / 0.8); }
+  :global(.dark) .hl-cadence    { background: rgb(109 94 252 / 0.32); text-decoration-color: #b5acff; }
+  :global(.dark) .hl-structure  { background: rgb(244 63 94 / 0.28); text-decoration-color: #fda4af; }
+  :global(.dark) .hl-hedging    { background: rgb(245 158 11 / 0.30); text-decoration-color: #fcd34d; }
+  :global(.dark) .hl-vocabulary { background: rgb(16 185 129 / 0.28); text-decoration-color: #6ee7b7; }
+
+  .hl-pulse { animation: hlPulse 1.1s ease; }
+  @keyframes hlPulse {
+    0%, 100% { outline: 2px solid transparent; }
+    30% { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .hl-pulse { animation: none; } }
+
+  .bar { flex: 1 0 4px; min-width: 4px; border-radius: 2px 2px 0 0; background: var(--color-accent); opacity: 0.55; cursor: pointer; transition: opacity .15s ease; }
+  .bar:hover, .bar:focus-visible { opacity: 1; outline: none; }
+</style>
+
+<script>
+  import {
+    analyze,
+    resolveHighlights,
+    buildReport,
+    bandLabel,
+    CATEGORY_LABELS,
+    type Report,
+    type Finding,
+    type FindingCategory,
+  } from '../../lib/tools/human-voice-ai-tell-report';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const CATS: FindingCategory[] = ['cadence', 'structure', 'hedging', 'vocabulary'];
+
+  // --- sample drafts for the empty state --------------------------------
+  const SAMPLES: Record<string, string> = {
+    heavy: `In today's fast-paced world, effective communication stands as a testament to human ingenuity. It's not just about words — it's about connection. Moreover, it's important to note that clarity is paramount. Furthermore, we must delve into the intricate tapestry of language. Additionally, robust, seamless, and compelling messaging can unlock the full potential of any team. Ultimately, mastering this art will underscore your value, elevate your brand, and foster lasting trust. In conclusion, the future belongs to those who navigate this landscape with meticulous care.`,
+    subtle: `Good writing takes practice. It's worth noting that most drafts improve on the second pass. You should read your work aloud, cut the filler, and fix the rhythm. A robust edit will sharpen weak sentences. Keep your reader in mind, and the words will follow. The best writers revise relentlessly.`,
+    human: `I rewrote the intro three times last night. The first version felt stiff. The second was better but too long. By the third, I'd cut half of it and finally liked how it read. Funny how that works — you have to write the bad version first to find the good one. Anyway, it's done now. Ship it.`,
+  };
+
+  // --- toast ------------------------------------------------------------
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- animated count-up for the headline score -------------------------
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to); el.dataset.v = String(to); return;
+    }
+    const from = parseInt(el.dataset.v || '0', 10);
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/[&<>"]/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+  }
+
+  const RING = 213.6;
+  let lastReport: Report | null = null;
+  let baseline: { score: number; report: Report } | null = null;
+
+  // --- which highlight layers are enabled -------------------------------
+  function enabledCats(): Set<FindingCategory> {
+    const s = new Set<FindingCategory>();
+    for (const c of CATS) if ($<HTMLInputElement>(`cat-${c}`).checked) s.add(c);
+    return s;
+  }
+
+  // --- render the inline highlight surface ------------------------------
+  function renderHighlights(src: string, report: Report) {
+    const el = $<HTMLDivElement>('highlight');
+    if (!src.trim()) {
+      el.innerHTML = '<span class="muted">Your draft will appear here with each AI tell flagged in place.</span>';
+      return;
+    }
+    const on = enabledCats();
+    const spans = resolveHighlights(report.findings).filter((s) => on.has(s.category));
+    // Map a span back to its finding so the popover can read swaps.
+    const byId = new Map<string, Finding>(report.findings.map((f) => [f.id, f]));
+
+    let html = '';
+    let cursor = 0;
+    for (const s of spans) {
+      if (s.start > cursor) html += escapeHtml(src.slice(cursor, s.start));
+      const raw = src.slice(s.start, s.end);
+      const f = byId.get(s.findingId);
+      const swap = f?.swaps?.length ? ` data-swaps="${escapeHtml(f.swaps.join('|'))}" data-word="${escapeHtml(raw)}"` : '';
+      const title = f ? `${f.label} — ${f.why}` : '';
+      html += `<span class="hl hl-${s.category}" data-fid="${s.findingId}" data-start="${s.start}"${swap} title="${escapeHtml(title)}">${escapeHtml(raw)}</span>`;
+      cursor = s.end;
+    }
+    if (cursor < src.length) html += escapeHtml(src.slice(cursor));
+    el.innerHTML = html;
+  }
+
+  // --- render the burstiness chart --------------------------------------
+  function renderChart(report: Report) {
+    const chart = $<HTMLDivElement>('chart');
+    const cv = $<HTMLSpanElement>('burst-cv');
+    const note = $<HTMLParagraphElement>('burst-note');
+    const b = report.burstiness;
+    chart.innerHTML = '';
+    if (b.bars.length === 0) {
+      cv.textContent = '';
+      note.textContent = '';
+      return;
+    }
+    if (b.lowConfidence) {
+      cv.textContent = '';
+      note.textContent = 'Add more text (5+ sentences) for a reliable cadence read.';
+    } else {
+      cv.textContent = `· variation ${b.cv} (${b.band})`;
+      note.textContent =
+        b.band === 'uniform'
+          ? 'Uniform cadence — a flat skyline reads robotic. Mix short and long sentences.'
+          : b.band === 'bursty'
+          ? 'Varied cadence — this reads human.'
+          : 'Reasonable cadence variation.';
+    }
+    const max = Math.max(...b.bars.map((x) => x.words), 1);
+    b.bars.forEach((bar) => {
+      const div = document.createElement('button');
+      div.className = 'bar';
+      div.style.height = `${Math.max(8, Math.round((bar.words / max) * 100))}%`;
+      div.dataset.start = String(bar.start);
+      div.title = `${bar.words} words`;
+      div.setAttribute('aria-label', `Sentence: ${bar.words} words — jump to it`);
+      chart.appendChild(div);
+    });
+  }
+
+  // --- render the findings punch-list -----------------------------------
+  function renderFindings(report: Report) {
+    for (const c of report.counts) {
+      $<HTMLSpanElement>(`count-${c.category}`).innerHTML =
+        `<span class="cat-dot cat-${c.category}"></span>${c.label} ${c.count}`;
+    }
+    const list = $<HTMLOListElement>('findings');
+    const on = enabledCats();
+    const shown = report.findings.filter((f) => on.has(f.category));
+    if (shown.length === 0) {
+      list.innerHTML = report.findings.length === 0
+        ? '<li class="rounded-lg px-2 py-1.5" style="background: color-mix(in srgb, var(--color-ok) 14%, transparent); color: var(--color-ok);">No strong tells found — reads human ✓</li>'
+        : '<li class="muted">No findings in the enabled layers.</li>';
+      return;
+    }
+    list.innerHTML = '';
+    // De-duplicate identical label+text so the list stays a tight checklist.
+    const seen = new Set<string>();
+    for (const f of shown) {
+      const key = `${f.label}::${f.text}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const li = document.createElement('li');
+      const snip = f.text ? `"${f.text.trim().slice(0, 56)}${f.text.length > 56 ? '…' : ''}"` : f.label;
+      li.innerHTML = `<details class="rounded-lg border border-ink/10 px-2 py-1.5" style="background: var(--c-paper);">
+        <summary class="flex cursor-pointer list-none items-start gap-2 marker:hidden">
+          <span class="cat-dot cat-${f.category} mt-1 shrink-0"></span>
+          <span class="min-w-0 flex-1"><span class="font-medium">${escapeHtml(f.label)}</span> <span class="muted">${escapeHtml(snip)}</span></span>
+          <button data-jump="${f.start}" class="shrink-0 rounded px-1.5 text-xs font-medium text-accent hover:underline" aria-label="Jump to this finding in the text">↧</button>
+        </summary>
+        <p class="mt-1.5 pl-6 text-xs muted">${escapeHtml(f.why)} <span class="italic">— ${escapeHtml(f.source)}</span></p>
+        ${f.swaps?.length ? `<p class="mt-1 pl-6 text-xs">Try: ${f.swaps.map((s) => `<span class="rounded px-1" style="background: var(--c-accent-soft); color: var(--color-accent);">${escapeHtml(s)}</span>`).join(' ')}</p>` : ''}
+      </details>`;
+      list.appendChild(li);
+    }
+  }
+
+  // --- main run ---------------------------------------------------------
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const report = analyze(src);
+    lastReport = report;
+
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${report.words} word${report.words === 1 ? '' : 's'} · ${report.sentences} sentence${report.sentences === 1 ? '' : 's'}`;
+
+    const scoreNum = $<HTMLSpanElement>('score-num');
+    const ring = document.getElementById('ring') as unknown as SVGCircleElement;
+    const copyBtn = $<HTMLButtonElement>('copy');
+    const copyBar = $<HTMLButtonElement>('copy-bar');
+
+    if (!src.trim()) {
+      scoreNum.textContent = '—'; scoreNum.dataset.v = '0';
+      ring.style.strokeDashoffset = String(RING);
+      $<HTMLParagraphElement>('band').textContent = 'Paste text to scan';
+      $<HTMLParagraphElement>('delta').textContent = '';
+      $<HTMLParagraphElement>('verdict').textContent = 'Paste a draft to see why it might read like AI — and how to fix it in your own voice.';
+      copyBtn.disabled = true; copyBar.disabled = true;
+    } else {
+      animateCount(scoreNum, report.score);
+      ring.style.strokeDashoffset = String(RING * (1 - report.score / 100));
+      const color = report.band === 'human' ? 'var(--color-ok)' : report.band === 'some' ? 'var(--color-warn)' : 'var(--color-bad)';
+      ring.style.stroke = color;
+      $<HTMLParagraphElement>('band').textContent = bandLabel(report.band);
+      $<HTMLParagraphElement>('verdict').textContent = report.verdict;
+      copyBtn.disabled = false; copyBar.disabled = false;
+
+      // before/after delta vs the snapshot baseline
+      const deltaEl = $<HTMLParagraphElement>('delta');
+      if (baseline) {
+        const d = baseline.score - report.score;
+        if (d > 0) { deltaEl.textContent = `▼ ${d} better than baseline (${baseline.score})`; deltaEl.style.color = 'var(--color-ok)'; }
+        else if (d < 0) { deltaEl.textContent = `▲ ${-d} above baseline (${baseline.score})`; deltaEl.style.color = 'var(--color-warn)'; }
+        else { deltaEl.textContent = `= baseline (${baseline.score})`; deltaEl.style.color = ''; }
+      } else {
+        deltaEl.textContent = '';
+      }
+    }
+
+    renderChart(report);
+    renderFindings(report);
+    renderHighlights(src, report);
+    saveDraft(src);
+  }
+
+  // --- debounced live update --------------------------------------------
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  CATS.forEach((c) => $(`cat-${c}`).addEventListener('change', () => { savePrefs(); run(); }));
+
+  // --- jump-to: scroll the highlight surface and pulse the span ----------
+  function jumpTo(start: string) {
+    const wanted = document.querySelector<HTMLElement>(`#highlight [data-start="${start}"]`);
+    if (!wanted) return;
+    wanted.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    wanted.classList.remove('hl-pulse');
+    void wanted.offsetWidth;
+    wanted.classList.add('hl-pulse');
+  }
+  $('findings').addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest('[data-jump]') as HTMLButtonElement | null;
+    if (btn) { e.preventDefault(); jumpTo(btn.dataset.jump!); }
+  });
+  $('chart').addEventListener('click', (e) => {
+    const bar = (e.target as HTMLElement).closest('.bar') as HTMLElement | null;
+    if (bar) jumpTo(bar.dataset.start!);
+  });
+
+  // --- vocabulary swap popover (the ONLY mutation path) -----------------
+  const pop = $<HTMLDivElement>('swap-pop');
+  let swapTarget: { word: string; node: HTMLElement } | null = null;
+  function closePop() { pop.hidden = true; swapTarget = null; }
+
+  $('highlight').addEventListener('click', (e) => {
+    const span = (e.target as HTMLElement).closest('.hl') as HTMLElement | null;
+    if (!span || !span.dataset.swaps) return;
+    swapTarget = { word: span.dataset.word || span.textContent || '', node: span };
+    $<HTMLSpanElement>('swap-word').textContent = `"${swapTarget.word}"`;
+    const opts = $<HTMLDivElement>('swap-opts');
+    opts.innerHTML = '';
+    for (const s of span.dataset.swaps.split('|')) {
+      const b = document.createElement('button');
+      b.className = 'ctl w-full px-2 text-left text-sm transition hover:border-accent hover:text-accent';
+      b.textContent = s;
+      b.addEventListener('click', () => applySwap(s));
+      opts.appendChild(b);
+    }
+    const r = span.getBoundingClientRect();
+    pop.style.left = `${Math.min(r.left, window.innerWidth - 240)}px`;
+    pop.style.top = `${Math.min(r.bottom + 6, window.innerHeight - 160)}px`;
+    pop.hidden = false;
+  });
+
+  // Replace the FIRST occurrence of the flagged word at/after its offset.
+  function applySwap(replacement: string) {
+    if (!swapTarget) return;
+    const start = parseInt(swapTarget.node.dataset.start || '0', 10);
+    const word = swapTarget.word;
+    const src = input.value;
+    // Preserve leading capitalization of the original word.
+    const repl = /^[A-Z]/.test(word) ? replacement[0].toUpperCase() + replacement.slice(1) : replacement;
+    if (src.slice(start, start + word.length) === word) {
+      input.value = src.slice(0, start) + repl + src.slice(start + word.length);
+    } else {
+      input.value = src.replace(word, repl); // fallback
+    }
+    closePop();
+    run();
+    toast(`Swapped "${word}" → "${repl}"`);
+  }
+  document.addEventListener('click', (e) => {
+    if (!pop.hidden && !pop.contains(e.target as Node) && !(e.target as HTMLElement).closest('.hl')) closePop();
+  });
+
+  // --- mobile pane switcher ---------------------------------------------
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- samples ----------------------------------------------------------
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      input.value = SAMPLES[b.dataset.sample!];
+      baseline = null;
+      run();
+      setPane('output');
+    }));
+
+  // --- shared actions ---------------------------------------------------
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); baseline = null; run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!lastReport) return;
+    await navigator.clipboard.writeText(buildReport(lastReport));
+    const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+    b.textContent = '✓ Copied'; toast('Report copied to clipboard');
+    setTimeout(() => (b.textContent = prev), 1300);
+  }
+  function doReset() { input.value = ''; baseline = null; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // --- snapshot baseline for before/after compare -----------------------
+  $('snapshot').addEventListener('click', () => {
+    if (!lastReport || !input.value.trim()) { toast('Paste a draft first'); return; }
+    baseline = { score: lastReport.score, report: lastReport };
+    run();
+    toast(`Baseline set at ${baseline.score}/100 — edit to see the delta`);
+  });
+
+  // --- download report (.md) --------------------------------------------
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    if (!lastReport || !input.value.trim()) { toast('Paste a draft first'); return; }
+    const blob = new Blob([buildReport(lastReport)], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'human-voice-ai-tell-report.md'; a.click();
+    URL.revokeObjectURL(url);
+    toast('Downloaded report.md');
+  });
+
+  // --- keyboard: Cmd/Ctrl+Enter re-scans, Esc clears popover/text -------
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); toast('Re-scanned'); }
+    else if (e.key === 'Escape') {
+      if (!pop.hidden) closePop();
+    }
+  });
+
+  // --- persistence (last draft + layer prefs) ---------------------------
+  function saveDraft(text: string) { try { localStorage.setItem('hvatr_draft', text); } catch {} }
+  function savePrefs() {
+    try {
+      const p: Record<string, boolean> = {};
+      for (const c of CATS) p[c] = $<HTMLInputElement>(`cat-${c}`).checked;
+      localStorage.setItem('hvatr_prefs', JSON.stringify(p));
+    } catch {}
+  }
+  function loadPrefs() {
+    try {
+      const p = JSON.parse(localStorage.getItem('hvatr_prefs') || '{}');
+      for (const c of CATS) if (typeof p[c] === 'boolean') $<HTMLInputElement>(`cat-${c}`).checked = p[c];
+      const draft = localStorage.getItem('hvatr_draft');
+      if (draft) input.value = draft;
+    } catch {}
+  }
+
+  loadPrefs();
+  setPane('input');
+  run();
+</script>

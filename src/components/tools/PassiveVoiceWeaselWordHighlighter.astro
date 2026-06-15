@@ -1,0 +1,407 @@
+---
+// Interactive island for the Passive-Voice & Weasel-Word Highlighter.
+// Static HTML here; behavior wired by the client client script, which imports the
+// pure engine. Matches the Cleaner / Readability tool look exactly.
+---
+
+<section id="tool" aria-label="Passive voice and weasel word highlighter" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <span class="font-medium">Show:</span>
+      <label class="flex min-h-11 items-center gap-2 rounded-lg px-2 hover:bg-ink/5">
+        <input type="checkbox" id="opt-passive" checked class="h-5 w-5" /> Passive
+      </label>
+      <label class="flex min-h-11 items-center gap-2 rounded-lg px-2 hover:bg-ink/5">
+        <input type="checkbox" id="opt-adverb" checked class="h-5 w-5" /> Adverbs
+      </label>
+      <label class="flex min-h-11 items-center gap-2 rounded-lg px-2 hover:bg-ink/5">
+        <input type="checkbox" id="opt-weasel" checked class="h-5 w-5" /> Weasel
+      </label>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Edit</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Highlights</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste or type your draft</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to analyze"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste a draft — or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="ai" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 Hedge-heavy AI</button>
+              <button data-sample="passive" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🏛 Passive bureaucratese</button>
+              <button data-sample="fiction" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📖 Adverb-stuffed fiction</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats">0 words · 0 sentences</p>
+      </div>
+
+      <!-- Highlighted output -->
+      <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Highlighted</h2>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download your text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <!-- Read-only highlight surface; the textarea on the left stays the
+             source of truth. Each flagged span is a <mark> with a category
+             class (background + distinct underline) and an aria-label. -->
+        <div id="highlight" aria-live="polite"
+          class="h-[calc(14*1.625em+1.5rem)] w-full overflow-auto whitespace-pre-wrap rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed"
+          style="background: var(--c-paper);">
+          <span class="muted">Flagged passive voice, adverbs and weasel words will appear here.</span>
+        </div>
+        <!-- Legend — never colour-only, each has a distinct underline. -->
+        <div class="mt-2 flex flex-wrap items-center gap-3 text-xs">
+          <span class="inline-flex items-center gap-1"><span class="fl-passive inline-block h-3 w-4 rounded-sm align-middle"></span> passive</span>
+          <span class="inline-flex items-center gap-1"><span class="fl-adverb inline-block h-3 w-4 rounded-sm align-middle"></span> -ly adverb</span>
+          <span class="inline-flex items-center gap-1"><span class="fl-weasel inline-block h-3 w-4 rounded-sm align-middle"></span> weasel / vague</span>
+          <span class="muted">Hover or tap a flag for why &amp; a fix.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Score + counters -->
+    <div class="grid items-center gap-5 border-t border-ink/8 px-4 py-4 sm:grid-cols-[auto_1fr]">
+      <div class="flex items-center gap-4">
+        <div class="relative h-20 w-20 shrink-0">
+          <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+            <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+            <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+              stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+              style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+            <span class="text-[9px] muted">/ 100</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide muted">Directness score</p>
+          <p id="band" class="text-sm font-semibold">Paste text to scan</p>
+          <p id="pct" class="mt-0.5 text-xs muted" aria-live="polite"></p>
+          <button id="share" class="mt-1 text-xs font-medium text-accent hover:underline" hidden>↗ Share summary</button>
+        </div>
+      </div>
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wide muted">What we found</span>
+        <ul id="counts" class="mt-1.5 flex flex-wrap gap-1.5 text-xs" aria-live="polite"></ul>
+        <p id="ai-chip" hidden class="mt-2 text-xs">
+          <span class="rounded-full px-2 py-0.5 text-accent" style="background: var(--c-accent-soft);">
+            💡 Lots of hedges — these are classic <a href="/" class="font-medium underline">AI tells</a>.
+          </span>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline. Nothing is uploaded.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<style>
+  /* Category highlights never rely on colour alone (WCAG 1.4.1):
+     each carries a distinct underline style as well as a background. */
+  .fl-passive {
+    background: rgb(109 94 252 / 0.20);
+    text-decoration: underline wavy rgb(109 94 252 / 0.85);
+    border-radius: 3px;
+  }
+  .fl-adverb {
+    background: rgb(245 158 11 / 0.22);
+    text-decoration: underline dotted rgb(180 110 4 / 0.85);
+    text-decoration-thickness: 2px;
+    border-radius: 3px;
+  }
+  .fl-weasel {
+    background: rgb(244 63 94 / 0.20);
+    text-decoration: underline dashed rgb(190 30 50 / 0.85);
+    border-radius: 3px;
+  }
+  :global(.dark) .fl-passive { background: rgb(141 130 255 / 0.28); text-decoration-color: #b3a8ff; }
+  :global(.dark) .fl-adverb { background: rgb(245 158 11 / 0.28); text-decoration-color: #fcd34d; }
+  :global(.dark) .fl-weasel { background: rgb(244 63 94 / 0.30); text-decoration-color: #fda4af; }
+  mark.fl-passive, mark.fl-adverb, mark.fl-weasel { color: inherit; cursor: help; }
+  .fl-pulse { animation: flPulse 1.1s ease; }
+  @keyframes flPulse {
+    0%, 100% { outline: 2px solid transparent; }
+    30% { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .fl-pulse { animation: none; } }
+</style>
+
+<script>
+  import {
+    analyze,
+    summarize,
+    CATEGORY_LABEL,
+    type Toggles,
+    type Flag,
+    type Analysis,
+  } from '../../lib/tools/passive-voice-weasel-word-highlighter';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const highlightEl = $<HTMLDivElement>('highlight');
+
+  // --- demo snippets (solve the blank-canvas problem + show detection range)
+  const SAMPLES: Record<string, string> = {
+    ai: `It is important to note that studies suggest our approach is fairly effective. Many experts believe the results were significantly improved, and it could be argued that the data clearly shows a remarkably strong trend. Evidence suggests that, quite simply, the strategy was executed extremely well.`,
+    passive: `The report was written by the committee and was reviewed extensively. Decisions were made after the proposal had been approved by management. The funds were allocated, the timeline was extended, and the team was notified that the project had been completed.`,
+    fiction: `She quickly opened the door and walked nervously into the dimly lit room. He spoke softly, almost completely overwhelmed, as the rain fell steadily. The clock ticked loudly, and she suddenly realized she was utterly, hopelessly late.`,
+  };
+
+  // --- toggles (persisted)
+  function readToggles(): Toggles {
+    return {
+      passive: $<HTMLInputElement>('opt-passive').checked,
+      adverb: $<HTMLInputElement>('opt-adverb').checked,
+      weasel: $<HTMLInputElement>('opt-weasel').checked,
+    };
+  }
+  const OPT_IDS = ['opt-passive', 'opt-adverb', 'opt-weasel'];
+  function savePrefs() {
+    try { localStorage.setItem('pvww-opts', JSON.stringify(readToggles())); } catch {}
+  }
+  function loadPrefs() {
+    try {
+      const s = JSON.parse(localStorage.getItem('pvww-opts') || '{}');
+      if (typeof s.passive === 'boolean') $<HTMLInputElement>('opt-passive').checked = s.passive;
+      if (typeof s.adverb === 'boolean') $<HTMLInputElement>('opt-adverb').checked = s.adverb;
+      if (typeof s.weasel === 'boolean') $<HTMLInputElement>('opt-weasel').checked = s.weasel;
+    } catch {}
+  }
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up for the directness gauge
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(to); el.dataset.v = String(to); return; }
+    const from = parseInt(el.dataset.v || '0', 10);
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function escapeHtml(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  const CLASS: Record<Flag['category'], string> = {
+    passive: 'fl-passive',
+    adverb: 'fl-adverb',
+    weasel: 'fl-weasel',
+  };
+
+  // --- render the highlight surface from the original text + flag spans
+  function renderHighlights(text: string, flags: Flag[]) {
+    if (!text) {
+      highlightEl.innerHTML =
+        '<span class="muted">Flagged passive voice, adverbs and weasel words will appear here.</span>';
+      return;
+    }
+    let html = '';
+    let cursor = 0;
+    for (const f of flags) {
+      if (f.start < cursor) continue; // safety: dedupe already guarantees this
+      html += escapeHtml(text.slice(cursor, f.start));
+      const label = `${CATEGORY_LABEL[f.category]}: ${f.why} ${f.fix}`;
+      html +=
+        `<mark class="${CLASS[f.category]}" data-start="${f.start}" tabindex="0"` +
+        ` role="mark" aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}">` +
+        `${escapeHtml(text.slice(f.start, f.end))}</mark>`;
+      cursor = f.end;
+    }
+    html += escapeHtml(text.slice(cursor));
+    highlightEl.innerHTML = html;
+  }
+
+  const RING = 213.6;
+  let lastSummary = '';
+
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const result: Analysis = analyze(src, readToggles());
+    const { flags, stats, cleaned } = result;
+
+    // input stats line
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${stats.words} word${stats.words === 1 ? '' : 's'} · ${stats.sentences} sentence${stats.sentences === 1 ? '' : 's'}`;
+
+    // Render over the exact string the engine measured (invisibles already
+    // stripped), so flag offsets and rendered characters share one coordinate
+    // space and highlights never drift on invisible-char-laden AI paste.
+    renderHighlights(cleaned, flags);
+
+    const hasText = src.trim().length > 0;
+    $<HTMLButtonElement>('copy').disabled = !hasText;
+    ($('copy-bar') as HTMLButtonElement).disabled = !hasText;
+    $<HTMLButtonElement>('share').hidden = !hasText;
+
+    // directness gauge
+    const scoreNum = $<HTMLSpanElement>('score-num');
+    const ring = document.getElementById('ring') as unknown as SVGCircleElement;
+    if (!hasText) {
+      scoreNum.textContent = '—'; scoreNum.dataset.v = '0';
+      ring.style.strokeDashoffset = String(RING);
+      $<HTMLParagraphElement>('band').textContent = 'Paste text to scan';
+      $<HTMLParagraphElement>('pct').textContent = '';
+    } else {
+      animateCount(scoreNum, stats.directness);
+      ring.style.strokeDashoffset = String(RING * (1 - stats.directness / 100));
+      const good = stats.directness >= 80;
+      const ok = stats.directness >= 55;
+      ring.style.stroke = good ? 'var(--color-ok)' : ok ? 'var(--color-warn)' : 'var(--color-bad)';
+      $<HTMLParagraphElement>('band').textContent =
+        good ? '✓ Strong, direct writing' : ok ? 'Some weak spots' : 'Lots to tighten';
+      $<HTMLParagraphElement>('pct').textContent =
+        `${stats.passivePct}% passive sentences (aim < 10%)`;
+    }
+
+    // counters
+    const countsEl = $<HTMLUListElement>('counts');
+    countsEl.innerHTML = '';
+    if (!hasText) {
+      countsEl.innerHTML = '<li class="muted">Paste text to scan.</li>';
+    } else if (stats.passive + stats.adverb + stats.weasel === 0) {
+      countsEl.innerHTML =
+        '<li class="rounded-full bg-emerald-50 px-2 py-0.5 text-emerald-700">No passive voice or weasel words found — strong, direct writing! ✓</li>';
+    } else {
+      const pill = (label: string, n: number) => {
+        const li = document.createElement('li');
+        li.className = 'rounded-full px-2 py-0.5 text-accent';
+        li.style.background = 'var(--c-accent-soft)';
+        li.textContent = `${label}: ${n}`;
+        return li;
+      };
+      countsEl.appendChild(pill('Passive', stats.passive));
+      countsEl.appendChild(pill('Adverbs', stats.adverb));
+      countsEl.appendChild(pill('Weasel', stats.weasel));
+    }
+
+    // AI-tell cross-promo chip when hedges run hot
+    $<HTMLParagraphElement>('ai-chip').hidden = !(hasText && stats.weasel >= 4);
+
+    lastSummary = summarize(result);
+  }
+
+  // --- debounced live update (requestAnimationFrame)
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  OPT_IDS.forEach((id) => $(id).addEventListener('change', () => { savePrefs(); run(); }));
+
+  // --- samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!]; run(); setPane('output'); }));
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- shared actions
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!input.value) return;
+    await navigator.clipboard.writeText(input.value);
+    const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+    b.textContent = '✓ Copied'; toast('Copied to clipboard');
+    setTimeout(() => (b.textContent = prev), 1300);
+  }
+  function doReset() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // --- download
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    const blob = new Blob([input.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'draft.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded draft.txt');
+  });
+
+  // --- share the summary
+  $<HTMLButtonElement>('share').addEventListener('click', async () => {
+    const msg = `${lastSummary} — checked on ${location.origin}`;
+    try { await navigator.share({ text: msg }); }
+    catch { await navigator.clipboard.writeText(msg); toast('Summary copied'); }
+  });
+
+  // --- keyboard: Cmd/Ctrl+Enter re-runs the analysis
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); toast('Re-scanned'); }
+  });
+
+  loadPrefs();
+  setPane('input');
+  run();
+</script>

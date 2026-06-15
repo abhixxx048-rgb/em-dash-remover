@@ -1,0 +1,216 @@
+---
+import Base from '../../layouts/Base.astro';
+import ReadAloudProofreader from '../../components/tools/ReadAloudProofreader.astro';
+
+const faqs = [
+  {
+    q: 'Does reading your writing aloud really help proofreading?',
+    a: 'Yes. Reading aloud routes your text through the auditory cortex instead of the visual cortex, and that different processing path is what makes errors stand out. Studies of proofreading find people catch significantly more mistakes when they hear the text than when they read silently. A text-to-speech voice reads exactly what is on the page — not what you meant to write — so dropped words, doubled words, run-ons and awkward phrasing become audible.',
+  },
+  {
+    q: 'Is my text sent anywhere?',
+    a: 'Not when you pick an on-device voice. The tool uses your browser\'s built-in speech engine (the Web Speech API). Voices marked "on-device" speak entirely locally — nothing is uploaded. Some browsers also offer "cloud" voices that send the text to a vendor to synthesize; we label those clearly and show a warning so you can choose a fully-local voice for sensitive work.',
+  },
+  {
+    q: 'Which browsers support word-by-word highlighting?',
+    a: 'Word-level highlighting relies on the speech engine\'s "boundary" events, which fire reliably on Safari (macOS) and Chromium on Windows. On Linux and Android those events are often missing, so the tool falls back to sentence-level highlighting — it always knows which sentence is speaking because it reads sentence by sentence. You never lose your place; the granularity just changes.',
+  },
+  {
+    q: 'Why does text-to-speech slow down or stop on long documents?',
+    a: 'Desktop Chrome cancels a single utterance after roughly fifteen seconds or two hundred characters — a long-standing browser bug. This tool defeats it by splitting your text into sentence-sized chunks and reading them back to back, with a periodic keep-alive tick and a screen wake-lock so a long read does not silently die. You hear one continuous read.',
+  },
+  {
+    q: 'Can I change the voice, speed and pitch? Is it free?',
+    a: 'Yes to all. Pick any voice your device offers, set the speed from a slow proofing pace (0.75×) up to a quick skim (1.5×), and adjust pitch under the speed menu. It is completely free, no signup, no limits, and it works offline once the page has loaded.',
+  },
+  {
+    q: 'What does the "flag" button do?',
+    a: 'While you listen, tapping 🚩 (or pressing F) drops a marker on the sentence you just heard into a side fix-list. You can do a full listen-through without stopping to edit, then fix everything at the end and copy or download the list as a markdown checklist. That listen-and-flag workflow is what turns plain text-to-speech into a real proofreading pass.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/read-aloud-proofreader#app`,
+  name: 'Read-Aloud Proofreader',
+  url: `${Astro.site}tools/read-aloud-proofreader`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript and a browser with the Web Speech API.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Read any text aloud in your browser for proofreading',
+    'Word-by-word and sentence highlighting while it reads',
+    'Pick voice, speed (slow-proof to skim) and pitch',
+    'Flag what you hear into an exportable fix-list',
+    'Long-text chunking to defeat the Chrome utterance cutoff',
+    'Awkwardness pre-scan: long sentences, repeated words, double spaces',
+    'On-device voices — text never leaves your browser',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const howTo = {
+  '@context': 'https://schema.org',
+  '@type': 'HowTo',
+  name: 'How to proofread by listening',
+  description: 'Catch the errors your eyes skip by hearing your writing read aloud.',
+  step: [
+    { '@type': 'HowToStep', name: 'Paste your text', text: 'Paste your writing into the box, or load a sample.' },
+    { '@type': 'HowToStep', name: 'Pick a voice and speed', text: 'Choose an on-device voice and a slow-proof speed (0.75×).' },
+    { '@type': 'HowToStep', name: 'Press Play', text: 'Listen as each sentence is highlighted while it is spoken.' },
+    { '@type': 'HowToStep', name: 'Flag what sounds off', text: 'Tap the flag button (or press F) on any line that sounds wrong.' },
+    { '@type': 'HowToStep', name: 'Fix the list', text: 'When the read finishes, fix each flagged line and copy or download the fix-list.' },
+  ],
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Read-Aloud Proofreader — Hear Your Writing & Catch What Your Eyes Miss"
+  description="Free read-aloud proofreader. Hear your essay, post or draft read aloud with word highlighting to catch dropped words, run-ons and typos by ear — 100% in your browser, no signup."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <div class="mb-3 flex justify-center">
+        <a href="/tools" class="inline-flex min-h-11 items-center rounded-lg px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">← All tools</a>
+      </div>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Read-Aloud Proofreader — hear your writing, catch what your eyes miss.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Paste any text and hear it read back to you with <strong>word-by-word
+        highlighting</strong>. Your ear catches the dropped words, run-ons and
+        repeats your eyes skim right past. Flag what sounds off, fix it at the
+        end — and with an on-device voice, nothing is ever uploaded.
+      </p>
+    </header>
+
+    <ReadAloudProofreader />
+
+    <!-- Value props -->
+    <section class="mx-auto mt-16 max-w-5xl px-4">
+      <div class="grid gap-6 sm:grid-cols-3">
+        <div class="card p-5">
+          <h2 class="font-semibold">Proofing, not just listening</h2>
+          <p class="mt-1.5 text-sm muted">Flag a line the moment it sounds wrong, then fix the whole list at the end. A pre-scan even points out the longest sentence before you press Play.</p>
+        </div>
+        <div class="card p-5">
+          <h2 class="font-semibold">Your text never leaves your browser</h2>
+          <p class="mt-1.5 text-sm muted">On-device voices speak entirely locally — no upload, no account. We label cloud voices clearly so you can keep sensitive drafts private.</p>
+        </div>
+        <div class="card p-5">
+          <h2 class="font-semibold">Reliable on long documents</h2>
+          <p class="mt-1.5 text-sm muted">We chunk text into sentences and keep the engine alive, defeating the browser bug that stops most read-aloud tools partway through.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">Why reading your writing aloud catches more errors</h2>
+      <p class="muted">
+        When you read silently, your brain fills in what you <em>meant</em> to write,
+        so missing words and clumsy phrasing slide by unnoticed. Reading aloud
+        forces the text through your <strong>auditory cortex</strong> — a different
+        processing path — and that is exactly why errors stand out. Proofreading
+        research has found people catch significantly more mistakes hearing a passage
+        than reading it on screen. Even better, a text-to-speech voice reads the
+        <em>literal</em> words on the page, with none of the autocorrect your own inner
+        voice quietly applies. If a word is missing, you hear the gap. If a sentence
+        runs on, you hear yourself run out of breath.
+      </p>
+
+      <h2 class="text-2xl font-bold">How to proofread by listening (in five steps)</h2>
+      <ol class="list-decimal space-y-2 pl-6 muted">
+        <li>Paste your text into the box above, or load one of the deliberately flawed samples.</li>
+        <li>Pick an <strong>on-device voice</strong> and set a slow proofing speed (0.75×) — slower than you'd listen for fun.</li>
+        <li>Press <strong>Play</strong> and follow the highlight with your eyes while your ear listens.</li>
+        <li>The instant a line sounds off, tap <strong>🚩 Flag</strong> (or press <kbd>F</kbd>) — don't stop to edit, keep the flow.</li>
+        <li>When the read finishes, work through your fix-list and <strong>copy or download</strong> it as a checklist.</li>
+      </ol>
+
+      <h2 class="text-2xl font-bold">Word highlighting and slow-proof speeds</h2>
+      <p class="muted">
+        As each word is spoken it lights up and the page scrolls to keep it in view,
+        so your eye follows your ear and you see exactly where a problem is. A
+        slightly different, flatter voice helps too: it stops the text from sounding
+        like your own head, which is half the reason silent reading hides mistakes.
+        Use <strong>Slow proof (0.75×)</strong> for a careful pass and
+        <strong>Skim (1.5×)</strong> to test overall flow. Word-level highlighting
+        works on Safari and Chrome on macOS and Windows; on Linux and Android the
+        tool falls back to sentence-level highlighting so you never lose your place.
+      </p>
+
+      <h2 class="text-2xl font-bold">100% private — speech runs in your browser</h2>
+      <p class="muted">
+        Read-aloud is one of the few text tools where a naive build could quietly
+        send your writing to a vendor, so we make the choice visible. Pick a voice
+        marked <strong>on-device</strong> and the speech is generated entirely on your
+        machine — nothing is uploaded, and it works offline. Some browsers also offer
+        higher-quality <strong>cloud</strong> voices that do send the text away to be
+        synthesized; we flag those with a warning so you can decide. For a graded
+        essay, an embargoed draft, or confidential copy, a local voice keeps it on
+        your device.
+      </p>
+
+      <h2 class="text-2xl font-bold">What it catches — and reading the cleaned version</h2>
+      <p class="muted">
+        Listening surfaces dropped words, doubled words, run-on sentences, awkward
+        transitions and tone problems that spell-check never sees. The built-in
+        pre-scan gives you a head start, flagging very long sentences, repeated words
+        like "the the", and double spaces before you even press Play. Once your draft
+        sounds right, run it through our <a href="/">Em Dash Remover and AI-text
+        cleaner</a> to strip AI tells, then paste the cleaned text back here and listen
+        again — clean it, then hear that your human voice survived the edit.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(howTo)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <!-- Clear the fixed mobile action bar so the footer is reachable. -->
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo kbd {
+      border: 1px solid color-mix(in srgb, var(--c-ink) 25%, transparent);
+      border-radius: 4px; padding: 0 4px; font-size: 0.85em; font-family: var(--font-mono);
+    }
+  </style>
+</Base>

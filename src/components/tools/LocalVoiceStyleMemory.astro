@@ -1,0 +1,834 @@
+---
+// Interactive island for the Local Voice / Style Memory tool.
+// Static HTML here; behavior is wired by the client client script, which imports the
+// pure stylometry engine. Styling reuses the same utility classes + tokens as
+// Cleaner.astro so it looks native in both light and dark mode.
+//
+// Two modes share one page:
+//  - Build: paste samples → save a private "style fingerprint" to IndexedDB.
+//  - Check: paste a draft → live "sounds-like-you" score + off-voice flags.
+// The profile is the durable state (IndexedDB, with a localStorage fallback);
+// the draft is transient and the report is fully derived.
+---
+
+<section id="tool" aria-label="Local voice / style memory" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Mode tabs + active-profile switcher -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <div role="tablist" aria-label="Mode" class="inline-flex rounded-lg border border-ink/15 p-0.5">
+        <button role="tab" id="mode-build" aria-selected="false" class="min-h-9 rounded-md px-3 font-medium muted">1 · Build profile</button>
+        <button role="tab" id="mode-check" aria-selected="true" class="min-h-9 rounded-md px-3 font-medium">2 · Check a draft</button>
+      </div>
+
+      <label class="ml-auto flex min-w-0 items-center gap-2">
+        <span class="font-medium">Voice</span>
+        <select id="profile-select" aria-label="Active style profile" class="ctl px-3"></select>
+      </label>
+      <button id="manage" class="ctl inline-flex items-center justify-center px-3 transition hover:bg-ink/5" aria-expanded="false" aria-controls="drawer">⚙ Manage</button>
+    </div>
+
+    <!-- ============================ BUILD MODE ============================ -->
+    <div id="build-mode" hidden class="bg-surface p-4" style="background: var(--c-surface);">
+      <div class="mb-3 rounded-lg border border-ink/10 p-3 text-sm muted" style="background: var(--c-paper);">
+        <strong class="text-accent">1)</strong> Paste a few things you actually wrote ·
+        <strong class="text-accent">2)</strong> we learn your style (on this device only) ·
+        <strong class="text-accent">3)</strong> check any draft against it.
+      </div>
+
+      <div class="mb-2 flex items-center justify-between">
+        <h2 class="text-xs font-semibold uppercase tracking-wide muted">Your writing samples</h2>
+        <button id="add-sample" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">+ Add sample</button>
+      </div>
+
+      <div id="samples" class="space-y-3"></div>
+
+      <!-- Profile strength meter -->
+      <div class="mt-4">
+        <div class="flex items-center justify-between text-xs">
+          <span class="font-semibold uppercase tracking-wide muted">Profile strength</span>
+          <span id="strength-pct" class="font-semibold" data-v="0">0%</span>
+        </div>
+        <div class="mt-1 h-2 w-full overflow-hidden rounded-full" style="background: color-mix(in srgb, var(--c-ink) 10%, transparent);">
+          <div id="strength-bar" class="h-full rounded-full transition-all" style="width: 0%; background: var(--color-ok);"></div>
+        </div>
+        <p id="strength-msg" class="mt-1.5 text-xs muted" aria-live="polite">Paste a few things you actually wrote to start your fingerprint.</p>
+      </div>
+
+      <div class="mt-4 flex flex-wrap items-end gap-3">
+        <label class="flex min-w-0 flex-1 flex-col gap-1 text-sm">
+          <span class="font-medium">Name this voice</span>
+          <input id="profile-name" type="text" placeholder="e.g. My voice, Newsletter, Client A"
+            class="ctl px-3 py-2" />
+        </label>
+        <button id="save-profile" class="inline-flex min-h-11 items-center rounded-md bg-accent px-5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40">Save profile</button>
+        <button id="try-demo" class="ctl inline-flex min-h-11 items-center px-4 text-sm transition hover:border-accent hover:text-accent">✨ Try a demo profile</button>
+      </div>
+      <p class="mt-3 text-xs muted">🔒 Stored only in this browser (IndexedDB). Nothing is uploaded.</p>
+    </div>
+
+    <!-- ============================ CHECK MODE ============================ -->
+    <div id="check-mode">
+      <!-- Mobile pane switcher -->
+      <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+        <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Draft</button>
+        <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Report</button>
+      </div>
+
+      <!-- Empty state when no profile exists yet -->
+      <div id="no-profile" hidden class="bg-surface p-6 text-center" style="background: var(--c-surface);">
+        <p class="text-base font-semibold">No voice profile yet.</p>
+        <p class="mx-auto mt-1 max-w-md text-sm muted">A style check needs to know how <em>you</em> write. Build a profile from a few of your own samples, or try a demo to see the whole loop first.</p>
+        <div class="mt-4 flex flex-wrap justify-center gap-2">
+          <button id="go-build" class="inline-flex min-h-11 items-center rounded-md bg-accent px-5 text-sm font-semibold text-white transition hover:opacity-90">Build my profile</button>
+          <button id="go-demo" class="ctl inline-flex min-h-11 items-center px-4 text-sm transition hover:border-accent hover:text-accent">✨ Try a demo</button>
+        </div>
+      </div>
+
+      <!-- Panes -->
+      <div id="check-panes" class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+        <!-- Input / draft -->
+        <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+          <div class="mb-2 flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste a draft to check</h2>
+            <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+          </div>
+          <div class="relative">
+            <textarea id="input" rows="14" aria-label="Draft to check against your voice"
+              class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"></textarea>
+            <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+              <p class="muted text-sm">Paste a draft — or try a sample. We check it against your saved voice.</p>
+              <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+                <button data-sample="ai" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🤖 AI-ish draft</button>
+                <button data-sample="demo" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✨ Demo off-voice</button>
+              </div>
+            </div>
+          </div>
+          <p class="mt-2 text-xs muted" id="in-stats">0 words · 0 sentences</p>
+
+          <!-- Off-voice findings punch-list -->
+          <div class="mt-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-semibold uppercase tracking-wide muted">Where it stops sounding like you</span>
+              <span id="flag-count" class="text-xs muted"></span>
+            </div>
+            <ul id="flags" class="mt-1.5 space-y-1.5 text-sm" aria-live="polite"></ul>
+          </div>
+        </div>
+
+        <!-- Output / report rail -->
+        <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+          <div class="mb-2 flex items-center justify-between">
+            <h2 class="text-xs font-semibold uppercase tracking-wide muted">Sounds-like-you read</h2>
+            <div class="flex items-center gap-1.5">
+              <button id="download" aria-label="Download style report as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download report">⬇</button>
+              <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy report</button>
+            </div>
+          </div>
+
+          <!-- Match gauge + verdict -->
+          <div class="flex items-center gap-4 rounded-lg border border-ink/10 p-3" style="background: var(--c-paper);">
+            <div class="relative h-20 w-20 shrink-0">
+              <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+                <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+                <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+                  stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="213.6"
+                  style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span id="score-num" class="text-xl font-bold leading-none" data-v="0">—</span>
+                <span class="text-[9px] muted">/ 100</span>
+              </div>
+            </div>
+            <div class="min-w-0">
+              <p class="text-xs font-semibold uppercase tracking-wide muted">Sounds-like-you</p>
+              <p id="band" class="text-sm font-semibold">Paste a draft to scan</p>
+              <p id="verdict" class="mt-0.5 text-xs muted" aria-live="polite"></p>
+            </div>
+          </div>
+
+          <!-- Profile portrait -->
+          <div class="mt-3">
+            <p class="text-xs font-semibold uppercase tracking-wide muted">Your voice</p>
+            <p id="portrait" class="mt-1 text-sm muted"></p>
+          </div>
+
+          <!-- You vs. this draft -->
+          <div class="mt-3">
+            <p class="text-xs font-semibold uppercase tracking-wide muted">You vs. this draft</p>
+            <ul id="deltas" class="mt-1.5 space-y-2 text-xs"></ul>
+          </div>
+
+          <!-- Trend sparkline -->
+          <div id="trend-wrap" class="mt-3" hidden>
+            <p class="text-xs font-semibold uppercase tracking-wide muted">Recent match scores</p>
+            <div id="trend" class="mt-1 flex items-end gap-1 h-8" aria-hidden="true"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Your samples and drafts never leave your browser — profiles live in IndexedDB on this device.
+    Open DevTools → Network and you'll see zero requests. Works offline.
+  </p>
+</section>
+
+<!-- Profiles manager drawer -->
+<div id="drawer" hidden class="fixed inset-0 z-50">
+  <div id="drawer-scrim" class="absolute inset-0" style="background: rgb(0 0 0 / 0.4);"></div>
+  <div role="dialog" aria-label="Manage profiles" aria-modal="true"
+    class="card absolute right-0 top-0 h-full w-full max-w-sm overflow-y-auto rounded-none p-4">
+    <div class="flex items-center justify-between">
+      <h2 class="text-lg font-bold">Your voices</h2>
+      <button id="drawer-close" aria-label="Close" class="grid h-11 w-11 place-items-center rounded-md text-lg muted transition hover:bg-ink/5">✕</button>
+    </div>
+    <ul id="profile-list" class="mt-4 space-y-2 text-sm"></ul>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <button id="import-btn" class="ctl inline-flex min-h-11 items-center px-3 text-sm transition hover:border-accent hover:text-accent">⬆ Import JSON</button>
+      <input id="import-file" type="file" accept="application/json,.json" class="sr-only" />
+      <button id="wipe-all" class="inline-flex min-h-11 items-center rounded-md border border-ink/15 px-3 text-sm font-medium transition hover:bg-ink/5" style="color: var(--color-bad);">🗑 Delete all my data</button>
+    </div>
+    <div class="mt-5 rounded-lg border border-ink/10 p-3 text-xs muted" style="background: var(--c-paper);">
+      <p class="font-semibold">Privacy receipt</p>
+      <p class="mt-1" id="privacy-receipt">0 network requests made for profiling. Your data lives only in this browser's IndexedDB — export it for a backup, or wipe it here at any time.</p>
+    </div>
+  </div>
+</div>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-[60] -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile, check mode) -->
+<div id="mobile-bar" class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<script>
+  import {
+    buildProfile, buildDemoProfile, profileStrength, describeProfile,
+    scanDraft, exportProfile, importProfile,
+    DEMO_DRAFT, type Profile, type ScanResult, type Flag,
+  } from '../../lib/tools/local-voice-style-memory';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+
+  // ---- A draft to demo the off-voice scan (clearly model-flavored).
+  const SAMPLES: Record<string, string> = {
+    demo: DEMO_DRAFT,
+    ai: `Moreover, it is important to note that we are committed to delivering a seamless, robust, and multifaceted solution that leverages cutting-edge methodologies. We do not believe in shortcuts; rather, we endeavor to facilitate transformative outcomes that demonstrate sufficient value. It is worth noting that our approach is a testament to innovation.`,
+  };
+
+  // ===================================================================
+  // Persistence — IndexedDB with a localStorage fallback (private mode).
+  // Promise-wrapped raw IndexedDB; no dependency.
+  // ===================================================================
+  const DB_NAME = 'voice-style-memory';
+  const STORE = 'profiles';
+  const LS_KEY = 'voice-style-profiles';
+  let useIDB = true;
+
+  function openDB(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(STORE)) db.createObjectStore(STORE, { keyPath: 'id' });
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  function lsLoad(): Profile[] {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || '[]'); } catch { return []; }
+  }
+  function lsSave(list: Profile[]) {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch {}
+  }
+
+  async function idbAll(): Promise<Profile[]> {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).getAll();
+      req.onsuccess = () => resolve(req.result as Profile[]);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbPut(p: Profile) {
+    const db = await openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put(p);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function idbDelete(id: string) {
+    const db = await openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function idbClear() {
+    const db = await openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).clear();
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  // Storage facade — try IndexedDB, fall back to localStorage on failure.
+  async function loadAll(): Promise<Profile[]> {
+    if (useIDB) {
+      try { return await idbAll(); }
+      catch { useIDB = false; toast('Private mode? Using local fallback storage.'); }
+    }
+    return lsLoad();
+  }
+  async function putProfile(p: Profile) {
+    if (useIDB) { try { await idbPut(p); return; } catch { useIDB = false; } }
+    const list = lsLoad().filter((x) => x.id !== p.id); list.push(p); lsSave(list);
+  }
+  async function deleteProfile(id: string) {
+    if (useIDB) { try { await idbDelete(id); return; } catch { useIDB = false; } }
+    lsSave(lsLoad().filter((x) => x.id !== id));
+  }
+  async function clearAll() {
+    if (useIDB) { try { await idbClear(); } catch { useIDB = false; } }
+    lsSave([]);
+  }
+
+  // ===================================================================
+  // Shared helpers (mirrors Cleaner.astro patterns)
+  // ===================================================================
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) { el.textContent = String(to); el.dataset.v = String(to); return; }
+    const from = parseInt(el.dataset.v || '0', 10);
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function esc(s: string): string {
+    return s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!));
+  }
+
+  // ===================================================================
+  // App state
+  // ===================================================================
+  let profiles: Profile[] = [];
+  let activeId: string | null = null;
+  const ACTIVE_KEY = 'voice-active-id';
+
+  function activeProfile(): Profile | null {
+    return profiles.find((p) => p.id === activeId) || profiles[0] || null;
+  }
+
+  // ===================================================================
+  // BUILD MODE
+  // ===================================================================
+  function sampleSlot(value = ''): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'relative';
+    wrap.innerHTML = `
+      <textarea rows="4" data-sample-input aria-label="Writing sample"
+        class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 text-[15px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+        placeholder="Paste something you actually wrote — an email, a note, a post…"></textarea>
+      <button type="button" data-remove aria-label="Remove sample"
+        class="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-md text-sm muted transition hover:bg-ink/5">✕</button>`;
+    (wrap.querySelector('textarea') as HTMLTextAreaElement).value = value;
+    wrap.querySelector('textarea')!.addEventListener('input', updateStrength);
+    wrap.querySelector('[data-remove]')!.addEventListener('click', () => {
+      if ($('samples').querySelectorAll('[data-sample-input]').length > 1) { wrap.remove(); updateStrength(); }
+      else { (wrap.querySelector('textarea') as HTMLTextAreaElement).value = ''; updateStrength(); }
+    });
+    return wrap;
+  }
+
+  function readSamples(): string[] {
+    return Array.from($('samples').querySelectorAll<HTMLTextAreaElement>('[data-sample-input]')).map((t) => t.value);
+  }
+
+  function updateStrength() {
+    const s = profileStrength(readSamples());
+    $<HTMLDivElement>('strength-bar').style.width = s.pct + '%';
+    const pctEl = $<HTMLSpanElement>('strength-pct');
+    pctEl.textContent = s.pct + '%';
+    $<HTMLDivElement>('strength-bar').style.background =
+      s.pct >= 66 ? 'var(--color-ok)' : s.pct >= 33 ? 'var(--color-warn)' : 'var(--color-bad)';
+    $<HTMLParagraphElement>('strength-msg').textContent = s.message;
+    $<HTMLButtonElement>('save-profile').disabled = s.words < 20;
+  }
+
+  async function saveProfile() {
+    const samples = readSamples().filter((s) => s.trim());
+    if (!samples.length) { toast('Paste at least one sample first.'); return; }
+    const name = $<HTMLInputElement>('profile-name').value || 'My voice';
+    const p = buildProfile(name, samples);
+    profiles.push(p);
+    activeId = p.id;
+    await putProfile(p);
+    localStorage.setItem(ACTIVE_KEY, p.id);
+    refreshProfileUI();
+    toast(p.lowConfidence ? 'Saved — add more writing for a sharper fingerprint.' : `Saved "${p.name}" ✓`);
+    setMode('check');
+    run();
+  }
+
+  // ===================================================================
+  // CHECK MODE — live scan
+  // ===================================================================
+  const RING = 213.6;
+  let lastScan: ScanResult | null = null;
+  let raf = 0;
+
+  function run() {
+    const profile = activeProfile();
+    const hasProfile = !!profile;
+    $<HTMLDivElement>('no-profile').hidden = hasProfile;
+    $<HTMLDivElement>('check-panes').hidden = !hasProfile;
+    if (!profile) return;
+
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+    $<HTMLParagraphElement>('portrait').textContent = describeProfile(profile);
+    renderTrend(profile);
+
+    if (!src.trim()) {
+      $<HTMLSpanElement>('score-num').textContent = '—';
+      $<HTMLSpanElement>('score-num').dataset.v = '0';
+      ($('ring') as unknown as SVGCircleElement).style.strokeDashoffset = String(RING);
+      $<HTMLParagraphElement>('band').textContent = 'Paste a draft to scan';
+      $<HTMLParagraphElement>('verdict').textContent = '';
+      $<HTMLParagraphElement>('in-stats').textContent = '0 words · 0 sentences';
+      $<HTMLUListElement>('deltas').innerHTML = '';
+      $<HTMLUListElement>('flags').innerHTML = '';
+      $<HTMLSpanElement>('flag-count').textContent = '';
+      $<HTMLButtonElement>('copy').disabled = true;
+      ($('copy-bar') as HTMLButtonElement).disabled = true;
+      lastScan = null;
+      return;
+    }
+
+    const result = scanDraft(src, profile);
+    lastScan = result;
+
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${result.draftStats.wordCount} word${result.draftStats.wordCount === 1 ? '' : 's'} · ${result.draftStats.sentenceCount} sentence${result.draftStats.sentenceCount === 1 ? '' : 's'}`;
+
+    // Gauge.
+    animateCount($<HTMLSpanElement>('score-num'), result.score);
+    const ring = $('ring') as unknown as SVGCircleElement;
+    ring.style.strokeDashoffset = String(RING * (1 - result.score / 100));
+    const color = result.band === 'you' ? 'var(--color-ok)' : result.band === 'drifting' ? 'var(--color-warn)' : 'var(--color-bad)';
+    ring.style.stroke = color;
+    $<HTMLParagraphElement>('band').textContent =
+      result.band === 'you' ? '✓ This sounds like you' : result.band === 'drifting' ? '◑ Drifting from your voice' : '✕ Reads like the model';
+    $<HTMLParagraphElement>('verdict').textContent = result.verdict;
+
+    renderDeltas(result);
+    renderFlags(result);
+
+    $<HTMLButtonElement>('copy').disabled = false;
+    ($('copy-bar') as HTMLButtonElement).disabled = false;
+  }
+
+  function renderDeltas(r: ScanResult) {
+    const ul = $<HTMLUListElement>('deltas');
+    ul.innerHTML = '';
+    for (const d of r.deltas) {
+      const li = document.createElement('li');
+      const off = d.severity >= 2;
+      const w = Math.min(100, d.severity * 25);
+      const barColor = d.severity >= 3 ? 'var(--color-bad)' : d.severity >= 2 ? 'var(--color-warn)' : 'var(--color-ok)';
+      li.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-medium">${esc(d.label)} ${off ? '<span class="muted">(off)</span>' : ''}</span>
+          <span class="muted">you ${esc(d.you)} · draft <strong>${esc(d.draft)}</strong></span>
+        </div>
+        <div class="mt-0.5 h-1.5 w-full overflow-hidden rounded-full" style="background: color-mix(in srgb, var(--c-ink) 10%, transparent);">
+          <div class="h-full rounded-full" style="width:${w}%; background:${barColor};"></div>
+        </div>`;
+      ul.appendChild(li);
+    }
+  }
+
+  function renderFlags(r: ScanResult) {
+    const ul = $<HTMLUListElement>('flags');
+    ul.innerHTML = '';
+    $<HTMLSpanElement>('flag-count').textContent = r.flags.length ? `${r.flags.length} spot${r.flags.length === 1 ? '' : 's'}` : '';
+    if (!r.flags.length) {
+      ul.innerHTML = '<li class="rounded-lg px-2 py-1 text-emerald-700" style="background: color-mix(in srgb, var(--color-ok) 14%, transparent);">Nothing off-voice found — nice. ✓</li>';
+      return;
+    }
+    const icon: Record<Flag['kind'], string> = {
+      'long-sentence': '↔', 'short-sentence': '·', 'expanded-contraction': '✎', 'off-punct': '⚑',
+    };
+    r.flags.forEach((f, i) => {
+      const li = document.createElement('li');
+      li.className = 'rounded-lg border border-ink/10 p-2';
+      li.style.background = 'var(--c-paper)';
+      const snippet = f.text.length > 70 ? f.text.slice(0, 70) + '…' : f.text;
+      let html = `
+        <div class="flex items-start gap-2">
+          <span aria-hidden="true">${icon[f.kind]}</span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate font-medium" title="${esc(f.text)}">${esc(snippet)}</p>
+            <p class="muted text-xs">${esc(f.reason)}</p>
+          </div>`;
+      if (f.suggestion) {
+        html += `<button data-fix="${i}" class="ctl shrink-0 inline-flex min-h-9 items-center px-2 text-xs transition hover:border-accent hover:text-accent">Apply</button>`;
+      }
+      html += `</div>`;
+      li.innerHTML = html;
+      ul.appendChild(li);
+    });
+    // Wire click-to-apply suggestions (the only mutation path).
+    ul.querySelectorAll<HTMLButtonElement>('[data-fix]').forEach((b) =>
+      b.addEventListener('click', () => applyFix(r.flags[parseInt(b.dataset.fix!, 10)])));
+  }
+
+  // Apply a single suggestion non-destructively into the draft, by offset.
+  function applyFix(flag: Flag) {
+    if (!flag.suggestion) return;
+    const v = input.value;
+    // Re-find by offset; guard against drift if the user edited.
+    if (v.slice(flag.start, flag.end) === flag.text) {
+      input.value = v.slice(0, flag.start) + flag.suggestion.with + v.slice(flag.end);
+    } else {
+      input.value = v.replace(flag.suggestion.replace, flag.suggestion.with);
+    }
+    run();
+    toast(`Applied: "${flag.suggestion.replace}" → "${flag.suggestion.with}"`);
+  }
+
+  function renderTrend(p: Profile) {
+    const wrap = $<HTMLDivElement>('trend-wrap');
+    const scores = p.lastMatchScores || [];
+    if (scores.length < 2) { wrap.hidden = true; return; }
+    wrap.hidden = false;
+    const trend = $<HTMLDivElement>('trend');
+    trend.innerHTML = '';
+    for (const s of scores.slice(-16)) {
+      const bar = document.createElement('div');
+      bar.style.height = Math.max(8, s) + '%';
+      bar.style.flex = '1';
+      bar.style.borderRadius = '2px';
+      bar.style.background = s >= 75 ? 'var(--color-ok)' : s >= 50 ? 'var(--color-warn)' : 'var(--color-bad)';
+      bar.title = String(s);
+      trend.appendChild(bar);
+    }
+  }
+
+  // Persist a scan score to the active profile's trend (debounced on blur/scan).
+  async function logScore() {
+    const p = activeProfile();
+    if (!p || !lastScan) return;
+    p.lastMatchScores = [...(p.lastMatchScores || []), lastScan.score].slice(-20);
+    await putProfile(p);
+    renderTrend(p);
+  }
+
+  // ===================================================================
+  // Report text (copy / download)
+  // ===================================================================
+  function buildReportText(): string {
+    const p = activeProfile();
+    if (!p || !lastScan) return '';
+    const r = lastScan;
+    const lines = [
+      'VOICE / STYLE MATCH REPORT',
+      '==========================',
+      '',
+      `Profile: ${p.name}${p.lowConfidence ? ' (low confidence)' : ''}`,
+      `Sounds-like-you match: ${r.score}/100 (${r.band})`,
+      '',
+      r.verdict,
+      '',
+      'YOUR VOICE',
+      `  ${describeProfile(p)}`,
+      '',
+      'YOU vs. THIS DRAFT',
+      ...r.deltas.map((d) => `  ${d.label.padEnd(20)} you ${d.you} · draft ${d.draft} (z ${d.z})`),
+      '',
+      `OFF-VOICE SPOTS (${r.flags.length})`,
+      ...(r.flags.length ? r.flags.map((f) => `  • ${f.reason}`) : ['  None — this sounds like you.']),
+    ];
+    return lines.join('\n');
+  }
+
+  // ===================================================================
+  // Mode + pane switching
+  // ===================================================================
+  function setMode(mode: 'build' | 'check') {
+    const build = mode === 'build';
+    $<HTMLDivElement>('build-mode').hidden = !build;
+    $<HTMLDivElement>('check-mode').hidden = build;
+    $<HTMLDivElement>('mobile-bar').style.display = build ? 'none' : '';
+    for (const [id, on] of [['mode-build', build], ['mode-check', !build]] as const) {
+      const b = $<HTMLButtonElement>(id);
+      b.setAttribute('aria-selected', String(on));
+      b.classList.toggle('muted', !on);
+      b.style.background = on ? 'var(--c-accent-soft)' : '';
+      b.style.color = on ? 'var(--color-accent)' : '';
+    }
+    if (build && !$('samples').children.length) $('samples').appendChild(sampleSlot());
+    if (build) updateStrength(); else run();
+  }
+
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('#check-panes [data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+
+  // ===================================================================
+  // Profiles UI (select dropdown + drawer list)
+  // ===================================================================
+  function refreshProfileUI() {
+    const sel = $<HTMLSelectElement>('profile-select');
+    sel.innerHTML = '';
+    for (const p of profiles) {
+      const o = document.createElement('option');
+      o.value = p.id;
+      o.textContent = p.name + (p.lowConfidence ? ' (low conf.)' : '');
+      sel.appendChild(o);
+    }
+    if (activeProfile()) sel.value = activeProfile()!.id;
+    sel.parentElement!.style.display = profiles.length ? '' : 'none';
+    renderDrawerList();
+  }
+
+  function renderDrawerList() {
+    const ul = $<HTMLUListElement>('profile-list');
+    ul.innerHTML = '';
+    if (!profiles.length) {
+      ul.innerHTML = '<li class="muted">No profiles yet. Build one in step 1.</li>';
+      return;
+    }
+    for (const p of profiles) {
+      const li = document.createElement('li');
+      li.className = 'rounded-lg border border-ink/10 p-2';
+      li.style.background = 'var(--c-paper)';
+      li.innerHTML = `
+        <div class="flex items-center justify-between gap-2">
+          <span class="min-w-0 flex-1 truncate font-medium">${esc(p.name)}</span>
+          ${p.id === activeId ? '<span class="text-xs text-accent">active</span>' : ''}
+        </div>
+        <p class="muted text-xs">${p.sampleStats.wordCount} words · ${p.sampleStats.sampleCount} sample${p.sampleStats.sampleCount === 1 ? '' : 's'}${p.lowConfidence ? ' · low confidence' : ''}</p>
+        <div class="mt-1.5 flex flex-wrap gap-1.5 text-xs">
+          <button data-use="${esc(p.id)}" class="ctl inline-flex min-h-9 items-center px-2 transition hover:border-accent hover:text-accent">Use</button>
+          <button data-rename="${esc(p.id)}" class="ctl inline-flex min-h-9 items-center px-2 transition hover:border-accent hover:text-accent">Rename</button>
+          <button data-export="${esc(p.id)}" class="ctl inline-flex min-h-9 items-center px-2 transition hover:border-accent hover:text-accent">Export</button>
+          <button data-del="${esc(p.id)}" class="ctl inline-flex min-h-9 items-center px-2 transition hover:border-accent" style="color: var(--color-bad);">Delete</button>
+        </div>`;
+      ul.appendChild(li);
+    }
+    ul.querySelectorAll<HTMLButtonElement>('[data-use]').forEach((b) => b.addEventListener('click', () => { activeId = b.dataset.use!; localStorage.setItem(ACTIVE_KEY, activeId); refreshProfileUI(); run(); toast('Switched voice'); }));
+    ul.querySelectorAll<HTMLButtonElement>('[data-rename]').forEach((b) => b.addEventListener('click', () => renameProfile(b.dataset.rename!)));
+    ul.querySelectorAll<HTMLButtonElement>('[data-export]').forEach((b) => b.addEventListener('click', () => doExport(b.dataset.export!)));
+    ul.querySelectorAll<HTMLButtonElement>('[data-del]').forEach((b) => b.addEventListener('click', () => doDelete(b.dataset.del!)));
+  }
+
+  async function renameProfile(id: string) {
+    const p = profiles.find((x) => x.id === id);
+    if (!p) return;
+    const name = prompt('Rename this voice', p.name);
+    if (name && name.trim()) { p.name = name.trim(); await putProfile(p); refreshProfileUI(); }
+  }
+
+  function doExport(id: string) {
+    const p = profiles.find((x) => x.id === id);
+    if (!p) return;
+    const blob = new Blob([exportProfile(p)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `voice-${p.name.replace(/\W+/g, '-').toLowerCase()}.json`; a.click();
+    URL.revokeObjectURL(url);
+    toast('Profile exported');
+  }
+
+  async function doDelete(id: string) {
+    const p = profiles.find((x) => x.id === id);
+    if (!p) return;
+    if (!confirm(`Delete "${p.name}"? This wipes it from this browser. Export first if you want a backup.`)) return;
+    await deleteProfile(id);
+    profiles = profiles.filter((x) => x.id !== id);
+    if (activeId === id) activeId = profiles[0]?.id || null;
+    if (activeId) localStorage.setItem(ACTIVE_KEY, activeId); else localStorage.removeItem(ACTIVE_KEY);
+    refreshProfileUI(); run();
+    toast('Deleted');
+  }
+
+  // ===================================================================
+  // Demo profile
+  // ===================================================================
+  async function addDemo() {
+    if (!profiles.some((p) => p.id === 'demo')) {
+      const demo = buildDemoProfile();
+      profiles.push(demo);
+      await putProfile(demo);
+    }
+    activeId = 'demo';
+    localStorage.setItem(ACTIVE_KEY, 'demo');
+    refreshProfileUI();
+    setMode('check');
+    input.value = DEMO_DRAFT;
+    run();
+    setPane('output');
+    toast('Demo profile loaded — try editing the draft.');
+  }
+
+  // ===================================================================
+  // Drawer
+  // ===================================================================
+  function openDrawer() {
+    $<HTMLDivElement>('drawer').hidden = false;
+    $<HTMLButtonElement>('manage').setAttribute('aria-expanded', 'true');
+    renderDrawerList();
+  }
+  function closeDrawer() {
+    $<HTMLDivElement>('drawer').hidden = true;
+    $<HTMLButtonElement>('manage').setAttribute('aria-expanded', 'false');
+  }
+
+  // ===================================================================
+  // Actions
+  // ===================================================================
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    const text = buildReportText();
+    if (!text) return;
+    await navigator.clipboard.writeText(text);
+    const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+    b.textContent = '✓ Copied'; toast('Report copied');
+    setTimeout(() => (b.textContent = prev), 1300);
+    logScore();
+  }
+  function doClear() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  // ===================================================================
+  // Wiring
+  // ===================================================================
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+  input.addEventListener('blur', logScore);
+
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!] || SAMPLES.ai; run(); setPane('output'); }));
+
+  $('mode-build').addEventListener('click', () => setMode('build'));
+  $('mode-check').addEventListener('click', () => setMode('check'));
+  $('go-build').addEventListener('click', () => setMode('build'));
+  $('go-demo').addEventListener('click', addDemo);
+  $('try-demo').addEventListener('click', addDemo);
+
+  $('add-sample').addEventListener('click', () => { $('samples').appendChild(sampleSlot()); });
+  $('save-profile').addEventListener('click', saveProfile);
+
+  $('profile-select').addEventListener('change', (e) => {
+    activeId = (e.target as HTMLSelectElement).value;
+    localStorage.setItem(ACTIVE_KEY, activeId);
+    refreshProfileUI(); run();
+  });
+
+  $('manage').addEventListener('click', openDrawer);
+  $('drawer-close').addEventListener('click', closeDrawer);
+  $('drawer-scrim').addEventListener('click', closeDrawer);
+
+  $('import-btn').addEventListener('click', () => $('import-file').click());
+  $('import-file').addEventListener('change', async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    try {
+      const p = importProfile(await file.text());
+      profiles.push(p); activeId = p.id;
+      await putProfile(p); localStorage.setItem(ACTIVE_KEY, p.id);
+      refreshProfileUI(); run(); toast(`Imported "${p.name}" ✓`);
+    } catch (err) { toast('Could not import — not a valid profile file.'); }
+    (e.target as HTMLInputElement).value = '';
+  });
+
+  $('wipe-all').addEventListener('click', async () => {
+    if (!confirm('Delete ALL profiles from this browser? This cannot be undone. Export first if you want a backup.')) return;
+    await clearAll();
+    profiles = []; activeId = null; localStorage.removeItem(ACTIVE_KEY);
+    refreshProfileUI(); run(); closeDrawer(); toast('All data wiped');
+  });
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('clear-bar').addEventListener('click', doClear);
+
+  $('download').addEventListener('click', () => {
+    const text = buildReportText();
+    if (!text) { toast('Paste a draft first'); return; }
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'voice-report.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded voice-report.txt'); logScore();
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); logScore(); }
+    if (e.key === 'Escape' && !$('drawer').hidden) closeDrawer();
+  });
+
+  // ---- boot
+  (async () => {
+    profiles = await loadAll();
+    profiles.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+    const saved = localStorage.getItem(ACTIVE_KEY);
+    activeId = saved && profiles.some((p) => p.id === saved) ? saved : profiles[0]?.id || null;
+    refreshProfileUI();
+    if (profiles.length) {
+      setMode('check');
+      const p = activeProfile();
+      if (p) toast(`Welcome back — checking against "${p.name}".`);
+    } else {
+      setMode('check'); // shows the no-profile empty state with build/demo CTAs
+    }
+    setPane('input');
+    run();
+  })();
+</script>

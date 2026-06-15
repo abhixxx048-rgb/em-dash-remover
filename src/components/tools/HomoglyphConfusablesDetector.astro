@@ -1,0 +1,576 @@
+---
+// Interactive island for the Homoglyph / Confusables Detector & Normalizer.
+// Static HTML below; the client script imports the pure engine and wires behavior.
+// Visual language mirrors Cleaner.astro / the Invisible inspector (toolbar,
+// panes, toast, sticky bar) so it feels native to the suite.
+---
+
+<section id="tool" aria-label="Homoglyph and confusable character detector" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar: script-class filter chips -->
+    <div class="flex flex-wrap items-center gap-2 border-b border-ink/8 px-3 py-3 text-sm sm:gap-3 sm:px-4">
+      <span class="font-medium">Detect</span>
+
+      <details class="group relative w-full sm:w-auto">
+        <summary class="ctl flex w-full cursor-pointer list-none items-center gap-1.5 px-3 marker:hidden sm:w-auto">
+          ⚙ Script filters <span class="ml-auto transition group-open:rotate-180 sm:ml-0">▾</span>
+        </summary>
+        <div class="card mt-2 w-full space-y-1 p-2 text-sm sm:absolute sm:left-0 sm:top-full sm:z-20 sm:w-64 sm:p-3 sm:shadow-lg">
+          <p class="px-2 pb-1 text-xs muted">Choose which look-alikes to flag &amp; normalize.</p>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-cyrillic" checked class="h-5 w-5" /> Cyrillic <span class="muted text-xs">(а е о р)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-greek" checked class="h-5 w-5" /> Greek <span class="muted text-xs">(ο α ν)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-fullwidth" checked class="h-5 w-5" /> Fullwidth <span class="muted text-xs">(Ａ ｂ)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-math" checked class="h-5 w-5" /> Math alphanumeric <span class="muted text-xs">(𝐀 𝕒)</span></label>
+          <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5"><input type="checkbox" id="opt-other" checked class="h-5 w-5" /> Other scripts</label>
+        </div>
+      </details>
+
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Paste</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Result</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="bg-surface p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Paste your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="14"
+            aria-label="Text to scan for homoglyph and confusable characters"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Paste text — we'll find any Cyrillic, Greek or fullwidth letters disguised as English. Try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="paypal" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🔤 Cyrillic spoof</button>
+              <button data-sample="greek" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">Ω Greek look-alikes</button>
+              <button data-sample="fullwidth" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">Ａ Fullwidth text</button>
+              <button data-sample="clean" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">✓ Clean text</button>
+            </div>
+            <p class="muted text-xs">🔒 Nothing leaves your browser.</p>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats">0 chars scanned</p>
+      </div>
+
+      <!-- Output -->
+      <div class="bg-surface p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <div class="inline-flex rounded-lg border border-ink/15 p-0.5 text-xs">
+            <button id="view-flag" class="min-h-9 rounded-md px-3 font-medium">Flagged</button>
+            <button id="view-skeleton" class="min-h-9 rounded-md px-3 font-medium muted">Skeleton</button>
+            <button id="view-clean" class="min-h-9 rounded-md px-3 font-medium muted">Normalized</button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download normalized text as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download normalized .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy clean</button>
+          </div>
+        </div>
+
+        <!-- Inline highlighted render of the original (DOM built in JS). -->
+        <div id="render" aria-label="Text with look-alike characters highlighted" tabindex="0"
+          class="h-[calc(14*1.625em+1.5rem)] w-full overflow-auto whitespace-pre-wrap break-words rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed"
+          style="background: var(--c-paper);"></div>
+
+        <!-- UTS #39 skeleton ("what a machine sees") view. -->
+        <textarea id="skeleton" rows="14" readonly aria-label="Unicode skeleton — what a machine sees" hidden
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+
+        <!-- Normalized (clean Latin) output. -->
+        <textarea id="output" rows="14" readonly aria-label="Normalized clean Latin text" hidden
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+
+        <p class="mt-2 text-xs muted" id="view-hint">Click any flagged glyph to keep it (e.g. a real name) out of normalization.</p>
+      </div>
+    </div>
+
+    <!-- Score + summary -->
+    <div class="grid items-center gap-5 border-t border-ink/8 px-4 py-4 sm:grid-cols-[auto_1fr]">
+      <div class="flex items-center gap-4">
+        <div class="relative h-20 w-20 shrink-0">
+          <svg viewBox="0 0 80 80" class="h-20 w-20 -rotate-90">
+            <circle class="ring-track" cx="40" cy="40" r="34" fill="none" stroke-width="8" />
+            <circle id="ring" cx="40" cy="40" r="34" fill="none" stroke-width="8" stroke-linecap="round"
+              stroke="var(--color-ok)" stroke-dasharray="213.6" stroke-dashoffset="0"
+              style="transition: stroke-dashoffset .6s ease, stroke .4s ease;" />
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center">
+            <span id="score-num" class="text-xl font-bold leading-none" data-v="100">—</span>
+            <span class="text-[9px] muted">% Latin</span>
+          </div>
+        </div>
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide muted">Confusability</p>
+          <p id="band" class="text-sm font-semibold">Paste text to scan</p>
+          <p id="found" class="mt-0.5 text-xs" aria-live="polite"></p>
+          <button id="report" class="mt-1 text-xs font-medium text-accent hover:underline" hidden>📋 Copy report</button>
+        </div>
+      </div>
+      <div>
+        <span class="text-xs font-semibold uppercase tracking-wide muted">What we found</span>
+        <ul id="counts" class="mt-1.5 flex flex-wrap gap-1.5 text-xs" aria-live="polite"></ul>
+      </div>
+    </div>
+
+    <!-- Spoof banner (shown only when a high-severity, mixed-script run is present). -->
+    <div id="spoof-banner" hidden class="border-t border-ink/8 px-4 py-3 text-sm font-medium"
+      style="background: color-mix(in srgb, var(--color-bad) 12%, transparent); color: var(--color-bad);">
+      ⚠ Mixed-script spoof: this text mixes Latin with Cyrillic or Greek look-alike letters inside words — the classic homoglyph substitution. Normalize to map them back to clean Latin.
+    </div>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-ink px-4 py-2 text-sm text-paper opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy clean</button>
+</div>
+
+<!-- Chip styling for the inline render. Uses tokens so it works in both themes. -->
+<style is:global>
+  .hg-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15em;
+    padding: 0 0.3em;
+    margin: 0 0.05em;
+    border-radius: 5px;
+    font-size: 0.9em;
+    line-height: 1.4;
+    font-weight: 700;
+    vertical-align: baseline;
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .hg-chip:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+  /* Severity colours are PAIRED with a superscript script tag + underline, never colour alone. */
+  .hg-chip { text-decoration: underline dotted; text-underline-offset: 2px; }
+  .hg-chip--high { background: color-mix(in srgb, var(--color-bad) 16%, transparent); color: var(--color-bad); border-color: color-mix(in srgb, var(--color-bad) 50%, transparent); }
+  .hg-chip--medium { background: color-mix(in srgb, var(--color-warn) 18%, transparent); color: var(--color-warn); border-color: color-mix(in srgb, var(--color-warn) 45%, transparent); }
+  .hg-chip--low { background: color-mix(in srgb, var(--c-ink) 10%, transparent); color: var(--c-ink); border-color: color-mix(in srgb, var(--c-ink) 22%, transparent); }
+  .dark .hg-chip--high { color: #fda4af; }
+  .dark .hg-chip--medium { color: #fbbf24; }
+  /* "kept" glyphs are excluded from normalization — shown struck/greyed. */
+  .hg-chip--kept { opacity: 0.55; text-decoration: line-through; }
+  .hg-tag { font-size: 0.6em; font-weight: 700; vertical-align: super; opacity: 0.85; }
+  .count-pill { border-radius: 9999px; padding: 0.1rem 0.5rem; }
+</style>
+
+<script>
+  import {
+    detect,
+    tokenize,
+    skeleton,
+    normalize,
+    verdict,
+    confusabilityScore,
+    buildReport,
+    formatCp,
+    SCRIPT_ICON,
+    SCRIPT_LABEL,
+    SEVERITY_LABEL,
+    DEFAULT_OPTIONS,
+    type DetectOptions,
+    type ScriptClass,
+    type Severity,
+  } from '../../lib/tools/homoglyph-confusables-detector';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+  const skelEl = $<HTMLTextAreaElement>('skeleton');
+  const render = $<HTMLDivElement>('render');
+
+  // --- Example payloads. Built programmatically from escapes so the look-alike
+  // glyphs survive editing/copy-paste of this source file.
+  const CYR_A = 'а'; // а
+  const CYR_E = 'е'; // е
+  const CYR_O = 'о'; // о
+  const CYR_R = 'р'; // р
+  const CYR_P_CAP = 'Р'; // Р
+  const GRK_O = 'ο'; // ο
+  const GRK_A = 'α'; // α
+  const GRK_NU = 'ν'; // ν
+  const FW = (s: string) => s.replace(/[\x21-\x7e]/g, (ch) => String.fromCodePoint(ch.codePointAt(0)! + 0xfee0));
+  const SAMPLES: Record<string, string> = {
+    paypal:
+      `Please confirm your ${CYR_P_CAP}${CYR_A}yp${CYR_A}l account by logging in. ` +
+      `Your inv${CYR_O}ice is r${CYR_E}ady — review the ch${CYR_A}rges b${CYR_E}fore the deadline.`,
+    greek:
+      `The final rep${GRK_O}rt is due s${GRK_O}${GRK_O}n. ` +
+      `Our st${GRK_A}tus is g${GRK_O}${GRK_O}d, and the ${GRK_NU}alue we delivered exceeded every target.`,
+    fullwidth:
+      FW('This whole line is written in fullwidth letters and digits 12345 ()') +
+      ` — it renders wide but normalizes back to plain ASCII.`,
+    clean:
+      `This is a perfectly ordinary paragraph of English text. It uses only genuine ` +
+      `Latin letters, normal spaces, and plain punctuation — nothing to clean up here.`,
+  };
+
+  // --- per-character "keep" set (code points the user chose to preserve)
+  const keep = new Set<number>();
+
+  // --- options
+  const SCRIPT_IDS: Array<[string, ScriptClass]> = [
+    ['opt-cyrillic', 'cyrillic'],
+    ['opt-greek', 'greek'],
+    ['opt-fullwidth', 'fullwidth'],
+    ['opt-math', 'math'],
+    ['opt-other', 'other'],
+  ];
+  function readOptions(): DetectOptions {
+    const scripts: Partial<Record<ScriptClass, boolean>> = {};
+    for (const [id, sc] of SCRIPT_IDS) scripts[sc] = $<HTMLInputElement>(id).checked;
+    return { scripts };
+  }
+
+  // --- persistence (preferences only — never the user's text, for privacy)
+  function saveOpts() {
+    const s: Record<string, boolean> = {};
+    for (const [id] of SCRIPT_IDS) s[id] = $<HTMLInputElement>(id).checked;
+    localStorage.setItem('hcd-opts', JSON.stringify(s));
+  }
+  function loadOpts() {
+    try {
+      const s = JSON.parse(localStorage.getItem('hcd-opts') || '{}');
+      for (const [id] of SCRIPT_IDS) if (id in s) $<HTMLInputElement>(id).checked = s[id];
+    } catch {}
+  }
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up
+  function animateCount(el: HTMLElement, to: number, dur = 600) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to);
+      el.dataset.v = String(to);
+      return;
+    }
+    const from = parseInt(el.dataset.v || '0', 10);
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick);
+      else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // --- inline render. Build DOM (never innerHTML with user text → XSS-safe).
+  // Each flagged glyph becomes a clickable chip: click to toggle "keep".
+  function renderInline(src: string, opts: DetectOptions) {
+    render.replaceChildren();
+    const tokens = tokenize(src, opts);
+    for (const tok of tokens) {
+      if (tok.kind === 'text') {
+        render.appendChild(document.createTextNode(tok.value));
+      } else {
+        const chip = document.createElement('span');
+        const kept = keep.has(tok.cp);
+        chip.className = `hg-chip hg-chip--${tok.severity}${kept ? ' hg-chip--kept' : ''}`;
+        chip.tabIndex = 0;
+        // Show the real glyph + a superscript script tag (text, not colour-only).
+        const glyph = document.createElement('span');
+        glyph.textContent = String.fromCodePoint(tok.cp);
+        const tag = document.createElement('span');
+        tag.className = 'hg-tag';
+        tag.textContent = SCRIPT_ICON[tok.info.script];
+        chip.append(glyph, tag);
+        const cpStr = formatCp(tok.cp);
+        const label =
+          `${tok.info.name}, ${cpStr}, ${SCRIPT_LABEL[tok.info.script]}, maps to Latin "${tok.info.target}"` +
+          (kept ? ', kept (excluded from normalize)' : '') +
+          `. ${SEVERITY_LABEL[tok.severity]}.`;
+        chip.setAttribute('aria-label', label);
+        chip.setAttribute('role', 'button');
+        chip.title = `${cpStr} ${tok.info.name}\n${SCRIPT_LABEL[tok.info.script]} → Latin "${tok.info.target}"\nClick to ${kept ? 'normalize' : 'keep'} this glyph.`;
+        const toggle = () => {
+          if (keep.has(tok.cp)) keep.delete(tok.cp);
+          else keep.add(tok.cp);
+          run();
+        };
+        chip.addEventListener('click', toggle);
+        chip.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+          }
+        });
+        render.appendChild(chip);
+      }
+    }
+  }
+
+  const RING = 213.6;
+  let lastReport = '';
+  let normalizedText = '';
+
+  function run() {
+    const src = input.value;
+    const opts = readOptions();
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const result = detect(src, opts);
+
+    // Stats line.
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${result.scanned} chars scanned · ${result.counts.total} look-alike${result.counts.total === 1 ? '' : 's'}`;
+
+    // Inline highlighted render of the original.
+    renderInline(src, opts);
+
+    // Skeleton + normalized text.
+    skelEl.value = skeleton(src);
+    const norm = normalize(src, opts, keep);
+    normalizedText = norm.text;
+    output.value = normalizedText;
+
+    const hasText = src.length > 0;
+    $<HTMLButtonElement>('copy').disabled = !hasText;
+    ($('copy-bar') as HTMLButtonElement).disabled = !hasText;
+
+    // Confusability score ring (% genuine Latin).
+    const scoreNum = $<HTMLSpanElement>('score-num');
+    const ring = document.getElementById('ring') as unknown as SVGCircleElement;
+    if (!src.trim()) {
+      scoreNum.textContent = '—';
+      scoreNum.dataset.v = '100';
+      ring.style.strokeDashoffset = '0';
+      ring.style.stroke = 'var(--color-ok)';
+      $<HTMLParagraphElement>('band').textContent = 'Paste text to scan';
+      $<HTMLParagraphElement>('found').textContent = '';
+      $<HTMLButtonElement>('report').hidden = true;
+    } else {
+      const score = confusabilityScore(src, result);
+      animateCount(scoreNum, score);
+      ring.style.strokeDashoffset = String(RING * (1 - score / 100));
+      const color =
+        result.topSeverity === 'high'
+          ? 'var(--color-bad)'
+          : result.topSeverity === 'medium'
+            ? 'var(--color-warn)'
+            : result.topSeverity === 'low'
+              ? 'var(--color-warn)'
+              : 'var(--color-ok)';
+      ring.style.stroke = color;
+      $<HTMLParagraphElement>('band').textContent =
+        result.counts.total === 0
+          ? '✓ Genuine Latin'
+          : result.topSeverity === 'high'
+            ? '⚠ Mixed-script spoof'
+            : 'Look-alikes found';
+      const found = $<HTMLParagraphElement>('found');
+      found.textContent = verdict(result);
+      found.style.color = result.counts.total === 0 ? 'var(--color-ok)' : 'var(--c-muted)';
+      $<HTMLButtonElement>('report').hidden = false;
+    }
+
+    // Script-class count chips.
+    const countsEl = $<HTMLUListElement>('counts');
+    countsEl.replaceChildren();
+    if (!src.trim()) {
+      const li = document.createElement('li');
+      li.className = 'muted';
+      li.textContent = 'Paste text to scan.';
+      countsEl.appendChild(li);
+    } else if (result.rows.length === 0) {
+      const li = document.createElement('li');
+      li.className = 'count-pill';
+      li.style.background = 'color-mix(in srgb, var(--color-ok) 16%, transparent)';
+      li.style.color = 'var(--color-ok)';
+      li.textContent = '✓ No look-alikes — genuine Latin text';
+      countsEl.appendChild(li);
+    } else {
+      for (const row of result.rows) {
+        const li = document.createElement('li');
+        li.className = `hg-chip hg-chip--${row.severity} count-pill`;
+        li.style.textDecoration = 'none';
+        li.textContent = `${SCRIPT_ICON[row.info.script]} ${formatCp(row.cp)} → ${row.info.target} ×${row.count}`;
+        li.title = `${row.info.name}\n${SCRIPT_LABEL[row.info.script]} → Latin "${row.info.target}"`;
+        countsEl.appendChild(li);
+      }
+    }
+
+    // Spoof banner: high severity + at least one mixed-script word.
+    $<HTMLDivElement>('spoof-banner').hidden = !(result.topSeverity === 'high' && result.counts.runs > 0);
+
+    // Cache the report for the copy-report button.
+    lastReport = buildReport(result);
+  }
+
+  // debounced via rAF
+  let raf = 0;
+  const schedule = () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(run);
+  };
+  input.addEventListener('input', () => {
+    keep.clear(); // editing invalidates per-glyph keep selections
+    schedule();
+  });
+  for (const [id] of SCRIPT_IDS) {
+    $(id).addEventListener('change', () => {
+      saveOpts();
+      run();
+    });
+  }
+
+  // samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => {
+      keep.clear();
+      input.value = SAMPLES[b.dataset.sample!];
+      run();
+      setPane('output');
+    }),
+  );
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name),
+    );
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')),
+  );
+
+  // --- shared actions
+  async function doPaste() {
+    try {
+      input.value = await navigator.clipboard.readText();
+      keep.clear();
+      run();
+      setPane('output');
+      toast('Pasted');
+    } catch {
+      input.focus();
+      setPane('input');
+      toast('Press Ctrl/Cmd+V to paste');
+    }
+  }
+  async function doCopy() {
+    if (!normalizedText) return;
+    await navigator.clipboard.writeText(normalizedText);
+    const b = $<HTMLButtonElement>('copy');
+    const prev = b.textContent;
+    b.textContent = '✓ Copied';
+    toast('Clean Latin text copied');
+    setTimeout(() => (b.textContent = prev), 1300);
+  }
+  function doReset() {
+    input.value = '';
+    keep.clear();
+    run();
+    input.focus();
+    setPane('input');
+    toast('Cleared');
+  }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // download normalized text (or skeleton, depending on active view)
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    const text = skelEl.hidden ? normalizedText : skelEl.value;
+    const blob = new Blob([text], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = skelEl.hidden ? 'normalized.txt' : 'skeleton.txt';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast(`Downloaded ${a.download}`);
+  });
+
+  // copy plaintext report
+  $<HTMLButtonElement>('report').addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(lastReport);
+      toast('Report copied');
+    } catch {
+      toast('Could not copy report');
+    }
+  });
+
+  // view toggle: flagged original / skeleton / normalized
+  function setView(view: 'flag' | 'skeleton' | 'clean') {
+    render.hidden = view !== 'flag';
+    skelEl.hidden = view !== 'skeleton';
+    output.hidden = view !== 'clean';
+    $<HTMLParagraphElement>('view-hint').hidden = view !== 'flag';
+    const buttons: Array<['flag' | 'skeleton' | 'clean', string]> = [
+      ['flag', 'view-flag'],
+      ['skeleton', 'view-skeleton'],
+      ['clean', 'view-clean'],
+    ];
+    for (const [v, id] of buttons) {
+      const b = $<HTMLButtonElement>(id);
+      const active = v === view;
+      b.classList.toggle('muted', !active);
+      b.style.background = active ? 'var(--c-accent-soft)' : '';
+    }
+  }
+  $<HTMLButtonElement>('view-flag').addEventListener('click', () => setView('flag'));
+  $<HTMLButtonElement>('view-skeleton').addEventListener('click', () => setView('skeleton'));
+  $<HTMLButtonElement>('view-clean').addEventListener('click', () => setView('clean'));
+
+  // keyboard: Cmd/Ctrl+Enter re-runs / normalizes (explicit flow for SR users)
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      e.preventDefault();
+      run();
+      toast('Re-scanned');
+    }
+  });
+
+  loadOpts();
+  setView('flag');
+  setPane('input');
+  run();
+</script>

@@ -1,0 +1,194 @@
+---
+import Base from '../../layouts/Base.astro';
+import HumanVoiceAiTellReport from '../../components/tools/HumanVoiceAiTellReport.astro';
+
+const faqs = [
+  {
+    q: 'Why does my text sound like ChatGPT?',
+    a: 'Usually a handful of habits stack up: very uniform sentence length (low "burstiness"), the "It\'s not X, it\'s Y" pattern, rule-of-three lists, paragraphs that all open with "Moreover/Furthermore", hedging preambles like "It\'s important to note", and a cluster of overused words such as delve, leverage, robust and tapestry. No single one is conclusive — it\'s the pile-up that reads like a model. This report shows you exactly which sentences and words are doing it.',
+  },
+  {
+    q: 'What is burstiness?',
+    a: 'Burstiness measures how much your sentence lengths vary. Human writing tends to mix short, punchy lines with longer ones, so it has high variation; AI output often lands in a narrow band, producing a "flat skyline". We chart every sentence\'s word count and show the coefficient of variation (CV): under about 0.4 reads uniform/AI-leaning, 0.4–0.7 is normal, and above 0.7 is bursty/human-leaning. It\'s corroborating signal, never proof.',
+  },
+  {
+    q: 'Is this an AI detector? Will it bypass detectors?',
+    a: 'No, and no. This is a guidance tool for quality, not a detector and not a "humanizer". It never gives a binary AI/human verdict, never tries to evade detection, and never uploads your text. The goal is the opposite of detector-gaming: help you fix what reads like a model so your own voice comes through.',
+  },
+  {
+    q: 'What words should I avoid?',
+    a: 'There\'s no banned list — context matters — but a recognizable set is heavily overused by AI: delve, underscore, tapestry, testament, realm, multifaceted, paramount, myriad, leverage, harness, robust, seamless, navigate, foster, utilize, elevate and similar. When the report flags one, click it for two or three plainer human swaps (e.g. delve → look at / dig into; utilize → use; robust → strong / reliable).',
+  },
+  {
+    q: 'Does my text get uploaded?',
+    a: 'No. Every part of the analysis — tokenizing, the regex tells, the burstiness math, the word swaps and your saved draft — runs in your browser with JavaScript. Nothing is sent to a server, stored remotely, or logged. Open DevTools → Network while you type and you will see zero requests. It even works offline. We deliberately do not compute true "perplexity", because that would need a language model we would have to ship or call.',
+  },
+  {
+    q: 'What is the rule of three?',
+    a: 'The rule of three is the tricolon — grouping ideas in threes ("clarity, consistency, and courage"). It\'s a real rhetorical device and one list is perfectly fine. AI just reaches for it constantly, so several three-item lists in a row flatten your rhythm. The report flags clusters so you can vary a few, not single instances.',
+  },
+  {
+    q: 'How accurate is it?',
+    a: 'Treat it as a graded guide, not a verdict. No single tell is conclusive, and good human writing can trip a flag or two. The value is the punch-list: it turns a vague "this sounds like AI" into specific sentences and words you can revise in your own voice. We pair every flag with a plain-English reason and a concrete next step.',
+  },
+];
+
+const url = `${Astro.site}tools/human-voice-ai-tell-report`;
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${url}#app`,
+  name: 'Human-Voice / AI-Tell Report',
+  url,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'See why your writing sounds like AI',
+    'Sentence cadence / burstiness checker with per-sentence chart',
+    'Detects "not X but Y", rule-of-three, repeated openers and metronomic transitions',
+    'Flags hedging, sycophancy and filler preambles',
+    'Overused ChatGPT / AI words list with human swaps',
+    'Non-destructive, graded human-voice score — not a detector',
+    '100% client-side — text never leaves your browser',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Why Does My Writing Sound Like AI? — Human-Voice / AI-Tell Report"
+  description="Free, private checker that shows why your writing sounds like AI: sentence cadence/burstiness, 'not X but Y', rule-of-three, repeated openers, hedging and overused ChatGPT words — with human swaps. Runs 100% in your browser."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <p class="mb-3">
+        <a href="/tools" class="text-sm font-medium text-accent hover:underline">← All tools</a>
+      </p>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no signup · not a detector
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Why does my writing sound like AI? See the tells — and fix them.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Paste any draft for a non-destructive, line-by-line <strong>Human-Voice / AI-Tell
+        Report</strong>: sentence-cadence and burstiness, the "not X but Y" pattern,
+        rule-of-three, repeated openers, hedging and a curated <strong>ChatGPT-word
+        dictionary with human swaps</strong>. Nothing is changed, nothing is uploaded —
+        you keep your human voice.
+      </p>
+    </header>
+
+    <HumanVoiceAiTellReport />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">What counts as an "AI tell"?</h2>
+      <p class="muted">
+        An AI tell is a habit of phrasing or structure that large language models
+        overuse, so it quietly signals "a machine drafted this." The important thing:
+        <strong>no single tell is conclusive.</strong> Plenty of good human writing uses
+        an em dash, a rule-of-three, or the word "robust." What reads as AI is the
+        <em>pile-up</em> — uniform sentence lengths, several stock openers, a fistful of
+        signature words and a hedging preamble, all in one short passage. This report
+        scores that density and, crucially, shows you the specific sentences and words
+        responsible, so you can revise the few that matter instead of rewriting
+        everything.
+      </p>
+
+      <h2 class="text-2xl font-bold">Sentence cadence &amp; burstiness, explained</h2>
+      <p class="muted">
+        "Burstiness" is just how much your sentence lengths vary. Human prose tends to
+        bounce between short, punchy lines and longer, winding ones; a lot of AI output
+        sits in a narrow band, which produces a flat, metronomic skyline. The cadence
+        chart above plots every sentence as a bar so you can <em>see</em> the rhythm, and
+        reports the coefficient of variation (CV): below ~0.4 reads uniform and
+        AI-leaning, 0.4–0.7 is normal, and above 0.7 is bursty and human-leaning. We need
+        at least five sentences for a reliable read, and we treat the number as
+        corroborating signal — never proof.
+      </p>
+
+      <h2 class="text-2xl font-bold">"Not X but Y", rule-of-three &amp; repeated openers</h2>
+      <p class="muted">
+        Three structural habits do a lot of the heavy lifting. <strong>Negative
+        parallelism</strong> — "It's not about the tool, it's about the craft" — is a
+        rhythm models love; one is fine, several read scripted. The <strong>rule of
+        three</strong> (the tricolon: "clarity, consistency, and courage") is a genuine
+        rhetorical device, but AI reaches for it constantly, so we flag clusters rather
+        than single lists. And <strong>repeated openers</strong> — three paragraphs in a
+        row starting "Moreover / Furthermore / Additionally", or half your sentences
+        beginning "This / It / There" — flatten a personal voice. Vary or drop them and
+        the prose immediately sounds more like a person.
+      </p>
+
+      <h2 class="text-2xl font-bold">Hedging, sycophancy &amp; the GPT-word dictionary</h2>
+      <p class="muted">
+        Filler preambles ("It's important to note that…"), chatbot flattery ("Great
+        question!", "You're absolutely right"), and engagement sign-offs ("Let's dive
+        in", "I hope this helps") all delay the point — cut them and start with the point
+        itself. On vocabulary, a recognizable set of words is heavily overused by AI:
+        <em>delve, underscore, tapestry, testament, realm, multifaceted, paramount,
+        leverage, harness, robust, seamless, navigate, foster, utilize</em>. When the
+        report flags one, click the highlight for two or three plainer human swaps —
+        delve → look at, utilize → use, robust → strong/reliable — and accept the one
+        that sounds like you. That swap is the <em>only</em> place this tool ever edits
+        your text, and only when you click.
+      </p>
+
+      <h2 class="text-2xl font-bold">Quality, not detector-bypass — and 100% in your browser</h2>
+      <p class="muted">
+        This is deliberately not a detector and not a "humanizer." It never gives a
+        binary AI/human verdict and never tries to evade anything; it helps you write
+        better and keep your own voice. Everything runs locally in JavaScript — the
+        tokenizer, the tell regexes, the burstiness math, the swap dictionary and your
+        saved draft. Nothing is uploaded, stored, or logged; open DevTools → Network and
+        you'll see zero requests, and it works offline. We even decline to compute true
+        "perplexity," because that would require shipping or calling a language model —
+        which would break the privacy promise. Clean AI writing for real quality, keep
+        your human voice.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; }
+  </style>
+</Base>

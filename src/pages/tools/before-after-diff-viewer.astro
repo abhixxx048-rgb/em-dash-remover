@@ -1,0 +1,176 @@
+---
+import Base from '../../layouts/Base.astro';
+import BeforeAfterDiffViewer from '../../components/tools/BeforeAfterDiffViewer.astro';
+
+const faqs = [
+  {
+    q: 'Does this upload my text anywhere?',
+    a: 'No. The diff is computed entirely in your browser with JavaScript — your original and changed text never leave your device. Open your browser DevTools Network tab while you use it and you will see zero requests with your text. It even works offline. That makes it safe for confidential legal, medical, or financial copy.',
+  },
+  {
+    q: "What's the difference between word-level and character-level diff?",
+    a: 'Word-level diff highlights whole words that changed, which reads cleanly for prose — ideal for checking that a cleanup did not alter your meaning. Character-level diff highlights the exact characters that changed, which is best for inspecting fine punctuation like a single em dash turning into a comma. Switch between them with the Word / Character toggle.',
+  },
+  {
+    q: 'Can I undo a change after I accept it?',
+    a: 'Yes. Every change is a reversible unit. Click ↩ to keep the original or ✓ to use the cleaned version, and switch back at any time. There are also Accept all and Reject all buttons. Rejecting restores your exact original substring, so reject-all gives you back your text untouched.',
+  },
+  {
+    q: "Can I compare two texts that didn't come from the cleaner?",
+    a: 'Absolutely. Paste any two pieces of text into the Original and Changed boxes — release-note versions, microcopy variants, prompt revisions, or two drafts of an essay. The viewer works as a standalone before-and-after text compare tool, not only for cleaner output.',
+  },
+  {
+    q: "Why are some 'invisible' changes shown as chips?",
+    a: 'Zero-width and non-breaking characters are literally invisible, so a removed one would look like nothing changed. To make those edits visible we render them as labelled chips such as [ZWSP] or ␣ inside the diff, so you can actually see the invisible AI artifacts that were removed.',
+  },
+  {
+    q: 'Does it work on mobile?',
+    a: 'Yes. The inline view is the default on phones, the accept/reject controls are tap-sized, and a Text / Diff switcher lets you flip between your inputs and the result. Side-by-side is available too and scrolls horizontally on narrow screens.',
+  },
+];
+
+const webApp = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  '@id': `${Astro.site}tools/before-after-diff-viewer#app`,
+  name: 'Before/After Diff Viewer',
+  url: `${Astro.site}tools/before-after-diff-viewer`,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Web Browser',
+  browserRequirements: 'Requires JavaScript.',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  isAccessibleForFree: true,
+  featureList: [
+    'Compare before and after text instantly',
+    'Inline and side-by-side diff views',
+    'Word-level and character-level diffing',
+    'Per-change accept and reject — keep your voice',
+    'Highlight invisible / zero-width characters',
+    '100% private — no upload, runs in your browser',
+  ],
+  publisher: { '@id': `${Astro.site}#org` },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<Base
+  title="Before/After Diff Viewer — Compare Text & See What Changed (No Upload)"
+  description="Compare your before and after text instantly. Inline or side-by-side, word or character diff, accept or reject every change. 100% private — runs in your browser, no upload."
+>
+  <main class="halo">
+    <!-- Hero -->
+    <header class="mx-auto max-w-3xl px-4 pt-10 pb-6 text-center">
+      <p class="mb-3">
+        <a href="/tools" class="inline-flex min-h-11 items-center text-sm font-medium text-accent hover:underline">← All tools</a>
+      </p>
+      <p class="mb-3 inline-block rounded-full px-3 py-1 text-xs font-semibold text-accent" style="background: var(--c-accent-soft);">
+        100% in your browser · free · no upload
+      </p>
+      <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+        Before/After Diff Viewer: see exactly what changed.
+      </h1>
+      <p class="mx-auto mt-3 max-w-2xl text-lg muted">
+        Compare your original and cleaned text side by side or inline. Every em
+        dash, quote, and invisible character is highlighted — and you decide,
+        change by change, whether to <strong>keep the original or use the
+        cleaned version</strong>. Clean for quality, keep your human voice.
+      </p>
+    </header>
+
+    <BeforeAfterDiffViewer />
+
+    <!-- SEO content -->
+    <article class="seo mx-auto mt-20 max-w-3xl space-y-5 px-4 leading-relaxed">
+      <h2 class="text-2xl font-bold">Compare your original and cleaned text instantly</h2>
+      <p class="muted">
+        Bulk find-and-replace tools are scary because they change your prose
+        silently. A before-and-after diff viewer removes that fear: it shows
+        every edit before you commit it. Paste your original on the left and the
+        cleaned or edited version on the right, and the diff appears instantly —
+        recomputing as you type. Deletions are shown struck through in red,
+        insertions underlined in green, and unchanged text stays neutral, so you
+        can read the change at a glance.
+      </p>
+
+      <h2 class="text-2xl font-bold">Inline vs side-by-side: pick your view</h2>
+      <p class="muted">
+        <strong>Inline</strong> view merges both versions into one column — the
+        lowest-effort way to read a change in context, and the default on mobile.
+        <strong>Side-by-side</strong> view aligns the original and the result in
+        two gutter-numbered columns, the way editors and developers expect to
+        compare versions. Your choice is remembered for next time. Both views
+        render invisible characters as visible chips like <code>[ZWSP]</code> so
+        nothing hides from you.
+      </p>
+
+      <h2 class="text-2xl font-bold">Accept or reject every change — keep your voice</h2>
+      <p class="muted">
+        This is track-changes without Microsoft Word and without uploading a
+        thing. Each change is its own reviewable unit: click ↩ to keep your
+        original wording or ✓ to use the cleaned version. Filter by change type —
+        dashes, quotes, ellipses, invisibles, whitespace, markdown — to scrutinise
+        one category while accepting the rest. Power users can navigate with
+        <code>j</code> / <code>k</code> and accept or reject with <code>a</code> /
+        <code>r</code>. When you are done, copy or download the merged result.
+        Reject everything and you get your exact original back — nothing is ever
+        forced on you.
+      </p>
+
+      <h2 class="text-2xl font-bold">Word-level vs character-level diff (what's the difference?)</h2>
+      <p class="muted">
+        <strong>Word-level</strong> diffing groups changes by whole words, which
+        reads naturally for prose and is the right default for verifying meaning.
+        <strong>Character-level</strong> diffing pinpoints the exact characters
+        that changed — perfect for inspecting a lone em dash becoming a comma or a
+        curly quote turning straight. Toggle between them live; the diff recomputes
+        without leaving the page.
+      </p>
+
+      <h2 class="text-2xl font-bold">100% private: your text never leaves your browser</h2>
+      <p class="muted">
+        Several popular compare tools offer "save online and share a URL," which
+        quietly sends your text to a server. This viewer never does. All diffing,
+        classification, accept/reject merging, and export run in your browser with
+        zero network calls — a direct answer to searches for a private, no-upload,
+        offline text diff checker. It is safe for sensitive documents and works
+        with no internet connection at all.
+      </p>
+    </article>
+
+    <!-- FAQ -->
+    <section class="mx-auto mt-16 max-w-3xl px-4">
+      <h2 class="text-2xl font-bold">Frequently asked questions</h2>
+      <div class="mt-6 divide-y divide-ink/10">
+        {faqs.map((f) => (
+          <details class="group py-4">
+            <summary class="cursor-pointer list-none font-semibold marker:hidden">
+              <span class="inline-flex w-full items-center justify-between">
+                {f.q}
+                <span class="ml-4 muted transition group-open:rotate-45">+</span>
+              </span>
+            </summary>
+            <p class="mt-2 text-sm muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
+    </section>
+
+    <script type="application/ld+json" set:html={JSON.stringify(webApp)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </main>
+
+  <style is:global>
+    @media (max-width: 767px) { body { padding-bottom: 4.5rem; } }
+    .seo a { color: var(--color-accent); text-decoration: underline; }
+    .seo code { font-family: var(--font-mono); font-size: 0.9em; background: var(--c-accent-soft); padding: 0 0.3em; border-radius: 4px; }
+  </style>
+</Base>

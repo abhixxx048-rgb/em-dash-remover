@@ -1,7 +1,16 @@
 ---
 import '../styles/global.css';
 import ConsentBanner from '../components/ConsentBanner.astro';
+import Analytics from '../components/Analytics.astro';
 import { ADSENSE_PUB_ID } from '../consts';
+import { TOOLS, CORE } from '../lib/tools-registry';
+
+// Footer mega-grid: every tool grouped by category for sitewide internal linking.
+const footerGroups: { label: string; tools: typeof TOOLS }[] = [
+  { label: 'Clean & convert', tools: TOOLS.filter((t) => t.category === 'clean') },
+  { label: 'Analyze & improve', tools: TOOLS.filter((t) => t.category === 'analyze') },
+  { label: 'Power tools & apps', tools: TOOLS.filter((t) => t.category === 'power') },
+];
 
 interface Props {
   title?: string;
@@ -24,11 +33,32 @@ const cleanPath = Astro.url.pathname
   .replace(/\/$/, '');
 const canonical = new URL(cleanPath || '/', Astro.site).href.replace(/\/$/, '');
 const seg = cleanPath.replace(/^\//, '') || 'index';
-const ogId = ['about', 'contact', 'terms', 'privacy'].includes(seg) ? seg : 'index';
+// Tool pages (/tools and /tools/<slug>) have their own OG image keyed `tools-<slug>`.
+const ogId = seg === 'tools' || seg.startsWith('tools/')
+  ? seg.replace(/\//g, '-')
+  : ['about', 'contact', 'terms', 'privacy'].includes(seg)
+    ? seg
+    : 'index';
 const ogImage = new URL(`/open-graph/${ogId}.png`, Astro.site).href;
+
+// Breadcrumb trail for tool pages (Home › Tools › This tool) — helps Google show
+// a breadcrumb in results and reinforces the hub-and-spoke structure.
+const isToolPage = seg.startsWith('tools/');
+const breadcrumb = isToolPage
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: new URL('/', Astro.site).href },
+        { '@type': 'ListItem', position: 2, name: 'Tools', item: new URL('/tools', Astro.site).href },
+        { '@type': 'ListItem', position: 3, name: (title || '').split('—')[0].split('|')[0].trim(), item: canonical },
+      ],
+    }
+  : null;
 
 const nav = [
   { href: '/', label: 'Tool' },
+  { href: '/tools', label: 'Tools' },
   { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' },
@@ -116,6 +146,9 @@ const orgGraph = {
     </script>
 
     <script type="application/ld+json" set:html={JSON.stringify(orgGraph)} />
+    {breadcrumb && <script type="application/ld+json" set:html={JSON.stringify(breadcrumb)} />}
+
+    <Analytics />
   </head>
   <body class="min-h-screen font-sans antialiased">
     <header class="sticky top-0 z-40 border-b border-ink/8 backdrop-blur-md" style="background: color-mix(in srgb, var(--c-paper) 80%, transparent);">
@@ -140,9 +173,41 @@ const orgGraph = {
 
     <footer class="mt-20 border-t border-ink/8">
       <div class="mx-auto max-w-6xl px-4 py-10 text-sm muted">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4 text-xs">
+          <div>
+            <p class="mb-2 font-semibold text-accent">Start here</p>
+            <ul class="space-y-0.5">
+              <li>
+                <a href={CORE.href} class="flex min-h-11 items-center gap-2 muted hover:text-accent">
+                  <span aria-hidden="true">{CORE.icon}</span><span>{CORE.title}</span>
+                </a>
+              </li>
+              <li>
+                <a href="/tools" class="flex min-h-11 items-center gap-2 muted hover:text-accent">
+                  <span aria-hidden="true">🧰</span><span>All tools</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+          {footerGroups.map((group) => (
+            <div>
+              <p class="mb-2 font-semibold text-accent">{group.label}</p>
+              <ul class="space-y-0.5">
+                {group.tools.map((tool) => (
+                  <li>
+                    <a href={tool.href} class="flex min-h-11 items-center gap-2 muted hover:text-accent">
+                      <span aria-hidden="true">{tool.icon}</span><span>{tool.title}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+        <div class="mt-10 flex flex-col gap-4 border-t border-ink/8 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p>🔒 100% client-side — your text never leaves your browser.</p>
           <nav class="flex flex-wrap gap-x-5 gap-y-2">
+            <a href="/tools" class="inline-flex min-h-11 items-center hover:text-accent">Tools</a>
             <a href="/blog" class="inline-flex min-h-11 items-center hover:text-accent">Blog</a>
             <a href="/about" class="inline-flex min-h-11 items-center hover:text-accent">About</a>
             <a href="/contact" class="inline-flex min-h-11 items-center hover:text-accent">Contact</a>

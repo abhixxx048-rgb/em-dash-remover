@@ -1,0 +1,172 @@
+---
+// Privacy-safe analytics layer. Sends COUNTS/metadata only — never user text.
+// All providers are gated: each script is injected only when its config const
+// in src/consts.ts is set (empty string = disabled).
+import { UMAMI_WEBSITE_ID, UMAMI_SRC, CF_WA_TOKEN } from '../consts';
+---
+
+{/*
+  Umami is cookieless and privacy-preserving, so it fires UNCONDITIONALLY and
+  is NOT gated behind the consent banner. Only injected when a website id is set.
+*/}
+{UMAMI_WEBSITE_ID && (
+  <script is:inline defer src={UMAMI_SRC} data-website-id={UMAMI_WEBSITE_ID}></script>
+)}
+
+{/* Cloudflare Web Analytics — cookieless beacon, injected only when token set. */}
+{CF_WA_TOKEN && (
+  <script
+    is:inline
+    defer
+    src="https://static.cloudflareinsights.com/beacon.min.js"
+    data-cf-beacon={`{"token": "${CF_WA_TOKEN}"}`}
+  ></script>
+)}
+
+{/*
+  Central auto-tracking funnel. ALWAYS injected (no per-page code needed). It
+  cannot import ../lib/analytics — inline scripts have no module scope — so the
+  allowlist + text-stripping guard are duplicated inline. Everything is
+  defensive (optional chaining + try/catch) and sends nothing unless
+  window.umami is present. Element text values are NEVER read into props.
+*/}
+<script is:inline>
+  (function () {
+    try {
+      var ALLOWED = {
+        tool_view: 1, input_received: 1, clean_run: 1, first_clean_run: 1,
+        output_copied: 1, output_downloaded: 1, sample_loaded: 1,
+        tool_switched: 1, related_tool_clicked: 1, next_step_clicked: 1,
+        extension_cta_click: 1, obsidian_cta_click: 1, pwa_install: 1,
+        scroll_depth: 1, ad_in_view: 1, share_click: 1,
+      };
+      var BANNED = /text|content|input|value|paste|body|html/i;
+
+      function track(name, props) {
+        try {
+          if (!ALLOWED[name]) return;
+          var safe;
+          if (props) {
+            safe = {};
+            for (var k in props) {
+              if (BANNED.test(k)) continue;
+              var v = props[k];
+              safe[k] = typeof v === 'string' ? v.slice(0, 64) : v;
+            }
+          }
+          if (window.umami && window.umami.track) window.umami.track(name, safe);
+        } catch (e) {}
+      }
+
+      function lenBucket(n) {
+        if (n <= 0) return '0';
+        if (n <= 50) return '1-50';
+        if (n <= 200) return '51-200';
+        if (n <= 1000) return '201-1k';
+        if (n <= 5000) return '1k-5k';
+        return '5k+';
+      }
+
+      var path = location.pathname || '/';
+      // Slug for the current tool: 'core' for the homepage hub, else the
+      // /tools/<slug> segment.
+      function toolSlug() {
+        if (path === '/') return 'core';
+        if (path.indexOf('/tools/') === 0) {
+          return path.replace('/tools/', '').replace(/\/$/, '') || 'core';
+        }
+        return '';
+      }
+      var TOOL = toolSlug();
+
+      // tool_view on load for the hub and any tool page.
+      if (path === '/' || path.indexOf('/tools/') === 0) {
+        track('tool_view', { tool: TOOL });
+      }
+
+      // input_received once, the first time the user types/pastes.
+      var inputFired = false;
+      function onFirstInput(e) {
+        try {
+          if (inputFired) return;
+          var el = e && e.target;
+          if (!el) return;
+          var tag = (el.tagName || '').toLowerCase();
+          var isInput = el.id === 'input' || tag === 'textarea';
+          if (!isInput) return;
+          inputFired = true;
+          var len = (el.value && el.value.length) || 0;
+          track('input_received', { tool: TOOL, len_bucket: lenBucket(len) });
+        } catch (err) {}
+      }
+      document.addEventListener('input', onFirstInput, true);
+      document.addEventListener('paste', onFirstInput, true);
+
+      // Delegated click listener for declarative + CTA tracking.
+      document.addEventListener('click', function (e) {
+        try {
+          var node = e.target;
+          // walk up to find a relevant element
+          var el = node;
+          var trackEl = null, copyEl = null, sampleEl = null, anchor = null;
+          while (el && el !== document) {
+            if (!trackEl && el.hasAttribute && el.hasAttribute('data-track')) trackEl = el;
+            if (!copyEl && el.hasAttribute && el.hasAttribute('data-copy')) copyEl = el;
+            if (!copyEl && el.tagName === 'BUTTON' && el.id && el.id.indexOf('copy') === 0) copyEl = el;
+            if (!sampleEl && el.hasAttribute && el.hasAttribute('data-sample')) sampleEl = el;
+            if (!anchor && el.tagName === 'A') anchor = el;
+            el = el.parentElement;
+          }
+
+          if (trackEl) {
+            var name = trackEl.getAttribute('data-track');
+            var props = {};
+            var from = trackEl.getAttribute('data-from');
+            var to = trackEl.getAttribute('data-to');
+            var placement = trackEl.getAttribute('data-placement');
+            if (from != null) props.from = from;
+            if (to != null) props.to = to;
+            if (placement != null) props.placement = placement;
+            track(name, props);
+          }
+
+          if (copyEl) track('output_copied', { tool: TOOL });
+          if (sampleEl) track('sample_loaded', { tool: TOOL });
+
+          if (anchor) {
+            var href = (anchor.getAttribute('href') || '').toLowerCase();
+            if (href) {
+              var isExt = href.indexOf('/tools/browser-extension') !== -1 ||
+                href.indexOf('chrome.google.com/webstore') !== -1 ||
+                href.indexOf('chromewebstore.google.com') !== -1 ||
+                href.indexOf('microsoftedge.microsoft.com') !== -1;
+              if (isExt) track('extension_cta_click', { tool: TOOL });
+              if (href.indexOf('obsidian') !== -1) track('obsidian_cta_click', { tool: TOOL });
+            }
+          }
+        } catch (err) {}
+      }, true);
+
+      // Scroll depth: fire 25/50/75/100% once each.
+      var marks = [25, 50, 75, 100];
+      var sent = {};
+      function onScroll() {
+        try {
+          var doc = document.documentElement;
+          var scrollable = (doc.scrollHeight - doc.clientHeight);
+          if (scrollable <= 0) return;
+          var pct = ((window.scrollY || doc.scrollTop || 0) / scrollable) * 100;
+          for (var i = 0; i < marks.length; i++) {
+            var m = marks[i];
+            if (pct >= m && !sent[m]) {
+              sent[m] = true;
+              track('scroll_depth', { tool: TOOL, pct: m });
+            }
+          }
+          if (sent[100]) window.removeEventListener('scroll', onScroll);
+        } catch (err) {}
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+    } catch (e) {}
+  })();
+</script>

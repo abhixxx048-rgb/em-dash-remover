@@ -1,0 +1,344 @@
+---
+// Interactive Case Converter island. Static HTML; behavior wired by the client
+// script, which imports the pure engine. Styling mirrors Cleaner.astro so it
+// looks native (same textarea / toolbar / toast / button language).
+---
+
+<section id="tool" aria-label="Case converter" class="mx-auto max-w-6xl px-4 pb-24 md:pb-0">
+  <div class="card overflow-hidden">
+    <!-- Toolbar: case mode buttons -->
+    <div class="border-b border-ink/8 px-3 py-3 sm:px-4">
+      <div role="group" aria-label="Choose a case" class="flex flex-wrap gap-1.5 text-sm" id="modes">
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="upper" aria-pressed="false">UPPER CASE</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="lower" aria-pressed="false">lower case</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="sentence" aria-pressed="false">Sentence case</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="title" aria-pressed="true">Title Case</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="capitalize" aria-pressed="false">Capitalize Each Word</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="alternating" aria-pressed="false">aLtErNaTiNg</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="inverse" aria-pressed="false">InVeRsE</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="camel" aria-pressed="false">camelCase</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="pascal" aria-pressed="false">PascalCase</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="snake" aria-pressed="false">snake_case</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="kebab" aria-pressed="false">kebab-case</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="constant" aria-pressed="false">CONSTANT_CASE</button>
+        <button class="ctl inline-flex items-center px-3 transition hover:border-accent hover:text-accent" data-mode="dot" aria-pressed="false">dot.case</button>
+      </div>
+
+      <!-- Title-case sub-options (only relevant in Title Case) -->
+      <div id="title-opts" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+        <label class="flex min-h-11 items-center gap-2">
+          <span class="font-medium">Style guide</span>
+          <select id="title-style" class="ctl px-3" aria-label="Title case style guide">
+            <option value="ap">AP</option>
+            <option value="chicago">Chicago (CMOS)</option>
+            <option value="apa">APA 7</option>
+            <option value="mla">MLA</option>
+          </select>
+        </label>
+        <label class="flex min-h-11 items-center gap-3 rounded-lg px-2 hover:bg-ink/5">
+          <input type="checkbox" id="opt-preserve" checked class="h-5 w-5" />
+          Keep brand names (iPhone, NASA)
+        </label>
+      </div>
+    </div>
+
+    <!-- Mobile pane switcher -->
+    <div role="tablist" aria-label="View" class="flex gap-1 px-3 pt-3 md:hidden">
+      <button role="tab" id="tab-input" data-pane-tab="input" aria-selected="true" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium">Type</button>
+      <button role="tab" id="tab-output" data-pane-tab="output" aria-selected="false" class="min-h-11 flex-1 rounded-lg px-3 text-sm font-medium muted">Result</button>
+    </div>
+
+    <!-- Panes -->
+    <div class="grid gap-px bg-ink/8 md:grid-cols-2" data-panes>
+      <!-- Input -->
+      <div class="p-4" data-pane="input" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">Your text</h2>
+          <button id="paste" class="inline-flex min-h-11 items-center rounded-md px-3 text-sm font-medium text-accent transition hover:bg-accent-soft">📋 Paste</button>
+        </div>
+        <div class="relative">
+          <textarea
+            id="input"
+            rows="12"
+            aria-label="Text to convert"
+            class="w-full resize-y rounded-lg border border-ink/15 bg-transparent p-3 font-mono text-[16px] leading-relaxed outline-none focus:border-accent focus:ring-2 focus:ring-accent/20"
+          ></textarea>
+          <!-- Empty state -->
+          <div id="empty" class="pointer-events-none absolute inset-0 flex flex-col items-center justify-center gap-3 p-4 text-center">
+            <p class="muted text-sm">Type or paste text — or try an example:</p>
+            <div class="pointer-events-auto flex flex-wrap justify-center gap-2">
+              <button data-sample="headline" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">📰 Headline</button>
+              <button data-sample="allcaps" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">🔠 ALL CAPS</button>
+              <button data-sample="identifier" class="ctl inline-flex items-center px-4 text-sm transition hover:border-accent hover:text-accent">💻 Variable name</button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-2 text-xs muted" id="in-stats" aria-live="polite">0 words · 0 chars</p>
+      </div>
+
+      <!-- Output -->
+      <div class="p-4" data-pane="output" style="background: var(--c-surface);">
+        <div class="mb-2 flex items-center justify-between">
+          <h2 class="text-xs font-semibold uppercase tracking-wide muted">
+            Result <span id="active-label" class="text-accent normal-case">— Title Case</span>
+          </h2>
+          <div class="flex items-center gap-1.5">
+            <button id="download" aria-label="Download result as .txt" class="grid h-11 w-11 place-items-center rounded-md text-base muted transition hover:bg-ink/5" title="Download .txt">⬇</button>
+            <button id="copy" class="inline-flex min-h-11 items-center rounded-md bg-accent px-4 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-40" disabled>Copy</button>
+          </div>
+        </div>
+        <textarea id="output" rows="12" readonly aria-label="Converted text"
+          class="w-full resize-y rounded-lg border border-ink/15 p-3 font-mono text-[16px] leading-relaxed outline-none"
+          style="background: var(--c-paper);"></textarea>
+      </div>
+    </div>
+
+    <!-- Counters + actions -->
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-ink/8 px-4 py-3 text-sm">
+      <div class="flex flex-wrap gap-x-5 gap-y-1" aria-live="polite">
+        <span><span id="c-words" class="font-semibold" data-v="0">0</span> <span class="muted">words</span></span>
+        <span><span id="c-chars" class="font-semibold" data-v="0">0</span> <span class="muted">chars</span></span>
+        <span><span id="c-sent" class="font-semibold" data-v="0">0</span> <span class="muted">sentences</span></span>
+        <span><span id="c-read" class="font-semibold" data-v="0">0</span> <span class="muted">min read</span></span>
+      </div>
+      <button id="reset" class="ctl ml-auto inline-flex items-center justify-center px-3 transition hover:bg-ink/5">↺ Clear</button>
+    </div>
+
+    <!-- "Why this casing?" explainer (title case only) -->
+    <details id="why" class="group border-t border-ink/8 px-4 py-3 text-sm" hidden>
+      <summary class="cursor-pointer list-none font-semibold marker:hidden">
+        <span class="inline-flex w-full items-center justify-between">
+          Why this casing?
+          <span class="ml-4 muted transition group-open:rotate-45">+</span>
+        </span>
+      </summary>
+      <p id="why-body" class="mt-2 muted"></p>
+    </details>
+  </div>
+
+  <p class="mt-3 text-center text-xs muted">
+    🔒 Runs entirely in your browser — open DevTools → Network and you'll see zero requests. Works offline.
+  </p>
+</section>
+
+<div id="toast" role="status" aria-live="polite"
+  class="pointer-events-none fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg px-4 py-2 text-sm opacity-0 shadow-lg transition-opacity md:bottom-5"
+  style="background: var(--c-ink); color: var(--c-paper);"></div>
+
+<!-- Sticky thumb-reachable action bar (mobile only) -->
+<div class="fixed inset-x-0 bottom-0 z-40 flex gap-2 border-t border-ink/8 px-3 pt-2 md:hidden"
+  style="background: color-mix(in srgb, var(--c-paper) 92%, transparent); backdrop-filter: blur(8px); padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));">
+  <button id="paste-bar" class="min-h-12 flex-1 rounded-xl border border-ink/15 font-semibold">📋 Paste</button>
+  <button id="clear-bar" aria-label="Clear" class="min-h-12 rounded-xl border border-ink/15 px-5 font-semibold">↺</button>
+  <button id="copy-bar" class="min-h-12 flex-1 rounded-xl bg-accent font-semibold text-white disabled:opacity-40" disabled>Copy</button>
+</div>
+
+<script>
+  import {
+    convert,
+    stats,
+    DEFAULT_OPTIONS,
+    MODE_LABELS,
+    TITLE_STYLE_LABELS,
+    type CaseMode,
+    type TitleStyle,
+    type ConvertOptions,
+  } from '../../lib/tools/case-converter';
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const input = $<HTMLTextAreaElement>('input');
+  const output = $<HTMLTextAreaElement>('output');
+
+  // Sample text for the empty state.
+  const SAMPLES: Record<string, string> = {
+    headline: 'the quick brown fox jumps over the lazy dog: a tale of speed',
+    allcaps: 'BREAKING NEWS: NASA CONFIRMS WATER ON THE MOON AND PLANS A NEW MISSION',
+    identifier: 'getUserProfileByID',
+  };
+
+  // --- current state (mode persisted; sticky per spec)
+  let mode: CaseMode = DEFAULT_OPTIONS.mode;
+
+  function readOptions(): ConvertOptions {
+    return {
+      mode,
+      titleStyle: $<HTMLSelectElement>('title-style').value as TitleStyle,
+      preserveProperNouns: $<HTMLInputElement>('opt-preserve').checked,
+    };
+  }
+
+  // --- persistence (mode + title style + preserve toggle)
+  function saveState() {
+    localStorage.setItem('cc-state', JSON.stringify({
+      mode,
+      style: $<HTMLSelectElement>('title-style').value,
+      preserve: $<HTMLInputElement>('opt-preserve').checked,
+    }));
+  }
+  function loadState() {
+    try {
+      const s = JSON.parse(localStorage.getItem('cc-state') || '{}');
+      if (s.mode && s.mode in MODE_LABELS) mode = s.mode;
+      if (s.style) $<HTMLSelectElement>('title-style').value = s.style;
+      if (typeof s.preserve === 'boolean') $<HTMLInputElement>('opt-preserve').checked = s.preserve;
+    } catch {}
+  }
+
+  // --- toast
+  let toastTimer = 0;
+  function toast(msg: string) {
+    const t = $<HTMLDivElement>('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    clearTimeout(toastTimer);
+    toastTimer = window.setTimeout(() => (t.style.opacity = '0'), 2200);
+  }
+
+  // --- count-up for the counters bar
+  function animateCount(el: HTMLElement, to: number, dur = 500) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      el.textContent = String(to); el.dataset.v = String(to); return;
+    }
+    const from = parseInt(el.dataset.v || '0', 10);
+    if (from === to) { el.textContent = String(to); return; }
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(from + (to - from) * e));
+      if (p < 1) requestAnimationFrame(tick); else el.dataset.v = String(to);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  // --- reflect the active mode in the buttons + labels
+  function refreshActiveUI() {
+    document.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach((b) => {
+      const active = b.dataset.mode === mode;
+      b.setAttribute('aria-pressed', String(active));
+      b.style.background = active ? 'var(--c-accent-soft)' : '';
+      b.style.borderColor = active ? 'var(--color-accent)' : '';
+      b.style.color = active ? 'var(--color-accent)' : '';
+      b.style.fontWeight = active ? '600' : '';
+    });
+    $<HTMLSpanElement>('active-label').textContent = '— ' + MODE_LABELS[mode].label;
+    // Title-only controls.
+    const isTitle = mode === 'title';
+    $<HTMLDivElement>('title-opts').style.display = isTitle ? '' : 'none';
+    $<HTMLDetailsElement>('why').hidden = !isTitle;
+  }
+
+  // --- build the "why this casing?" explainer text
+  function explain(style: TitleStyle): string {
+    const s = TITLE_STYLE_LABELS[style];
+    const common = 'Articles (a, an, the) and short coordinating conjunctions (and, but, or, nor, for) are lowercased mid-title; the first and last word — and the first word after a colon — are always capitalized.';
+    const prep =
+      style === 'chicago' ? 'Chicago lowercases all prepositions regardless of length, and capitalizes only the first part of a hyphenated word.'
+      : style === 'mla' ? 'MLA lowercases prepositions of any length.'
+      : style === 'apa' ? 'APA 7 lowercases prepositions of three letters or fewer and capitalizes any word of four letters or more.'
+      : 'AP lowercases prepositions of three letters or fewer (of, in, to) but capitalizes those of four letters or more (From, With, Into).';
+    return `${s} style: ${common} ${prep}`;
+  }
+
+  // --- main render
+  function run() {
+    const src = input.value;
+    $<HTMLDivElement>('empty').hidden = src.length > 0;
+
+    const out = convert(src, readOptions());
+    output.value = out;
+    $<HTMLButtonElement>('copy').disabled = out.length === 0;
+    ($('copy-bar') as HTMLButtonElement).disabled = out.length === 0;
+
+    const st = stats(src);
+    animateCount($('c-words'), st.words);
+    animateCount($('c-chars'), st.chars);
+    animateCount($('c-sent'), st.sentences);
+    animateCount($('c-read'), st.readingMin);
+    $<HTMLParagraphElement>('in-stats').textContent =
+      `${st.words} word${st.words === 1 ? '' : 's'} · ${st.chars} chars`;
+
+    if (mode === 'title') {
+      $<HTMLParagraphElement>('why-body').textContent = explain(readOptions().titleStyle);
+    }
+  }
+
+  // debounced via rAF
+  let raf = 0;
+  const schedule = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(run); };
+  input.addEventListener('input', schedule);
+
+  // mode buttons
+  document.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach((b) =>
+    b.addEventListener('click', () => {
+      mode = b.dataset.mode as CaseMode;
+      refreshActiveUI();
+      saveState();
+      run();
+    }));
+
+  // title sub-options
+  $('title-style').addEventListener('change', () => { saveState(); run(); });
+  $('opt-preserve').addEventListener('change', () => { saveState(); run(); });
+
+  // samples
+  document.querySelectorAll<HTMLButtonElement>('[data-sample]').forEach((b) =>
+    b.addEventListener('click', () => { input.value = SAMPLES[b.dataset.sample!]; run(); setPane('output'); }));
+
+  // --- mobile pane switcher
+  function setPane(name: 'input' | 'output') {
+    document.querySelectorAll<HTMLElement>('[data-pane]').forEach((p) =>
+      p.classList.toggle('max-md:hidden', p.dataset.pane !== name));
+    document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) => {
+      const active = t.dataset.paneTab === name;
+      t.setAttribute('aria-selected', String(active));
+      t.classList.toggle('muted', !active);
+      t.style.background = active ? 'var(--c-accent-soft)' : '';
+      t.style.color = active ? 'var(--color-accent)' : '';
+    });
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-pane-tab]').forEach((t) =>
+    t.addEventListener('click', () => setPane(t.dataset.paneTab as 'input' | 'output')));
+
+  // --- shared actions
+  async function doPaste() {
+    try { input.value = await navigator.clipboard.readText(); run(); setPane('output'); toast('Pasted'); }
+    catch { input.focus(); setPane('input'); toast('Press Ctrl/Cmd+V to paste'); }
+  }
+  async function doCopy() {
+    if (!output.value) return;
+    try {
+      await navigator.clipboard.writeText(output.value);
+      const b = $<HTMLButtonElement>('copy'); const prev = b.textContent;
+      b.textContent = '✓ Copied'; toast('Copied to clipboard');
+      setTimeout(() => (b.textContent = prev), 1300);
+    } catch { output.select(); toast('Press Ctrl/Cmd+C to copy'); }
+  }
+  function doReset() { input.value = ''; run(); input.focus(); setPane('input'); toast('Cleared'); }
+
+  $('paste').addEventListener('click', doPaste);
+  $('paste-bar').addEventListener('click', doPaste);
+  $('copy').addEventListener('click', doCopy);
+  $('copy-bar').addEventListener('click', doCopy);
+  $('reset').addEventListener('click', doReset);
+  $('clear-bar').addEventListener('click', doReset);
+
+  // download .txt
+  $<HTMLButtonElement>('download').addEventListener('click', () => {
+    if (!output.value) { toast('Nothing to download yet'); return; }
+    const blob = new Blob([output.value], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'converted.txt'; a.click();
+    URL.revokeObjectURL(url); toast('Downloaded converted.txt');
+  });
+
+  // keyboard: Cmd/Ctrl+Enter re-runs (and copies) the conversion
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); run(); doCopy(); }
+  });
+
+  loadState();
+  refreshActiveUI();
+  setPane('input');
+  run();
+</script>
