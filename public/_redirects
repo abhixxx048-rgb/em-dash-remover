@@ -1,0 +1,3 @@
+# Cloudflare Pages redirects
+# Consolidate www host to the apex (canonical) domain
+https://www.emdashremover.app/* https://emdashremover.app/:splat 301!

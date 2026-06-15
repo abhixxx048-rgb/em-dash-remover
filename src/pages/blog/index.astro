@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import { CATEGORIES } from '../../lib/blog-categories';
 
 const posts = (await getCollection('blog')).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -8,6 +9,9 @@ const posts = (await getCollection('blog')).sort(
 
 const fmt = (d: Date) => d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+// Curated topic hubs (not per-keyword) — each links to a real multi-post page.
+const tags = CATEGORIES.map((c) => ({ slug: c.slug, label: c.label }));
 
 const [lead, ...rest] = posts;
 ---
@@ -27,6 +31,19 @@ const [lead, ...rest] = posts;
     </header>
 
     <hr class="rule-dash mt-10" />
+
+    {tags.length > 0 && (
+      <nav class="tag-cloud mt-8" aria-label="Browse articles by topic">
+        <p class="eyebrow muted mb-3">Browse by topic</p>
+        <ul class="tag-chips">
+          {tags.map((tag) => (
+            <li>
+              <a href={`/blog/tag/${tag.slug}`} class="tag-chip">{tag.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
 
     {lead && (
       <a href={`/blog/${lead.id}`} class="entry entry-lead group block">
@@ -62,6 +79,25 @@ const [lead, ...rest] = posts;
   </main>
 
   <style is:global>
+    /* Browse-by-topic: light accent pills linking to /blog/tag/<slug>. */
+    .tag-chips { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag-chip {
+      display: inline-flex;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      padding: 0.42rem 0.7rem;
+      border-radius: 999px;
+      color: var(--color-accent);
+      text-decoration: none;
+      background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-accent) 22%, transparent);
+      transition: background 0.15s, color 0.15s;
+    }
+    .tag-chip:hover { background: var(--color-accent); color: var(--c-surface); }
+
     .entry-meta {
       display: flex;
       align-items: center;

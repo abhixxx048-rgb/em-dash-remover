@@ -1,0 +1,20 @@
+{
+  "name": "Em Dash Remover",
+  "short_name": "Em Dash",
+  "description": "Free, privacy-first, 100% in-browser tool to remove em dashes and clean up AI-generated text artifacts. No signup, no uploads.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf5ea",
+  "theme_color": "#2f5da8",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "en"
+}

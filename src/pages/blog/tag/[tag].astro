@@ -1,0 +1,159 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import { CATEGORIES, categoryBySlug } from '../../../lib/blog-categories';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  const byId = new Map(posts.map((p) => [p.id, p]));
+
+  // One page per CURATED category — each is a real multi-post hub, not a
+  // one-post keyword doorway. Missing ids are skipped defensively.
+  return CATEGORIES.map((cat) => ({
+    params: { tag: cat.slug },
+    props: {
+      label: cat.label,
+      description: cat.description,
+      posts: cat.ids
+        .map((id) => byId.get(id))
+        .filter((p): p is NonNullable<typeof p> => Boolean(p))
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+    },
+  }));
+}
+
+const { label, description, posts } = Astro.props;
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+const iso = (d: Date) => d.toISOString().slice(0, 10);
+
+const heading = label;
+const slug = Astro.params.tag;
+
+// Sibling topics to cross-link at the foot of the page (internal-linking web).
+const otherCats = CATEGORIES.filter((c) => c.slug !== slug);
+
+const collectionSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: `${heading} — Articles & Guides`,
+  description,
+  url: new URL(`/blog/tag/${slug}`, Astro.site).href.replace(/\/$/, ''),
+  mainEntity: {
+    '@type': 'ItemList',
+    itemListElement: posts.map((post, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: new URL(`/blog/${post.id}`, Astro.site).href,
+      name: post.data.title,
+    })),
+  },
+};
+---
+
+<Base
+  title={`${heading} — Articles & Guides`}
+  description={description}
+>
+  <main class="mx-auto max-w-3xl px-4 py-14">
+    <nav class="post-crumb" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-accent">Home</a>
+      <span aria-hidden="true">/</span>
+      <a href="/blog" class="hover:text-accent">Blog</a>
+      <span aria-hidden="true">/</span>
+      <span>Topic</span>
+    </nav>
+
+    <header class="mt-7">
+      <p class="eyebrow text-mark">Browse by topic</p>
+      <h1 class="mt-4 text-4xl tracking-tight sm:text-5xl">{heading}</h1>
+      <p class="mt-5 max-w-2xl text-lg leading-relaxed muted">
+        {posts.length === 1 ? '1 article' : `${posts.length} articles`} · {description}
+      </p>
+    </header>
+
+    <hr class="rule-dash mt-10" />
+
+    {posts.length > 0 ? (
+      <ol class="entry-list">
+        {posts.map((post) => (
+          <li>
+            <a href={`/blog/${post.id}`} class="entry group block">
+              <p class="entry-meta">
+                <time datetime={iso(post.data.pubDate)} class="entry-date">{fmt(post.data.pubDate)}</time>
+              </p>
+              <h2 class="entry-title mt-1.5">{post.data.title}</h2>
+              <p class="mt-1.5 text-sm leading-relaxed muted">{post.data.description}</p>
+            </a>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <p class="mt-8 muted">No articles found for this topic yet.</p>
+    )}
+
+    <nav class="mt-12" aria-label="Browse other topics">
+      <p class="eyebrow muted mb-3">Browse other topics</p>
+      <ul class="tag-chips">
+        {otherCats.map((c) => (
+          <li><a href={`/blog/tag/${c.slug}`} class="tag-chip">{c.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <p class="mt-10"><a href="/blog" class="post-back">← Back to all articles</a></p>
+  </main>
+
+  <script type="application/ld+json" set:html={JSON.stringify(collectionSchema)} />
+
+  <style is:global>
+    .post-crumb {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+    .post-crumb a { color: var(--c-muted); text-decoration: none; }
+    .post-back { font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-accent); text-decoration: none; }
+    .post-back:hover { text-decoration: underline; }
+
+    .entry-meta { display: flex; align-items: center; gap: 0.5rem; }
+    .entry-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--c-muted);
+    }
+    .entry-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+      font-size: 1.3rem;
+      transition: color 0.15s;
+    }
+    .entry:hover .entry-title { color: var(--color-accent); }
+
+    .entry-list { list-style: none; padding: 0; margin: 0.5rem 0 0; }
+    .entry-list > li { border-top: 1px solid color-mix(in srgb, var(--c-ink) 12%, transparent); }
+    .entry-list > li:last-child { border-bottom: 1px solid color-mix(in srgb, var(--c-ink) 12%, transparent); }
+    .entry-list .entry { padding: 1.4rem 0; }
+
+    .tag-chips { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .tag-chip {
+      display: inline-flex; align-items: center;
+      font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.02em; line-height: 1;
+      padding: 0.42rem 0.7rem; border-radius: 999px;
+      color: var(--color-accent); text-decoration: none;
+      background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+      border: 1px solid color-mix(in srgb, var(--color-accent) 22%, transparent);
+      transition: background 0.15s, color 0.15s;
+    }
+    .tag-chip:hover { background: var(--color-accent); color: var(--c-surface); }
+  </style>
+</Base>

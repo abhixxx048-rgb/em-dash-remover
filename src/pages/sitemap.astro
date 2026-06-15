@@ -1,0 +1,165 @@
+---
+import Base from '../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+import { TOOLS, CORE } from '../lib/tools-registry';
+
+// Human-readable HTML sitemap at /sitemap. This is distinct from the machine
+// XML sitemap at /sitemap-index.xml — it's a lightweight, all-real-links index
+// for visitors (and crawlers) to find every page in the suite.
+
+// Key static pages.
+const keyPages = [
+  { href: '/', title: 'Home — Em Dash Remover' },
+  { href: '/tools', title: 'All Tools' },
+  { href: '/blog', title: 'Blog' },
+  { href: '/about', title: 'About' },
+  { href: '/contact', title: 'Contact' },
+  { href: '/privacy', title: 'Privacy Policy' },
+  { href: '/terms', title: 'Terms' },
+  { href: '/cookies', title: 'Cookie Policy' },
+];
+
+// Programmatic landing pages (live under /tools but not in the registry).
+const landingPages = [
+  { href: '/tools/sentence-case-converter', title: 'Sentence Case Converter' },
+  { href: '/tools/title-case-converter', title: 'Title Case Converter' },
+  { href: '/tools/uppercase-to-lowercase', title: 'Uppercase to Lowercase' },
+  { href: '/tools/lowercase-to-uppercase', title: 'Lowercase to Uppercase' },
+  { href: '/tools/remove-em-dash-in-word', title: 'Remove Em Dash in Word' },
+  { href: '/tools/remove-em-dash-in-google-docs', title: 'Remove Em Dash in Google Docs' },
+  { href: '/tools/remove-em-dash-in-gmail', title: 'Remove Em Dash in Gmail' },
+  { href: '/tools/remove-em-dash-from-chatgpt', title: 'Remove Em Dash from ChatGPT' },
+];
+
+// Tools grouped by category, in registry order.
+const categories: { label: string; cat: typeof TOOLS[number]['category'] }[] = [
+  { label: 'Clean & convert', cat: 'clean' },
+  { label: 'Analyze & improve', cat: 'analyze' },
+  { label: 'Power tools & apps', cat: 'power' },
+];
+
+// Every blog post, newest first.
+const posts = (await getCollection('blog')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+---
+
+<Base
+  title="Sitemap — All Tools & Guides"
+  description="A complete, human-readable map of Em Dash Remover: the core cleaner, every tool grouped by category, all blog guides, and the key site pages."
+>
+  <main class="sitemap">
+    <header class="sitemap-head">
+      <p class="eyebrow">Sitemap</p>
+      <h1>Everything on Em Dash Remover</h1>
+      <p class="lede">
+        A plain index of every page in the suite — the core cleaner, all tools,
+        every guide, and the essentials. Looking for the machine-readable XML?
+        It lives at <a href="/sitemap-index.xml">/sitemap-index.xml</a>.
+      </p>
+    </header>
+
+    <section class="sitemap-section">
+      <h2>Core</h2>
+      <ul>
+        <li><a href={CORE.href}>{CORE.title}</a> — {CORE.desc}</li>
+      </ul>
+    </section>
+
+    {categories.map(({ label, cat }) => {
+      const list = TOOLS.filter((t) => t.category === cat);
+      return (
+        <section class="sitemap-section">
+          <h2>{label}</h2>
+          <ul>
+            {list.map((t) => (
+              <li><a href={t.href}>{t.title}</a> — {t.desc}</li>
+            ))}
+          </ul>
+        </section>
+      );
+    })}
+
+    <section class="sitemap-section">
+      <h2>Converters &amp; guides</h2>
+      <ul>
+        {landingPages.map((p) => (
+          <li><a href={p.href}>{p.title}</a></li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="sitemap-section">
+      <h2>Blog ({posts.length} guides)</h2>
+      <ul>
+        {posts.map((post) => (
+          <li><a href={`/blog/${post.id}`}>{post.data.title}</a></li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="sitemap-section">
+      <h2>Site pages</h2>
+      <ul>
+        {keyPages.map((p) => (
+          <li><a href={p.href}>{p.title}</a></li>
+        ))}
+      </ul>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .sitemap {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 4rem;
+  }
+  .sitemap-head {
+    margin-bottom: 2.5rem;
+  }
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin: 0 0 0.5rem;
+  }
+  .sitemap-head h1 {
+    font-family: 'Fraunces', serif;
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    line-height: 1.1;
+    margin: 0 0 0.75rem;
+  }
+  .lede {
+    font-family: 'Newsreader', serif;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    opacity: 0.85;
+    margin: 0;
+  }
+  .sitemap-section {
+    margin-bottom: 2.25rem;
+  }
+  .sitemap-section h2 {
+    font-family: 'Fraunces', serif;
+    font-size: 1.25rem;
+    margin: 0 0 0.75rem;
+    padding-bottom: 0.4rem;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 15%, transparent);
+  }
+  .sitemap-section ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .sitemap-section li {
+    font-family: 'Newsreader', serif;
+    line-height: 1.55;
+    padding: 0.25rem 0;
+  }
+  .sitemap-section a {
+    font-weight: 600;
+  }
+</style>

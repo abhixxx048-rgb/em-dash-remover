@@ -20,6 +20,10 @@ interface Props {
 
 const adsenseEnabled = ADSENSE_PUB_ID.length > 0;
 
+// Google Fonts URL — loaded non-render-blocking below.
+const fontsHref =
+  'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap';
+
 const {
   title = 'Em Dash Remover - Free AI Text Cleaner',
   description = 'Free, grammar-aware em dash remover. Strip em dashes, smart quotes, invisible characters and AI tells from your text - 100% in your browser. Your text never leaves your device.',
@@ -92,13 +96,25 @@ const orgGraph = {
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
+    <!-- PWA + brand -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#c5362c" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+
+    <!-- RSS discovery -->
+    <link rel="alternate" type="application/rss+xml" title="Em Dash Remover Blog" href="/rss.xml" />
+
+    <!-- Resource hints for third-party analytics/ads -->
+    <link rel="preconnect" href="https://cloud.umami.is" crossorigin />
+    <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+
     <!-- Type: Fraunces (display) · Newsreader (body) · IBM Plex Mono (labels/data) -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-    />
+    <!-- Non-render-blocking font load with a no-JS fallback. -->
+    <link rel="preload" as="style" href={fontsHref} />
+    <link rel="stylesheet" href={fontsHref} media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href={fontsHref} /></noscript>
 
     <!-- Google Consent Mode v2 - default DENIED, must load before any ad/analytics tag. -->
     <script is:inline>
@@ -128,7 +144,9 @@ const orgGraph = {
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    {noindex && <meta name="robots" content="noindex, follow" />}
+    {noindex
+      ? <meta name="robots" content="noindex, follow" />
+      : <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Em Dash Remover" />
@@ -270,6 +288,17 @@ const orgGraph = {
         panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
         matchMedia('(min-width: 640px)').addEventListener('change', (e) => { if (e.matches) setOpen(false); });
       })();
+    </script>
+
+    <!-- Register the service worker for offline/PWA support. -->
+    <script is:inline>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          try {
+            navigator.serviceWorker.register('/sw.js');
+          } catch (e) {}
+        });
+      }
     </script>
   </body>
 </html>

@@ -11,11 +11,15 @@ const enabled = ADSENSE_PUB_ID.length > 0;
 ---
 
 {enabled && (
-  <aside class="ad-slot my-8" style={`min-height:${minHeight};`} aria-label="Advertisement">
+  <aside class="ad-slot my-8" aria-label="Advertisement">
     {label && <p class="mb-1 text-center text-[10px] uppercase tracking-widest muted">Advertisement</p>}
+    {/* Reserve the ad's vertical+horizontal space up front so the responsive
+        unit filling in later does not push content around (avoids CLS).
+        The <ins> itself carries min-height (not the <aside>) so the label
+        height is additive and the slot area is always preserved. */}
     <ins
       class="adsbygoogle"
-      style="display:block"
+      style={`display:block;width:100%;min-height:${minHeight};`}
       data-ad-client={ADSENSE_PUB_ID}
       data-ad-slot={slot}
       data-ad-format="auto"

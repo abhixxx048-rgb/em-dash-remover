@@ -2,29 +2,44 @@
 import Base from './Base.astro';
 import { SITE_NAME, AUTHOR } from '../consts';
 
+interface RelatedPost {
+  id: string;
+  title: string;
+  description: string;
+  pubDate: Date;
+}
+
 interface Props {
   title: string;
   description: string;
   pubDate: Date;
   updatedDate?: Date;
+  related?: RelatedPost[];
 }
-const { title, description, pubDate, updatedDate } = Astro.props;
+const { title, description, pubDate, updatedDate, related = [] } = Astro.props;
 
 const fmt = (d: Date) =>
   d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+const iso = (d: Date) => d.toISOString().slice(0, 10);
 
-const canonical = new URL(Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, ''), Astro.site).href;
+const cleanPath = Astro.url.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+const canonical = new URL(cleanPath, Astro.site).href;
+// Derive the OG image URL the way Base does: blog posts fall back to the default
+// home OG image (/open-graph/index.png) since they have no per-post image.
+const ogImage = new URL('/open-graph/index.png', Astro.site).href;
 
 const articleSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Article',
+  '@type': 'BlogPosting',
   headline: title,
   description,
   datePublished: pubDate.toISOString(),
   dateModified: (updatedDate ?? pubDate).toISOString(),
-  author: { '@type': 'Organization', name: AUTHOR },
+  image: ogImage,
+  author: { '@type': 'Organization', name: AUTHOR, url: Astro.site?.href },
   publisher: { '@id': `${Astro.site}#org` },
   mainEntityOfPage: canonical,
+  inLanguage: 'en',
 };
 
 const breadcrumb = {
@@ -75,6 +90,25 @@ const breadcrumb = {
       <a href="/" class="mt-4 inline-flex min-h-11 items-center rounded-lg bg-accent px-5 font-semibold text-white transition hover:opacity-90">Open the tool →</a>
     </aside>
 
+    {related.length > 0 && (
+      <section class="mt-14" aria-labelledby="related-heading">
+        <p class="eyebrow muted" id="related-heading">Related reading</p>
+        <ol class="related-list mt-2">
+          {related.map((post) => (
+            <li>
+              <a href={`/blog/${post.id}`} class="entry group block">
+                <p class="entry-meta">
+                  <time datetime={iso(post.pubDate)} class="entry-date">{fmt(post.pubDate)}</time>
+                </p>
+                <h2 class="entry-title mt-1.5">{post.title}</h2>
+                <p class="mt-1.5 text-sm leading-relaxed muted">{post.description}</p>
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    )}
+
     <p class="mt-10"><a href="/blog" class="post-back">← Back to all articles</a></p>
   </main>
 
@@ -107,6 +141,28 @@ const breadcrumb = {
     .post-byline-dot { color: color-mix(in srgb, var(--c-ink) 30%, transparent); }
     .post-back { font-family: var(--font-mono); font-size: 0.8rem; color: var(--color-accent); text-decoration: none; }
     .post-back:hover { text-decoration: underline; }
+
+    /* Related reading — ruled-paper rows matching the blog archive. */
+    .related-list { list-style: none; padding: 0; margin: 0; }
+    .related-list > li { border-top: 1px solid color-mix(in srgb, var(--c-ink) 12%, transparent); }
+    .related-list > li:last-child { border-bottom: 1px solid color-mix(in srgb, var(--c-ink) 12%, transparent); }
+    .related-list .entry { padding: 1.25rem 0; }
+    .related-list .entry-meta { display: flex; align-items: center; gap: 0.5rem; }
+    .related-list .entry-date {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--c-muted);
+    }
+    .related-list .entry-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      line-height: 1.15;
+      font-size: 1.3rem;
+      transition: color 0.15s;
+    }
+    .related-list .entry:hover .entry-title { color: var(--color-accent); }
 
     /* Editorial CTA — a quiet sheet flagged in red pen, not a colour block. */
     .post-cta {
