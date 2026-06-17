@@ -93,49 +93,24 @@ const howToSchema = {
   description="Em dash remover that strips em dashes from ChatGPT and AI text with grammar-aware fixes. Free, no signup, runs 100% in your browser. Paste, clean, copy."
 >
   <main class="halo">
-    <!-- Hero: a galley proof being marked up in red pen -->
-    <header class="mx-auto max-w-6xl px-4 pt-10 pb-8 sm:pt-14">
-      <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
-        <!-- Thesis -->
-        <div class="lg:col-span-5">
-          <p class="eyebrow" style="color: var(--color-accent);">The instrument <span class="muted">— clean AI text</span></p>
-          <h1 class="mt-4 text-4xl sm:text-5xl lg:text-6xl">
-            Strip the AI <span class="struck">tells</span>.<br />Keep your <span style="color: var(--color-accent);">human voice.</span>
-          </h1>
-          <p class="mt-4 max-w-xl text-base leading-relaxed muted">
-            An em dash remover is a free online tool that strips em dashes (—) and
-            other AI tells from your text, replacing them with grammar-correct
-            punctuation in one click.
-          </p>
-          <p class="mt-3 max-w-xl text-lg leading-relaxed muted">
-            Paste text from ChatGPT, Claude or Gemini and we clear em dashes, smart
-            quotes and invisible characters with
-            <strong style="color: var(--c-ink); font-weight: 600;">grammar-aware</strong>
-            fixes — without sending a single byte anywhere.
-          </p>
-          <div class="mt-7 flex flex-wrap items-center gap-4">
-            <a href="#paste" class="inline-flex min-h-12 items-center gap-2 rounded-lg px-6 font-semibold text-white shadow-sm transition hover:opacity-90" style="background: var(--color-accent);">
-              Paste &amp; clean <span aria-hidden="true">→</span>
-            </a>
-            <span class="eyebrow muted">100% private · no signup</span>
-          </div>
-        </div>
-
-        <!-- The signature: a marked-up galley proof -->
-        <div class="lg:col-span-7">
-          <figure class="galley card" aria-label="Example of an AI draft being copyedited into clean text">
-            <figcaption class="galley-bar">
-              <span class="eyebrow">draft.txt · marked up</span>
-              <span class="galley-legend" aria-hidden="true"><i class="cut-key">cut</i><i class="add-key">kept</i></span>
-            </figcaption>
-            <div class="galley-body">
-              <p class="galley-line"><span class="ln">1</span><span class="gl">We <span class="cut" style="--d:.6s" data-note="used">leveraged</span> a robust strategy</span></p>
-              <p class="galley-line"><span class="ln">2</span><span class="gl">to unlock synergies <span class="cut" style="--d:1.2s" data-note=",">—</span> one that</span></p>
-              <p class="galley-line"><span class="ln">3</span><span class="gl">is <span class="flag" data-note="cliché">truly game-changing</span>.</span></p>
-              <p class="galley-line galley-out"><span class="ln" aria-hidden="true">✓</span><span class="gl">We used a strong strategy that connects teams.</span></p>
-            </div>
-          </figure>
-        </div>
+    <!-- Hero: one restrained statement; the cleaner below is the proof. -->
+    <header class="mx-auto max-w-3xl px-6 pt-24 pb-14 text-center sm:pt-28">
+      <p class="eyebrow muted" style="letter-spacing: 0.22em;">100% in your browser · no signup</p>
+      <h1 class="mx-auto mt-6 max-w-[15ch] text-5xl sm:text-6xl lg:text-7xl">
+        Remove em dashes. Keep your <span style="color: var(--color-accent);">voice.</span>
+      </h1>
+      <p class="mx-auto mt-7 max-w-[54ch] text-lg leading-relaxed muted">
+        An em dash remover that strips em dashes, smart quotes and invisible
+        characters from AI text with grammar-aware precision — without sending a
+        single byte anywhere.
+      </p>
+      <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+        <a href="#paste" class="inline-flex min-h-12 items-center gap-2 rounded-xl px-7 font-medium text-white transition hover:opacity-90" style="background: var(--color-accent);">
+          Paste &amp; clean <span aria-hidden="true">→</span>
+        </a>
+        <a href="/tools" class="inline-flex min-h-12 items-center rounded-xl border px-7 font-medium transition hover:bg-ink/5" style="border-color: color-mix(in srgb, var(--c-ink) 14%, transparent);">
+          See the toolkit
+        </a>
       </div>
     </header>
 

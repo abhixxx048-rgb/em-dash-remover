@@ -3,29 +3,29 @@
 @variant dark (&:where(.dark, .dark *));
 
 /* ─────────────────────────────────────────────────────────────
-   "The Instrument" — a precise console for cleaning text.
-   Cool drafting paper + ink, electric cobalt for actions,
-   amber as the signal/caret, proof-green for "clean".
+   "Premium minimal" — engineered, restrained, expensive.
+   Cool near-white + deep ink, one disciplined iris accent.
+   Type does the work; space and hairlines do the rest.
    ───────────────────────────────────────────────────────────── */
 @theme {
-  --color-ink: #14181f;          /* cool near-black ink            */
-  --color-paper: #edf0f2;        /* cool drafting white            */
-  --color-surface: #ffffff;      /* a fresh sheet (cards/console)  */
-  --color-muted: #5b6470;        /* graphite grey                  */
-  --color-accent: #1b3cf5;       /* electric cobalt — actions      */
-  --color-accent-soft: #e6eafe;  /* cobalt wash                    */
-  --color-mark: #ff9f1c;         /* amber — the signal / caret     */
-  --color-mark-soft: #fff1dd;    /* amber wash                     */
-  --color-ok: #18794e;           /* proof-green "clean"            */
+  --color-ink: #0e1116;          /* near-black, cool               */
+  --color-paper: #f7f8fa;        /* refined cool near-white        */
+  --color-surface: #ffffff;      /* clean sheet (cards)            */
+  --color-muted: #616875;        /* graphite                       */
+  --color-accent: #4b59d6;       /* iris — one disciplined accent  */
+  --color-accent-soft: #ecedfb;  /* iris wash                      */
+  --color-mark: #4b59d6;         /* signature = the accent itself  */
+  --color-mark-soft: #ecedfb;
+  --color-ok: #1f7a52;           /* clean                          */
   --color-warn: #b27a1d;
-  --color-bad: #d23b2e;
+  --color-bad: #d2483b;
 
-  --font-display: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif;
-  --font-sans: 'Hanken Grotesk', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-display: 'Geist', 'Inter', -apple-system, system-ui, sans-serif;
+  --font-sans: 'Geist', 'Inter', -apple-system, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
 
-  --radius-card: 14px;
-  --shadow-card: 0 1px 2px rgb(20 24 31 / 0.04), 0 12px 32px -16px rgb(20 24 31 / 0.18);
+  --radius-card: 12px;
+  --shadow-card: 0 1px 2px rgb(14 17 22 / 0.04), 0 18px 40px -24px rgb(14 17 22 / 0.22);
 }
 
 :root {
@@ -39,16 +39,16 @@
 }
 
 .dark {
-  --c-ink: #e7eaef;             /* cool light text on dark        */
-  --c-paper: #0e1116;           /* the console at night           */
-  --c-surface: #171c24;         /* panel under lamplight          */
-  --c-muted: #8a93a0;
-  --color-accent: #6e8bff;      /* cobalt, brighter for dark      */
-  --c-accent-soft: #1b2440;
-  --color-mark: #ffb44d;        /* amber, brighter for dark       */
-  --c-mark-soft: #2a2418;
-  --color-ok: #3fb07a;
-  --shadow-card: 0 1px 0 rgb(0 0 0 / 0.4), 0 14px 36px -16px rgb(0 0 0 / 0.7);
+  --c-ink: #eceef2;             /* near-white text                */
+  --c-paper: #0a0b0e;           /* deep engineered near-black     */
+  --c-surface: #131722;         /* layered panel surface          */
+  --c-muted: #8b919e;
+  --color-accent: #8ea2ff;      /* iris, brighter for dark        */
+  --c-accent-soft: #1b2138;
+  --color-mark: #8ea2ff;
+  --c-mark-soft: #1b2138;
+  --color-ok: #5fcf95;
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 30px 60px -30px rgb(0 0 0 / 0.85);
 }
 
 html {
@@ -64,14 +64,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Display face carries the personality; tight, confident grotesk headings. */
+/* Engineered grotesk; restrained weights, tight optical tracking. */
 h1, h2, h3, .font-display {
   font-family: var(--font-display);
   font-optical-sizing: auto;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
 }
-h1 { font-weight: 800; line-height: 0.99; }
-h2, h3 { font-weight: 700; }
+h1 { font-weight: 600; line-height: 0.98; }
+h2, h3 { font-weight: 600; }
 
 /* Never allow a stray child to create a horizontal scrollbar on mobile. */
 html, body { overflow-x: clip; max-width: 100%; }
